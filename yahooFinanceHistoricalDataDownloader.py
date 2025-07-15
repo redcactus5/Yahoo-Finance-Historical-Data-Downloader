@@ -666,7 +666,7 @@ def validateCommands(commands:list[dict]):
     return True
 
 
-skipBuffer=[]
+
 
 def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLookupDict:dict[str,int],values:list[list]):
     global skipBuffer
@@ -675,8 +675,8 @@ def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLooku
         rawLine=findLine(stock,date)
         #if it doesnt exist, skip it
         if(rawLine==False):
-            skipBuffer.append("\nno data for date: "+str(date))
-            skipBuffer.append("skipping...\n")
+            easyCLI.fastPrint("\nno data for date: "+str(date))
+            easyCLI.fastPrint("skipping...\n")
         elif(type(rawLine)==dict):
             line:dict=rawLine
             #otherwise, loop through all the attributes the command wants

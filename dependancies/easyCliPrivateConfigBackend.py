@@ -401,26 +401,26 @@ class _PrivateInternalAsyncPrintThread(_privateInternalReferenceKeeperObjDoNotEd
         
 
     def addItemToQueue(self,*args, **kwargs):
-        self._printQueue.put((0,(args,kwargs)))
+        self._printQueue.put_nowait((0,(args,kwargs)))
 
 
     def addMultipleItemsToQueue(self,items):
         for item in items:
-            self._printQueue.put((0,item))
+            self._printQueue.put_nowait((0,item))
     
     def addClearToQueue(self):
-        self._printQueue.put((1,None))
+        self._printQueue.put_nowait((1,None))
 
     def addOverwriteStringAtPosToQueue(self,x,y,text):
-        self._printQueue.put((3,(x,y,text)))
+        self._printQueue.put_nowait((3,(x,y,text)))
 
     def addUIHeaderToQueue(self):
-        self._printQueue.put((2,None))
+        self._printQueue.put_nowait((2,None))
 
     def stop(self):
         self._stopping=True
         self._alive=False
-        self._printQueue.put((4,None))
+        self._printQueue.put_nowait((4,None))
         self.working=False
         self.join(timeout=15)
     
