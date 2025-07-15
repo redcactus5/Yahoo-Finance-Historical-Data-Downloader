@@ -671,11 +671,12 @@ def validateCommands(commands:list[dict]):
 
 def executeCommands(commands:list[dict],stocks:list[dict]):
     print("executing commands...\n")
+    #need to update the month reformat logic
     months={1:"Jan",2:"Feb",3:"Mar",4:"Apr",5:"May",6:"Jun",7:"Jul",8:"Aug",9:"Sep",10:"Oct",11:"Nov",12:"Dec"}
     buffer=[]
     #if we have something to do
     if(len(commands)>0):
-        #create a value for our progress
+        
         
         #loop through our stocks
         for stockNumber, stock in enumerate(stocks):
@@ -774,7 +775,7 @@ def executeCommands(commands:list[dict],stocks:list[dict]):
             #put it in our buffer
             buffer.append(renderObj)
             #incriment our command count
-            stockCount+=1
+           
 
     print("command execution done.\n\n")
     return buffer
