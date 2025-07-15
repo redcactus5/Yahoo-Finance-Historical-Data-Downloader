@@ -628,9 +628,11 @@ def generateDateRange(startDate:str,endDate:str):
 
     
 def validateCommands(commands:list[dict]):
+    print("prevalidating commands...")
     validCommands=set(["specific dates","all data","date range"])
     validattributes=set(["date","open","high","low","close","adj close","volume"])
     for commandNumber, command in enumerate(commands):
+        print("validating command "+str(commandNumber+1)+" of "+str(len(commands))+"...")
         commandDates=command.get("dates")
         if(commandDates is None):
             raise Exception("command error: command "+str(commandNumber+1)+" has no dates value or key value")
@@ -657,7 +659,8 @@ def validateCommands(commands:list[dict]):
             raise Exception("command error: command "+str(commandNumber+1)+" has an invalid command value")
         elif(not (parseCommand in validCommands)):
             raise Exception("command error: command has an invalid value of: "+str(parseCommand)+" with a type of "+str(type(parseCommand)))
-        
+        print("done")
+    print("validation successful\n\n")
     return True
 
 
@@ -673,9 +676,9 @@ def executeCommands(commands:list[dict],stocks:list[dict]):
     #if we have something to do
     if(len(commands)>0):
         #create a value for our progress
-        stockCount=1
+        
         #loop through our stocks
-        for stock in stocks:
+        for stockNumber, stock in enumerate(stocks):
             #extract name and create a list for the catagories, and a 2d list for the values
             name=stock.get("name")
             categories=["date"]
@@ -686,7 +689,7 @@ def executeCommands(commands:list[dict],stocks:list[dict]):
             #loop thorugh our commands
             for commandNumber, command in enumerate(commands):
                 #do tuple and string magic for our cli
-                print("".join(("\nexecuting command ",str(commandNumber+1)," of ",str(len(commands))," on stock ",str(stockCount)," of ",str(len(stocks)))))
+                print("".join(("\nexecuting command ",str(commandNumber+1)," of ",str(len(commands))," on stock ",str(stockNumber+1)," of ",str(len(stocks)))))
 
                 #grab and validate the values we need from the command
                 
@@ -756,7 +759,7 @@ def executeCommands(commands:list[dict],stocks:list[dict]):
                 else:
                     raise Exception("command error, "+str(command.get("command"))+" is not a valid command")
                 #increment our command count
-                commandCount+=1
+              
 
             
 
