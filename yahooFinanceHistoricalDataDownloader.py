@@ -651,6 +651,7 @@ def validateCommands(commands:list[dict]):
         for attributeIndex, attribute in enumerate(attributes):
             if((type(attribute)!=str) or (not(attribute in validattributes))):
                 raise Exception("command error: attribute "+str(attributeIndex)+" has an invalid value of: "+str(attribute)+" with a type of "+str(type(attribute)))
+
         
         parseCommand=command.get("command")
         if(parseCommand is None):
