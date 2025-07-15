@@ -265,7 +265,7 @@ def parseDataSets(rawDataList,sortAlphabetical):
 
 
 
-def loadLinks():
+def loadLinks() -> tuple[list[str],bool] | bool:
     print("loading target stocks...")
     #create a dictionary for our link config and load its location string
     global linkConfigFile
@@ -897,9 +897,12 @@ def startup():
     #startup checks and loading of config files
     canStart=True
     commands=None
-    links=loadLinks()
-    if(links==False):
+    rawLinks=loadLinks()
+    links:tuple=tuple()
+    if(rawLinks==False):
         canStart=False
+    elif(type(rawLinks)==tuple):
+        links:tuple=rawLinks
     if(canStart):
         commands=loadCommands()
         if(commands==False):
@@ -912,7 +915,7 @@ def startup():
             #have the menter the file name they want
             fileName=easyCLI.enterFileNameScreen("please enter the name of the output file.\nwarning, if the file already exists, it will be overwritten.","(do not include the file extention)")+".csv"
             #then start the main program
-            main(fileName,links[0],commands,links[1]) # type: ignore
+            main(fileName,links[0],commands,links[1])
         #otherwise
         else:
             easyCLI.clear()
