@@ -745,11 +745,9 @@ def processStocks(commands:list[dict],stocks:list[dict]):
                 
 
             #convert the dates back to their origonal format (needs to be replaced)
-            for convertedDate in range(len(values[0])):
-                listedDate:list[str]=values[0][convertedDate].split("/")
-                listedDate[0]=months[int(listedDate[0])]
-                values[0][convertedDate]="".join((listedDate[0]," ",listedDate[1],", ",listedDate[2]))
             
+            fixedDates=[datetime.datetime.strptime(s, "%m/%d/%Y").strftime("%b %d, %Y") for s in values[0]]
+            values[0]=fixedDates
 
             #save this stock's data as a render object
             renderObj={"name":name,"categories":categories,"values":values}
@@ -775,15 +773,15 @@ def outputRenderedResults(displayList:list[dict],outputFileName:str):
         buffer.append([item.get("name"),])
         buffer.append(item.get("categories"))
         #grab the data
-        values=item.get("values")
+        values=item["values"]
         #loop through the y indexes
-        for y in range(len(values[0])):#type: ignore
+        for y in range(len(values[0])):
             #create a varaible for the row
             line=[]
             #loop through the x indexes
-            for x in range(len(item.get("categories"))):#type: ignore
+            for x in range(len(item["categories"])):
                 #write our value in to the line
-                line.append(values[x][y])#type: ignore
+                line.append(values[x][y])
             #put our line in the buffer
             buffer.append(line)
         #write some gaps 
@@ -903,6 +901,7 @@ def startup():
         canStart=False
     elif(type(rawLinks)==tuple):
         links:tuple=rawLinks
+        rawLinks=None
     if(canStart):
         commands=loadCommands()
         if(commands==False):
