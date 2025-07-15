@@ -666,16 +666,17 @@ def validateCommands(commands:list[dict]):
     return True
 
 
-        
+skipBuffer=[]
 
 def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLookupDict:dict[str,int],values:list[list]):
+    global skipBuffer
     for date in dates:
         #find the line for this date
         rawLine=findLine(stock,date)
         #if it doesnt exist, skip it
         if(rawLine==False):
-            easyCLI.fastPrint("\nno data for date: "+str(date))
-            easyCLI.fastPrint("skipping...\n")
+            skipBuffer.append("\nno data for date: "+str(date))
+            skipBuffer.append("skipping...\n")
         elif(type(rawLine)==dict):
             line:dict=rawLine
             #otherwise, loop through all the attributes the command wants
@@ -749,7 +750,9 @@ def processStocks(commands:list[dict],stocks:list[dict]):
             
             fixedDates=[datetime.datetime.strptime(s, "%m/%d/%Y").strftime("%b %d, %Y") for s in values[0]]
             values[0]=fixedDates
-
+            global skipBuffer
+            easyCLI.fastPrintList(skipBuffer)
+            skipBuffer=[]
             #save this stock's data as a render object
             renderObj={"name":name,"categories":categories,"values":values}
             #put it in our buffer
@@ -847,6 +850,8 @@ def waitForPrintFinish():
     waiting=True
     while waiting:
         waiting=(not easyCLI.isFastPrintDone())
+        print(easyCLI.isFastPrintDone())
+        print(easyCLI.easyCliPrivateConfigBackend._PrivateInternalAsyncPrintThreadOBJDoNotEdit._printQueue.qsize())
 
 
 def main(fileName,links,commands,sortAlphibetical):
