@@ -415,17 +415,18 @@ def loadCommands():
 
 
         
-def findLine(dataset:dict,date:str):
+def findLine(dataset:dict,date:str)->dict|bool:
     #use our date and dataset values smarktly to find the exact line we want then return it
     #grab our dates dict
-    lookup:dict=dataset.get("dates")#type: ignore
+    lookup:dict=dataset["dates"]
     #brab the dataList index for this date
-    index:int=lookup.get(date)#type: ignore
+    rawIndex=lookup.get(date)
     #if that date doesnt exist, send back that information
-    if(index is None):
+    if(rawIndex is None):
         return False
+    index:int=rawIndex
     #otherwise grab the dataset
-    dataList:list=dataset.get("data")#type: ignore
+    dataList:list=dataset["data"]
     #and extract the index of that line from it
     line=dataList[index]
     return line
@@ -438,9 +439,9 @@ def compareDates(date1:str,date2:str):
     #0 is both dates are the same
 
     #self explanitory logic, create date objects for the two dates
-    date1obj= datetime.datetime.strptime(date1, "%m/%d/%Y")#type: ignore
+    date1obj= datetime.datetime.strptime(date1, "%m/%d/%Y")
     
-    date2obj=datetime.datetime.strptime(date2, "%m/%d/%Y")#type: ignore
+    date2obj=datetime.datetime.strptime(date2, "%m/%d/%Y")
 
     #then compare them and return the result
     if(date1obj > date2obj):
@@ -570,7 +571,7 @@ def insertValue(date:str, value:str, category:str, catagoryLookupDict:dict, valu
     point=findDateInsertionPoint(date,values[0])
     equalizeListLens(values)
     #i am telling you linter, this will be an int, i wrote the code that makes the dict
-    catagoryIndex:int=catagoryLookupDict.get(category)#type: ignore
+    catagoryIndex:int=catagoryLookupDict[category]
     #if we are not creating a new spot for it
     if(point[0]==0):
         #overwrite whatever what there before with value
@@ -608,14 +609,14 @@ def generateDateRange(startDate:str,endDate:str):
     elif(order==1):
         start=startDate
         end=endDate
-    elif(order==2):
+    else:
         start=endDate
         end=startDate
     #create a list to store every date in the range, inclusive
     dateRange=[]
     #create our end and index value, and set index to start
-    endDateObject= datetime.datetime.strptime(end, "%m/%d/%Y")#type: ignore
-    current=datetime.datetime.strptime(start, "%m/%d/%Y")#type: ignore
+    endDateObject= datetime.datetime.strptime(end, "%m/%d/%Y")
+    current=datetime.datetime.strptime(start, "%m/%d/%Y")
     #loop through every date in between, including the start and end, and add that date to the list
     while current <= endDateObject:
         #compact the current date into a string in our format
@@ -670,12 +671,13 @@ def validateCommands(commands:list[dict]):
 def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLookupDict:dict[str,int],values:list[list]):
     for date in dates:
         #find the line for this date
-        line:dict=findLine(stock,date)
+        rawLine=findLine(stock,date)
         #if it doesnt exist, skip it
-        if(line==False):
+        if(rawLine==False):
             print("\nno data for date: "+str(date))
             print("skipping...\n")
-        else:
+        elif(type(rawLine)==dict):
+            line:dict=rawLine
             #otherwise, loop through all the attributes the command wants
             for attribute in attributes:
                 #and grab their values for the line, then write them to the buffer for this stock
