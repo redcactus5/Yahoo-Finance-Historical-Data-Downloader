@@ -669,7 +669,7 @@ def validateCommands(commands:list[dict]):
 
 
 def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLookupDict:dict[str,int],values:list[list]):
-    global skipBuffer
+   
     for date in dates:
         #find the line for this date
         rawLine=findLine(stock,date)
@@ -750,8 +750,8 @@ def processStocks(commands:list[dict],stocks:list[dict]):
             
             fixedDates=[datetime.datetime.strptime(s, "%m/%d/%Y").strftime("%b %d, %Y") for s in values[0]]
             values[0]=fixedDates
-            global skipBuffer
-            easyCLI.fastPrintList(skipBuffer)
+            
+            
             skipBuffer=[]
             #save this stock's data as a render object
             renderObj={"name":name,"categories":categories,"values":values}
