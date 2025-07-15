@@ -695,18 +695,18 @@ def executeCommands(commands:list[dict],stocks:list[dict]):
 
                 #grab and validate the values we need from the command
                 
-
-
-
+                action=command["command"]
+                commandDates=command["dates"]
+                attributes=command["attributes"]
                 #make sure the lists have the attributes in the command
-                possibleNewDict=updatecategories(commandAttributes,categories,values)
+                possibleNewDict=updatecategories(attributes,categories,values)
                 if(possibleNewDict[0]):
                     catagoryLookupDict=possibleNewDict[1]
                 #overwrite the old values with the corrected ones
                     
 
                 #self explanitory conditional, we are just checking command ids
-                if(command.get("command")=="specific dates"):
+                if(action=="specific dates"):
                     #loop through the specific dates to grab
                     for date in commandDates:
                         #find the line for this date
@@ -717,30 +717,30 @@ def executeCommands(commands:list[dict],stocks:list[dict]):
                             print("skipping...\n")
                         else:
                             #otherwise, loop through all the attributes the command wants
-                            for attribute in command.get("attributes"):#type: ignore
+                            for attribute in attributes:#type: ignore
                                 #and grab their values for the line, then write them to the buffer for this stock
                                 insertValue(date,line.get(attribute),attribute,catagoryLookupDict,values)#type: ignore
 
                 #check the command id
-                elif(command.get("command")=="all data"):
+                elif(action=="all data"):
                     #grab all the dates for this stock
-                    dates=stock.get("dates").keys()#type:ignore
+                    dates=commandDates.keys()
                     #llop thorugh said dates
                     for day in dates:
                         #find the line for the day
-                        line:dict=findLine(stock,day)#type: ignore
+                        line:dict=findLine(stock,day)
                         #if it doesnt exist skip it(it should always exist if its in there)
                         if(line==False):
                             print("\nno data for date: "+str(day))
                             print("skipping...\n")
                         else:
                             #otherwise, loop through all the attributes the command wants
-                            for attribute in command.get("attributes"):#type: ignore
+                            for attribute in attributes:
                                 #and grab their values for the line, then write them to the buffer for this stock
                                 insertValue(day,line.get(attribute),attribute,catagoryLookupDict,values)#type: ignore
 
                 #check the command id
-                elif(command.get("command")=="date range"):
+                elif(action=="date range"):
                     #generate all the dates for this range
                     dates=generateDateRange(command.get("dates")[0],command.get("dates")[1])#type: ignore
                     #loop through all the dates in the range
@@ -887,6 +887,7 @@ def main(fileName,links,commands,sortAlphibetical):
     #create and start our stopwatch
     timer=easyCLI.Stopwatch()
     timer.start()
+    validateCommands(commands)
     #grab the webpages
     webPages=retrieveWebPages(links)
     #extract their raw data
