@@ -31,8 +31,8 @@ from dependancies.easyCliPrivateConfigBackend import ln
 from dependancies.easyCliPrivateConfigBackend import isFastPrintDone
 #note: clears the screen as part of the process
 def recheckTerminalType():
-    easyCliPrivateConfigBackend.__PrivateAnsiCapableHandlerObject.recheckAnsiCapable()
-    easyCliPrivateConfigBackend.__PrivateClearHandlerObject.reDetermineTerminalClearType()
+    easyCliPrivateConfigBackend._PrivateAnsiCapableHandlerObject.recheckAnsiCapable()
+    easyCliPrivateConfigBackend._PrivateClearHandlerObject.reDetermineTerminalClearType()
 
         
     
@@ -46,7 +46,7 @@ def multilineStringBuilder(lines:list[str])->str:
         
 
 def getAnsiCapable()->bool:
-    return easyCliPrivateConfigBackend.__PrivateAnsiCapableHandlerObject.getAnsiCapable()
+    return easyCliPrivateConfigBackend._PrivateAnsiCapableHandlerObject.getAnsiCapable()
 
 
 
@@ -68,23 +68,23 @@ def getAnsiCapable()->bool:
 
 #self explanitory, it clears the terminal
 def clear():
-    easyCliPrivateConfigBackend.__PrivateClearHandlerObject.clear()
+    easyCliPrivateConfigBackend._PrivateClearHandlerObject.clear()
 
 
 def getUIHeader():
-    return easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit
+    return easyCliPrivateConfigBackend._currentLoadedUIHeaderDoNotEdit
 
 
 def setHeaderScreenName(newName:str):
-    if(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit is None):
+    if(easyCliPrivateConfigBackend._currentLoadedUIHeaderDoNotEdit is None):
         raise ValueError("error: no ui header has been set! one must be set before changing the screen name!")
-    elif((issubclass(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit), UIHeaderClass))):
+    elif((issubclass(type(easyCliPrivateConfigBackend._currentLoadedUIHeaderDoNotEdit), UIHeaderClass))):
         if(issubclass(type(newName),str)):
-            easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit.setCurrentScreenName(newName)
+            easyCliPrivateConfigBackend._currentLoadedUIHeaderDoNotEdit.setCurrentScreenName(newName)
         else:
             raise ValueError("error: non string argument given for new screen name. \ntype of provided new name: "+str(type(newName))+" value of new name: "+str(newName))
     else:
-        raise ValueError("error: loaded ui header is not of a compatible type. type must be a child class of UIHeaderClass.\nclass of loaded ui header: "+str(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit)))
+        raise ValueError("error: loaded ui header is not of a compatible type. type must be a child class of UIHeaderClass.\nclass of loaded ui header: "+str(type(easyCliPrivateConfigBackend._currentLoadedUIHeaderDoNotEdit)))
 
  
         
@@ -92,10 +92,10 @@ def setHeaderScreenName(newName:str):
 
 def setUIHeader(UIHeader: UIHeaderClass | None):
     
-    if((easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit is None) or (isinstance(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit), UIHeaderClass))):
-        easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit=UIHeader
+    if((easyCliPrivateConfigBackend._currentLoadedUIHeaderDoNotEdit is None) or (isinstance(type(easyCliPrivateConfigBackend._currentLoadedUIHeaderDoNotEdit), UIHeaderClass))):
+        easyCliPrivateConfigBackend._currentLoadedUIHeaderDoNotEdit=UIHeader
     else:
-        raise ValueError("error: new ui header object is not of a compatible type. type must be none or a child class of UIHeaderClass.\nclass of provided ui header: "+str(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit)))
+        raise ValueError("error: new ui header object is not of a compatible type. type must be none or a child class of UIHeaderClass.\nclass of provided ui header: "+str(type(easyCliPrivateConfigBackend._currentLoadedUIHeaderDoNotEdit)))
 
 
 

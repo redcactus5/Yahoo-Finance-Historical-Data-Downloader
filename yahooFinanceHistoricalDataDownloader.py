@@ -922,17 +922,17 @@ def startup():
 
 
 
+if(__name__=="__main__"):
 
-
-#devious check to make sure no one is doing an illegal thing and distributing without the open source licenses
-if((not os.path.exists("LICENSES/BeautifulSoup-MIT-LICENSE.txt"))or(not os.path.exists("LICENSES/easyCLI-GPL3-LICENSE.txt"))or(not os.path.exists("LICENSES/Nuitka-Apache-2.0-LICENSE.txt"))or(not os.path.exists("LICENSES/Playwright-Apache-2.0-LICENSE.txt"))or(not os.path.exists("LICENSES/Python-PSFL-2-LICENSE.txt"))or(not os.path.exists("LICENSES/WebKit-LGPL-2.0-BSD-License.txt"))or(not os.path.exists("LICENSE.txt"))):
-    easyCLI.clear()
-    easyCLI.uiHeader()
-    print("ERROR: License file(s) not found.")
-    print("This program is open source and must be distributed with its licenses.")
-    print("Please ensure the LICENSE.txt is present, and the LICENSES directory is \npresent and contains easyCLI-GPL3-LICENSE.txt, BeautifulSoup-MIT-LICENSE.txt, \nNuitka-Apache-2.0-LICENSE.txt, WebKit-LGPL-2.0-BSD-License.txt, and Playwright-Apache-2.0-LICENSE.txt.")
-    input("press enter to finish")
-else:
-    startup()
-
+    #devious check to make sure no one is doing an illegal thing and distributing without the open source licenses
+    if((not os.path.exists("LICENSES/BeautifulSoup-MIT-LICENSE.txt"))or(not os.path.exists("LICENSES/easyCLI-GPL3-LICENSE.txt"))or(not os.path.exists("LICENSES/Nuitka-Apache-2.0-LICENSE.txt"))or(not os.path.exists("LICENSES/Playwright-Apache-2.0-LICENSE.txt"))or(not os.path.exists("LICENSES/Python-PSFL-2-LICENSE.txt"))or(not os.path.exists("LICENSES/WebKit-LGPL-2.0-BSD-License.txt"))or(not os.path.exists("LICENSE.txt"))):
+        easyCLI.clear()
+        easyCLI.uiHeader()
+        print("ERROR: License file(s) not found.")
+        print("This program is open source and must be distributed with its licenses.")
+        print("Please ensure the LICENSE.txt is present, and the LICENSES directory is \npresent and contains easyCLI-GPL3-LICENSE.txt, BeautifulSoup-MIT-LICENSE.txt, \nNuitka-Apache-2.0-LICENSE.txt, WebKit-LGPL-2.0-BSD-License.txt, and Playwright-Apache-2.0-LICENSE.txt.")
+        input("press enter to finish")
+    else:
+        startup()
+        
          
