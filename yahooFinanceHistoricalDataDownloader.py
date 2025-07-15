@@ -667,8 +667,19 @@ def validateCommands(commands:list[dict]):
 
         
 
-def executeCommand(dates,attributes,catagoryLookupDict,values):
-
+def executeCommand(stock,dates,attributes,catagoryLookupDict,values):
+    for date in dates:
+        #find the line for this date
+        line:dict=findLine(stock,date)
+        #if it doesnt exist, skip it
+        if(line==False):
+            print("\nno data for date: "+str(date))
+            print("skipping...\n")
+        else:
+            #otherwise, loop through all the attributes the command wants
+            for attribute in attributes:
+                #and grab their values for the line, then write them to the buffer for this stock
+                insertValue(date,line.get(attribute),attribute,catagoryLookupDict,values)#type: ignore
 
 def processStocks(commands:list[dict],stocks:list[dict]):
     print("executing commands...\n")
@@ -686,6 +697,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
             categories=["date"]
             catagoryLookupDict={"date":0}
             values:list[list]=[[]]
+            stockDates:dict=stock["dates"]
             #create a variable for our progress through this stock
             
             #loop thorugh our commands
@@ -695,9 +707,9 @@ def processStocks(commands:list[dict],stocks:list[dict]):
 
                 #grab and validate the values we need from the command
                 
-                action=command["command"]
-                commandDates=command["dates"]
-                attributes=command["attributes"]
+                action:str=command["command"]
+                commandDates:list[str]=command["dates"]
+                attributes:list[str]=command["attributes"]
                 #make sure the lists have the attributes in the command
                 possibleNewDict=updatecategories(attributes,categories,values)
                 if(possibleNewDict[0]):
@@ -724,7 +736,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
                 #check the command id
                 elif(action=="all data"):
                     #grab all the dates for this stock
-                    dates=commandDates.keys()
+                    dates=stockDates.keys()
                     #llop thorugh said dates
                     for day in dates:
                         #find the line for the day
