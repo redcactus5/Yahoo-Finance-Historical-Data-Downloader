@@ -633,7 +633,7 @@ def validateCommands(commands:list[dict]):
     for commandNumber, command in enumerate(commands):
         commandDates=command.get("dates")
         if(commandDates is None):
-            raise Exception("command error: command "+str(commandNumber+1)+" has no dates value or key")
+            raise Exception("command error: command "+str(commandNumber+1)+" has no dates value or key value")
         elif(type(commandDates)!=list):
             raise Exception("command error: command "+str(commandNumber+1)+" has an invalid dates value")
         for dateIndex, date in enumerate(commandDates):
@@ -643,18 +643,18 @@ def validateCommands(commands:list[dict]):
 
         attributes=command.get("attributes")
         if(attributes is None):
-            raise Exception("command error: command "+str(commandNumber+1)+" has no attributes value or key value")
+            raise Exception("command error: command "+str(commandNumber+1)+" has no attributes value or no key value")
         elif(type(attributes)!=list):
-            raise Exception("command error: command "+str(commandNumber+1)+" has no attributes value or key value")
+            raise Exception("command error: command "+str(commandNumber+1)+" has an invalid attributes value")
         for attributeIndex, attribute in enumerate(attributes):
             if((type(attribute)!=str) or (not(attribute in validattributes))):
                 raise Exception("command error: attribute "+str(attributeIndex)+" has an invalid value of: "+str(attribute)+" with a type of "+str(type(attribute)))
         
         parseCommand=command.get("command")
         if(parseCommand is None):
-            raise Exception("command error: command "+str(commandNumber+1)+" has no command value or key value")
-        elif(type(parseCommand)!=list):
-            raise Exception("command error: command "+str(commandNumber+1)+" has no command value or key value")
+            raise Exception("command error: command "+str(commandNumber+1)+" has no command value or no key value")
+        elif(type(parseCommand)!=str):
+            raise Exception("command error: command "+str(commandNumber+1)+" has an invalid command value")
 
 
         
