@@ -205,7 +205,7 @@ def parseDataSet(retrievedData):
     datapointOptionList=["date","open","high","low","close","adj close","volume"]
     
     
-    headerRow=rows[0].find_all("td")#type: ignore
+    headerRow=rows[0].find_all("th")#type: ignore
     
 
     if((len(headerRow)>0) and all((datapoint.get_text(strip=True).strip() == ValidatorRowStrings[index]) for index, datapoint in enumerate(headerRow))):
@@ -213,7 +213,7 @@ def parseDataSet(retrievedData):
 
         ValidatorRowStringsLen=len(ValidatorRowStrings)
         #go through every row
-        for row in rows:
+        for rowIndex, row in enumerate(rows):
             lineData={}
             #extract the cells
             rowData:list[Tag]=row.find_all("td")#type: ignore
@@ -228,7 +228,7 @@ def parseDataSet(retrievedData):
                     if(pointIndex==0):#do the special case for saving date
                         parsedDate = datetime.datetime.strptime(point.get_text(strip=True), "%b %d, %Y")
                         fixedDate = parsedDate.strftime("%m/%d/%Y")
-                        dates[fixedDate]=row-1#type: ignore
+                        dates[fixedDate]=rowIndex
                     else:#otherwise save it like normal
                         lineData[datapointOptionList[pointIndex]]=str(point.get_text(strip=True))#type: ignore
                 #save what we extracted
@@ -782,7 +782,7 @@ def outputRenderedResults(displayList:list[dict],outputFileName:str):
             buffer.append(line)
         #write some gaps 
         
-        buffer.extend([None]*3)
+        buffer.extend([[None]]*3)
     easyCLI.fastPrint("done.\n")
     #self explanitory, write the buffer to the file
     easyCLI.fastPrint("saving results as \""+outputFileName+"\"...")
