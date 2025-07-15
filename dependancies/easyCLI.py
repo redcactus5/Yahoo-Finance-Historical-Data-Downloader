@@ -18,16 +18,21 @@ from dependancies.easyCliPrivateConfigBackend import ln
 
 from dependancies.easyCLIStopwatch import Stopwatch
 from dependancies.easyCLIStopwatch import EasyCLIStopwatchError
+from dependancies.easyCliPrivateConfigBackend import EasyCLIFastPrintThreadError
 
-
-
-
-
-
+from dependancies.easyCliPrivateConfigBackend import fastPrint
+from dependancies.easyCliPrivateConfigBackend import fastPrintList
+from dependancies.easyCliPrivateConfigBackend import fastln
+from dependancies.easyCliPrivateConfigBackend import uiHeader
+from dependancies.easyCliPrivateConfigBackend import fastClear
+from dependancies.easyCliPrivateConfigBackend import fastUIHeader
+from dependancies.easyCliPrivateConfigBackend import overwriteStringAtPos
+from dependancies.easyCliPrivateConfigBackend import ln
+from dependancies.easyCliPrivateConfigBackend import isFastPrintDone
 #note: clears the screen as part of the process
 def recheckTerminalType():
-    easyCliPrivateConfigBackend.__PrivateAnsiCapableHandlerObject__.recheckAnsiCapable()
-    easyCliPrivateConfigBackend.__PrivateClearHandlerObject__.reDetermineTerminalClearType()
+    easyCliPrivateConfigBackend.__PrivateAnsiCapableHandlerObject.recheckAnsiCapable()
+    easyCliPrivateConfigBackend.__PrivateClearHandlerObject.reDetermineTerminalClearType()
 
         
     
@@ -41,38 +46,11 @@ def multilineStringBuilder(lines:list[str])->str:
         
 
 def getAnsiCapable()->bool:
-    return easyCliPrivateConfigBackend.__PrivateAnsiCapableHandlerObject__.getAnsiCapable()
+    return easyCliPrivateConfigBackend.__PrivateAnsiCapableHandlerObject.getAnsiCapable()
 
 
 
 
-
-#y value zero index is current y, x value zero index is leftmost collumn. there isnt any protection if the screen isnt tall enough. do not enter ansi strings, it breaks things
-def overwriteStringAtPos(yRelativeToCursor:int,absoluteXPos:int,text:str):
-    if(not getAnsiCapable()):
-        raise Exception("error: this function requires an ANSI compliant terminal. \nthe current terminal has been determined to not be ANSI compliant.")
-
-
-    #uses ansi escape codes
-
-    #safety checks
-    if(yRelativeToCursor<0):
-        raise ValueError("error: y value argument must be a positive integer!\ngiven y value: "+str(yRelativeToCursor))
-
-    if(absoluteXPos<0):
-        raise ValueError("error: x value argument must be a positive integer!\ngiven x value: "+str(absoluteXPos))
-
-    if(chr(27) in set(text)): # type: ignore
-        raise ValueError("ANSI escape sequences are not allowed in text.")
-
-    #ansi and tuple and strings? oh my!
-    #in all seriouslness this is just an ansi escape code mess, in a tuple with our values so we can use a more readable 
-    #format without string concat losses, thanks to the join call on that empty string. aka: SHENANIGANS!
-    message="".join(("\x1b[?25l\x1b[s\x1b[", str(yRelativeToCursor),"A\x1b[",str(absoluteXPos+1), "G",text,"\x1b[u\x1b[?25h"))
-    
-    #print that mess
-    
-    print(message, end='')
     
 
 
@@ -81,15 +59,6 @@ def overwriteStringAtPos(yRelativeToCursor:int,absoluteXPos:int,text:str):
 
 
 
-
-
-
-
-#need to add timer class to easy cli and modify it
-
-
-
-#need to update ui header system to use a class and object system with a default of none
 
 
 
@@ -99,23 +68,23 @@ def overwriteStringAtPos(yRelativeToCursor:int,absoluteXPos:int,text:str):
 
 #self explanitory, it clears the terminal
 def clear():
-    easyCliPrivateConfigBackend.__PrivateClearHandlerObject__.clear()
+    easyCliPrivateConfigBackend.__PrivateClearHandlerObject.clear()
 
 
 def getUIHeader():
-    return easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit__
+    return easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit
 
 
 def setHeaderScreenName(newName:str):
-    if(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit__ is None):
+    if(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit is None):
         raise ValueError("error: no ui header has been set! one must be set before changing the screen name!")
-    elif((issubclass(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit__), UIHeaderClass))):
+    elif((issubclass(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit), UIHeaderClass))):
         if(issubclass(type(newName),str)):
-            easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit__.setCurrentScreenName(newName)
+            easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit.setCurrentScreenName(newName)
         else:
             raise ValueError("error: non string argument given for new screen name. \ntype of provided new name: "+str(type(newName))+" value of new name: "+str(newName))
     else:
-        raise ValueError("error: loaded ui header is not of a compatible type. type must be a child class of UIHeaderClass.\nclass of loaded ui header: "+str(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit__)))
+        raise ValueError("error: loaded ui header is not of a compatible type. type must be a child class of UIHeaderClass.\nclass of loaded ui header: "+str(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit)))
 
  
         
@@ -123,23 +92,12 @@ def setHeaderScreenName(newName:str):
 
 def setUIHeader(UIHeader: UIHeaderClass | None):
     
-    if((easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit__ is None) or (isinstance(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit__), UIHeaderClass))):
-        easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit__=UIHeader
+    if((easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit is None) or (isinstance(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit), UIHeaderClass))):
+        easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit=UIHeader
     else:
-        raise ValueError("error: new ui header object is not of a compatible type. type must be none or a child class of UIHeaderClass.\nclass of provided ui header: "+str(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit__)))
+        raise ValueError("error: new ui header object is not of a compatible type. type must be none or a child class of UIHeaderClass.\nclass of provided ui header: "+str(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit)))
 
 
-
-#ui header function to save time
-def uiHeader():
-    clear()
-    
-    if((isinstance(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit__, UIHeaderClass))):
-        easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit__.drawUIHeader()
-    elif(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit__)==None):
-        raise ValueError("error: no ui header has been set! one must be set before drawing the header!")
-    else:
-        raise ValueError("error: loaded ui header is not of a compatible type. type must be a child class of UIHeaderClass.\nclass of loaded ui header: "+str(type(easyCliPrivateConfigBackend.__currentLoadedUIHeaderDoNotEdit__)))
 
  
 
@@ -218,13 +176,13 @@ def booleanQuestionScreen(message:str,prompt:str|None):
 
 
 
-def textEntry(message:str,prompt:str):
+def textEntry(message:str,prompt:str|None):
     while True:
         uiHeader()
         
         print(message)
 
-        if(not((prompt=="")or(type(prompt)==None)or (prompt is None))):
+        if(not((prompt=="")or(type(prompt)==None)or(prompt is None))):
             ln(2)
             print(prompt)
         ln()
@@ -237,12 +195,12 @@ def textEntry(message:str,prompt:str):
 
 
 
-def enterFileNameScreen(message:str,prompt:str):
+def enterFileNameScreen(message:str,prompt:str|None):
     while True:
         uiHeader()
         
         print(message)
-        if(not((prompt=="")or(type(prompt)==None)or(prompt is None))):
+        if(not((prompt=="")or(type(prompt)==None)or (prompt is None))):
             ln(2)
             print(prompt)
         ln()
@@ -255,12 +213,13 @@ def enterFileNameScreen(message:str,prompt:str):
 
 
 
-def errorScreen(errorMessage:str):
+def errorScreen(errorMessage:str,prompt:str|None):
     uiHeader()
     print(errorMessage)
 
-    ln()
-    print("now returning to the main menu")
+    if(not((prompt=="")or(type(prompt)==None)or (prompt is None))):
+        ln(2)
+        print(prompt)
     ln(2)
     input("press enter to continue")
 

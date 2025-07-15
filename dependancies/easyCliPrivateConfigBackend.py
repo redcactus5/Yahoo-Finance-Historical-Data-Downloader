@@ -9,14 +9,20 @@ You should have received a copy of the GNU General Public License along with thi
 # variables and configs we dont want touched
 
 
-class __InternalPrivateLibReferenceKeeper__:
+class __InternalPrivateLibReferenceKeeper:
     def __init__(self) -> None:
         import sys
         import os
         import ctypes
+        import threading
+        import queue
+        import atexit
         self.sysLibReference=sys
         self.osLibReference=os
         self.ctypeLibreference=ctypes
+        self.threadingLibReference=threading
+        self.queueLibReference=queue
+        self.atexitLibReference=atexit
 
     def getSYS(self):
         return self.sysLibReference
@@ -24,27 +30,50 @@ class __InternalPrivateLibReferenceKeeper__:
     def getOS(self):
         return self.osLibReference
     
-    def getCTYPES(self):
+    def getCTypes(self):
         return self.ctypeLibreference
     
-__privateInternalReferenceKeeperObjDoNotEdit__=__InternalPrivateLibReferenceKeeper__()
+    def getThreading(self):
+        return self.threadingLibReference
+    
+    def getQueue(self):
+        return self.queueLibReference
+    
+    def getAtExit(self):
+        return self.atexitLibReference
+    
+__privateInternalReferenceKeeperObjDoNotEdit=__InternalPrivateLibReferenceKeeper()
 
 
-def __privateInternalGetSYSRef__():
-    return __privateInternalReferenceKeeperObjDoNotEdit__.getSYS()
+def __privateInternalGetSYSRef():
+    return __privateInternalReferenceKeeperObjDoNotEdit.getSYS()
 
 
 
-def __privateInternalGetOSRef__():
-    return __privateInternalReferenceKeeperObjDoNotEdit__.getOS()
+def __privateInternalGetOSRef():
+    return __privateInternalReferenceKeeperObjDoNotEdit.getOS()
 
 
 
-def __privateInternalGetCTYPESRef__():
-    return __privateInternalReferenceKeeperObjDoNotEdit__.getCTYPES()
+def __privateInternalGetCTypesRef():
+    return __privateInternalReferenceKeeperObjDoNotEdit.getCTypes()
+
+def __privateInternalGetThreadingRef():
+    return __privateInternalReferenceKeeperObjDoNotEdit.getThreading()
+
+def __privateInternalGetQueueRef():
+    return __privateInternalReferenceKeeperObjDoNotEdit.getQueue()
+
+def __privateInternalGetAtExitRef():
+    return __privateInternalReferenceKeeperObjDoNotEdit.getAtExit()
 
 
 
+
+
+    
+
+    
 
 
 
@@ -60,6 +89,9 @@ def ln(number:int=1):
         print("\n"*(number),end="")
     else:
         raise ValueError("error: argument somehow hit the no match case, even though that should be impossible. \n(what the heck did you feed this poor function?) \nproblem argument value: "+str(number)+" problem argument value's type: "+str(type(number)))
+
+
+
 
 
 def warning()->str:
@@ -83,15 +115,16 @@ class UIHeaderClass:
         return self.currentScreenName
 
     def drawUIHeader(self):
+        #DO NOT USE FASTCLI FUNCTIONS IN UI HEADER, AS THAT CAN CAUSE RACE CONDITIONS
         pass
 
-__currentLoadedUIHeaderDoNotEdit__:UIHeaderClass|None=None
+__currentLoadedUIHeaderDoNotEdit:UIHeaderClass|None=None
 
-class __CheckAnsiCapableHandler__:
-    def __internalCheckAnsiCapable__(self)->bool:
-        localC=__privateInternalGetCTYPESRef__()
-        localO=__privateInternalGetOSRef__()
-        localS=__privateInternalGetSYSRef__()
+class __CheckAnsiCapableHandler:
+    def __internalCheckAnsiCapable(self)->bool:
+        localC=__privateInternalGetCTypesRef()
+        localO=__privateInternalGetOSRef()
+        localS=__privateInternalGetSYSRef()
         tempAnsiCapable:bool=False
         try:
             if (localO.name == 'nt'):
@@ -124,12 +157,12 @@ class __CheckAnsiCapableHandler__:
     def __init__(self)->None:
         #this whole thing just runs that check
         self.ansiCapable:bool=False
-        self.ansiCapable=self.__internalCheckAnsiCapable__()
+        self.ansiCapable=self.__internalCheckAnsiCapable()
         if(type(self.ansiCapable)!=bool):
             raise RuntimeError("error: how the heck did this trigger? it should be physically impossible! \nthere should be no way for those variables to not be set at this point! \nwell, hopefully restarting the program can fix it for you.\n "+" type of ansiCapable: "+ str(type(self.ansiCapable))+" value of ansiCapable: "+str(self.ansiCapable))
 
     def recheckAnsiCapable(self)->None:
-        self.ansiCapable=self.__internalCheckAnsiCapable__()
+        self.ansiCapable=self.__internalCheckAnsiCapable()
 
     
     def getAnsiCapable(self)->bool:
@@ -137,19 +170,19 @@ class __CheckAnsiCapableHandler__:
         
     
     
-__PrivateAnsiCapableHandlerObject__=__CheckAnsiCapableHandler__()
+__PrivateAnsiCapableHandlerObject=__CheckAnsiCapableHandler()
     
 
 
-class __ClearHandler__:
+class __ClearHandler:
     def __init__(self) -> None:
-        self.localCT=__privateInternalGetCTYPESRef__()
-        self.localSY=__privateInternalGetSYSRef__()
-        self.localOS=__privateInternalGetOSRef__()
+        self.localCT=__privateInternalGetCTypesRef()
+        self.localSY=__privateInternalGetSYSRef()
+        self.localOS=__privateInternalGetOSRef()
         self.clearMode:int=0
 
         
-    def __InternalAutoClearConfig__(self)->None:
+    def __InternalAutoClearConfig(self)->None:
         
         
         
@@ -245,13 +278,221 @@ class __ClearHandler__:
         elif(self.clearMode==4):
             ln(100)
         elif(self.clearMode==0):
-            self.__InternalAutoClearConfig__()
+            self.__InternalAutoClearConfig()
             
 
         else:
             raise Exception("critical error: clear mode set to invalid value!\nvalue: "+str(self.clearMode))
-        
-    def reDetermineTerminalClearType(self):
-        self.__InternalAutoClearConfig__()
+
     
-__PrivateClearHandlerObject__=__ClearHandler__()
+
+    def reDetermineTerminalClearType(self):
+        self.__InternalAutoClearConfig()
+    
+__PrivateClearHandlerObject=__ClearHandler()
+
+
+
+
+#y value zero index is current y, x value zero index is leftmost collumn. there isnt any protection if the screen isnt tall enough. do not enter ansi strings, it breaks things
+def overwriteStringAtPos(yRelativeToCursor:int,absoluteXPos:int,text:str):
+    if(not __PrivateAnsiCapableHandlerObject.getAnsiCapable()):
+        raise Exception("error: this function requires an ANSI compliant terminal. \nthe current terminal has been determined to not be ANSI compliant.")
+
+
+    #uses ansi escape codes
+
+    #safety checks
+    if(yRelativeToCursor<0):
+        raise ValueError("error: y value argument must be a positive integer!\ngiven y value: "+str(yRelativeToCursor))
+
+    if(absoluteXPos<0):
+        raise ValueError("error: x value argument must be a positive integer!\ngiven x value: "+str(absoluteXPos))
+
+    if(chr(27) in set(text)): # type: ignore
+        raise ValueError("ANSI escape sequences are not allowed in text.")
+
+    #ansi and tuple and strings? oh my!
+    #in all seriouslness this is just an ansi escape code mess, in a tuple with our values so we can use a more readable 
+    #format without string concat losses, thanks to the join call on that empty string. aka: SHENANIGANS!
+    message="".join(("\x1b[?25l\x1b[s\x1b[", str(yRelativeToCursor),"A\x1b[",str(absoluteXPos+1), "G",text,"\x1b[u\x1b[?25h"))
+    
+    #print that mess
+    
+    print(message, end='')
+
+
+
+#ui header function to save time
+def uiHeader():
+    __PrivateClearHandlerObject.clear()
+    
+    if((isinstance(__currentLoadedUIHeaderDoNotEdit, UIHeaderClass))):
+        __currentLoadedUIHeaderDoNotEdit.drawUIHeader()
+    elif(type(__currentLoadedUIHeaderDoNotEdit)==None):
+        raise ValueError("error: no ui header has been set! one must be set before drawing the header!")
+    else:
+        raise ValueError("error: loaded ui header is not of a compatible type. type must be a child class of UIHeaderClass.\nclass of loaded ui header: "+str(type(__currentLoadedUIHeaderDoNotEdit)))
+
+
+
+#literally just an error for the timer so it has its own
+class EasyCLIFastPrintThreadError(Exception):
+    def __init__(self, message="generic fast print error"):
+        self.message = message
+        super().__init__(self.message)
+
+
+
+
+
+class __PrivateInternalAsyncPrintThread(__privateInternalReferenceKeeperObjDoNotEdit.getThreading().Thread):
+    def __init__(self):
+        super().__init__(daemon=True)
+        self.__alive=True
+        self.__printQueue=__privateInternalReferenceKeeperObjDoNotEdit.getQueue().Queue()
+        self.__stopping=False
+        self.stopped=False
+        self.working=False
+        self.start()  
+        __privateInternalGetAtExitRef().register(self.__stop)
+
+
+    def run(self):
+        '''
+        _PRINT = 0
+        _CLEAR = 1
+        _UI_HEADER = 2
+        _OVERWRITE = 3
+        _EXIT = 4
+        '''
+        try:
+            item=()
+
+            while(self.__alive):
+                item=self.__printQueue.get()
+                self.working=True
+                if(not(self.__stopping)):
+                    if(item[0]==0):
+                        args, kwargs = item[1]
+                        print(*args, **kwargs)
+                    elif(item[0]==1):
+                        __PrivateClearHandlerObject.clear()
+                    elif(item[0]==2):
+                        uiHeader()
+                    elif(item[0]==3):
+                        x,y,text=item[1]
+                        overwriteStringAtPos(y,x,text)
+                    elif(item[0]==4):
+                        break
+                    else:
+                        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint internal variables altered externally")
+                self.working=False
+    
+            self.stopped=True
+        
+        except Exception:
+            import traceback
+            import os
+            print("Exception in fast cli Worker thread:")
+            traceback.print_exc()
+            os._exit(1)
+        
+
+    def addItemToQueue(self,*args, **kwargs):
+        self.__printQueue.put((0,(args,kwargs)))
+
+
+    def addMultipleItemsToQueue(self,items):
+        for item in items:
+            self.__printQueue.put((0,item))
+    
+    def addClearToQueue(self):
+        self.__printQueue.put((1,None))
+
+    def addOverwriteStringAtPosToQueue(self,x,y,text):
+        self.__printQueue.put((3,(x,y,text)))
+
+    def addUIHeaderToQueue(self):
+        self.__printQueue.put((2,None))
+
+    def __stop(self):
+        self.__stopping=True
+        self.__alive=False
+        self.__printQueue.put((4,None))
+        self.working=False
+        self.join()
+    
+    def __getIsStoppedOrStopping(self):
+        return (self.stopped or self.__stopping)
+
+    def isNotBusy(self):
+        return ((self.__printQueue.qsize()==0) and (not self.working))
+
+__PrivateInternalAsyncPrintThreadOBJDoNotEdit=__PrivateInternalAsyncPrintThread()
+    
+def fastPrint(*args, **kwargs):
+    if(__PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
+    elif(type(__PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=__PrivateInternalAsyncPrintThreadOBJDoNotEdit):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+    elif(__PrivateInternalAsyncPrintThreadOBJDoNotEdit.__getIsStoppedOrStopping()):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+    __PrivateInternalAsyncPrintThreadOBJDoNotEdit.addItemToQueue(args, kwargs)
+
+def fastPrintList(printList):
+    if(__PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
+    elif(type(__PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=__PrivateInternalAsyncPrintThreadOBJDoNotEdit):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+    elif(__PrivateInternalAsyncPrintThreadOBJDoNotEdit.__getIsStoppedOrStopping()):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+    __PrivateInternalAsyncPrintThreadOBJDoNotEdit.addMultipleItemsToQueue(printList)
+
+def fastln(number:int=1):
+    if(type(number)!=int):
+        raise ValueError("error: argument must be an integer")
+    elif(number<=0):
+        raise ValueError("error: argument must be greater than zero")
+    elif(number>0):
+        fastPrint("\n"*(number),end="")
+    else:
+        raise ValueError("error: argument somehow hit the no match case, even though that should be impossible. \n(what the heck did you feed this poor function?) \nproblem argument value: "+str(number)+" problem argument value's type: "+str(type(number)))
+    
+
+def fastClear():
+    if(__PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
+    elif(type(__PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=__PrivateInternalAsyncPrintThreadOBJDoNotEdit):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+    elif(__PrivateInternalAsyncPrintThreadOBJDoNotEdit.__getIsStoppedOrStopping()):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+    __PrivateInternalAsyncPrintThreadOBJDoNotEdit.addClearToQueue()
+
+def fastUIHeader():
+    if(__PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
+    elif(type(__PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=__PrivateInternalAsyncPrintThreadOBJDoNotEdit):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+    elif(__PrivateInternalAsyncPrintThreadOBJDoNotEdit.__getIsStoppedOrStopping()):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+    __PrivateInternalAsyncPrintThreadOBJDoNotEdit.addUIHeaderToQueue()
+
+def fastOverwriteStringAtPos(yRelativeToCursor:int,absoluteXPos:int,text:str):
+    if(__PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
+    elif(type(__PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=__PrivateInternalAsyncPrintThreadOBJDoNotEdit):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+    elif(__PrivateInternalAsyncPrintThreadOBJDoNotEdit.__getIsStoppedOrStopping()):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+    __PrivateInternalAsyncPrintThreadOBJDoNotEdit.addOverwriteStringAtPosToQueue(absoluteXPos,yRelativeToCursor,text)    
+
+
+def isFastPrintDone():#BE EXTREMELY CAREFUL WITH THIS
+    if(__PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
+    elif(type(__PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=__PrivateInternalAsyncPrintThreadOBJDoNotEdit):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+    elif(__PrivateInternalAsyncPrintThreadOBJDoNotEdit.__getIsStoppedOrStopping()):
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+    __PrivateInternalAsyncPrintThreadOBJDoNotEdit.isNotBusy()   

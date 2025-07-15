@@ -54,7 +54,7 @@ def retrieveWebPages(links:list[str]):
     #grab our constants
     global browserPath
     global tryLimit
-    print("starting webpage retrieval...\n")
+    easyCLI.fastPrint("starting webpage retrieval...\n")
     #make a list for what we download
     pages=[None]*len(links)
     #shuffle our links to throw bot detectors off our scent
@@ -64,25 +64,25 @@ def retrieveWebPages(links:list[str]):
 
     #the print statements explain most of it
     with sync_playwright() as p:
-        print("launching retriever proxy...")
+        easyCLI.fastPrint("launching retriever proxy...")
         browser = p.webkit.launch(executable_path=browserPath,headless=True)
         try:
             
-            print("done.\n")
+            easyCLI.fastPrint("done.\n")
             #loop through links
             lenstring=str(len(links))
             for urlIndex, url in enumerate(links):
                 #keep track of retries
                 tryCount=1
                 while(True):
-                    print("page "+str(urlIndex+1)+" of "+lenstring)
-                    print("requesting page from server...")
+                    easyCLI.fastPrint("page "+str(urlIndex+1)+" of "+lenstring)
+                    easyCLI.fastPrint("requesting page from server...")
                     page = browser.new_page()
                     try:
                         page.goto(url,wait_until="domcontentloaded",timeout=30000)
 
 
-                        print("starting page load...")
+                        easyCLI.fastPrint("starting page load...")
 
                         #wait for the table to load
                         page.wait_for_selector("table.table.yf-1jecxey")
@@ -96,20 +96,20 @@ def retrieveWebPages(links:list[str]):
                         
                         #wait extra time just to be safe
                         wait=1+random.randint(0,1)+random.random()
-                        print("waiting "+f"{wait:.1f}"+" seconds for load completion...")
+                        easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" seconds for load completion...")
                         time.sleep(wait)
 
-                        print("saving data...")
+                        easyCLI.fastPrint("saving data...")
                         content = page.content()  # get rendered HTML
                         #reverse the scrambling to put the data in the correct order
                         pages[ogPos[urlIndex]]=content#type: ignore
-                        print("cleaning up...")
+                        easyCLI.fastPrint("cleaning up...")
                         page.close()
-                        print("page download complete")
+                        easyCLI.fastPrint("page download complete")
                         wait=1+random.randint(0,3)+random.random()
-                        print("waiting "+f"{wait:.1f}"+"  second antiantibot delay...")
+                        easyCLI.fastPrint("waiting "+f"{wait:.1f}"+"  second antiantibot delay...")
                         time.sleep(wait)
-                        print("done\n")
+                        easyCLI.fastPrint("done\n")
                         break
 
                     #detect the page randomly not loading, clean up, and try again
@@ -119,22 +119,22 @@ def retrieveWebPages(links:list[str]):
                         tryCount+=1
                         if(tryCount>tryLimit):#if we go past our retry limit, give up
                             raise Exception("download error: retry limit exceeded for url: "+str(links[urlIndex]))
-                        print("\ndownload timed out")
-                        print("retrying...\n")
-                        print("starting attempt "+str(tryCount)+"...")
+                        easyCLI.fastPrint("\ndownload timed out")
+                        easyCLI.fastPrint("retrying...\n")
+                        easyCLI.fastPrint("starting attempt "+str(tryCount)+"...")
 
 
             
-            print("cleaning up retriever proxy...")
+            easyCLI.fastPrint("cleaning up retriever proxy...")
             browser.close()
-            print("done\n")
+            easyCLI.fastPrint("done\n")
         #if there is an error first close the browser then crash, so we dont leave resources running
         except Exception as E:
             browser.close()
             raise(E)
     
   
-    print("all page retrievals complete.\n\n")
+    easyCLI.fastPrint("all page retrievals complete.\n\n")
     return pages
 
 
@@ -169,19 +169,19 @@ def retrieveTableAndName(htmlText):
 
 def retrieveHtmlListTablesAndName(htmlDataList):
     rawDataList=[]
-    print("extracting tables...\n")
+    easyCLI.fastPrint("extracting tables...\n")
     
     for pagenumber, page in enumerate(htmlDataList):
         print("extracting table "+str(pagenumber+1)+" of "+str(len(htmlDataList)))
         rawDataList.append(retrieveTableAndName(page))
         
-    print("done.\n\n")
+    easyCLI.fastPrint("done.\n\n")
     return rawDataList
 
 
 
 def parseDataSet(retrievedData):
-    print("parsing table for "+str(retrievedData[0])+"...")
+    easyCLI.fastPrint("parsing table for "+str(retrievedData[0])+"...")
 
     table:Tag=retrievedData[1]
     for span in table.select("span"):
@@ -237,7 +237,7 @@ def parseDataSet(retrievedData):
         raise Exception("error, invalid table")
     
 
-    print("done.\n")
+    easyCLI.fastPrint("done.\n")
     
     
     #return the data we extracted
@@ -249,7 +249,7 @@ def parseDataSet(retrievedData):
 
 
 def parseDataSets(rawDataList,sortAlphabetical):
-    print("starting dataset parsing...\n")
+    easyCLI.fastPrint("starting dataset parsing...\n")
 
     parsedData:list[dict]=[parseDataSet(dataSet) for dataSet in rawDataList]
     
@@ -257,7 +257,7 @@ def parseDataSets(rawDataList,sortAlphabetical):
     if(sortAlphabetical):
         parsedData=sorted(parsedData, key=lambda dataSet: dataSet["name"])
     
-    print("parsing complete.\n\n")
+    easyCLI.fastPrint("parsing complete.\n\n")
     return parsedData
 
 
@@ -629,11 +629,11 @@ def generateDateRange(startDate:str,endDate:str):
 
     
 def validateCommands(commands:list[dict]):
-    print("prevalidating commands...")
+    easyCLI.fastPrint("validating commands...")
     validCommands=set(["specific dates","all data","date range"])
     validattributes=set(["date","open","high","low","close","adj close","volume"])
     for commandNumber, command in enumerate(commands):
-        print("validating command "+str(commandNumber+1)+" of "+str(len(commands))+"...")
+        easyCLI.fastPrint("validating command "+str(commandNumber+1)+" of "+str(len(commands)))
         commandDates=command.get("dates")
         if(commandDates is None):
             raise Exception("command error: command "+str(commandNumber+1)+" has no dates value or key value")
@@ -661,8 +661,8 @@ def validateCommands(commands:list[dict]):
             raise Exception("command error: command "+str(commandNumber+1)+" has an invalid command value")
         elif(not (parseCommand in validCommands)):
             raise Exception("command error: command has an invalid value of: "+str(parseCommand)+" with a type of "+str(type(parseCommand)))
-        print("done")
-    print("validation successful\n\n")
+        easyCLI.fastPrint("done")
+    easyCLI.fastPrint("validation successful\n\n")
     return True
 
 
@@ -674,8 +674,8 @@ def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLooku
         rawLine=findLine(stock,date)
         #if it doesnt exist, skip it
         if(rawLine==False):
-            print("\nno data for date: "+str(date))
-            print("skipping...\n")
+            easyCLI.fastPrint("\nno data for date: "+str(date))
+            easyCLI.fastPrint("skipping...\n")
         elif(type(rawLine)==dict):
             line:dict=rawLine
             #otherwise, loop through all the attributes the command wants
@@ -687,7 +687,7 @@ def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLooku
 
 
 def processStocks(commands:list[dict],stocks:list[dict]):
-    print("executing commands...\n")
+    easyCLI.fastPrint("executing commands...\n")
     #need to update the month reformat logic
     buffer=[]
     #if we have something to do
@@ -707,7 +707,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
             #loop thorugh our commands
             for commandNumber, command in enumerate(commands):
                 #do tuple and string magic for our cli
-                print("".join(("\nexecuting command ",str(commandNumber+1)," of ",str(len(commands))," on stock ",str(stockNumber+1)," of ",str(len(stocks)))))
+                easyCLI.fastPrint("".join(("\nexecuting command ",str(commandNumber+1)," of ",str(len(commands))," on stock ",str(stockNumber+1)," of ",str(len(stocks)))))
 
                 #grab and validate the values we need from the command
                 
@@ -757,7 +757,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
             #incriment our command count
            
 
-    print("command execution done.\n\n")
+    easyCLI.fastPrint("command execution done.\n\n")
     return buffer
 
 
@@ -765,7 +765,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
 
                 
 def outputRenderedResults(displayList:list[dict],outputFileName:str):
-    print("rendering results...")
+    easyCLI.fastPrint("rendering results...")
     #create a buffer
     buffer=[]
     #loop through every render object
@@ -778,23 +778,18 @@ def outputRenderedResults(displayList:list[dict],outputFileName:str):
         #loop through the y indexes
         for y in range(len(values[0])):
             #create a varaible for the row
-            line=[]
-            #loop through the x indexes
-            for x in range(len(item["categories"])):
-                #write our value in to the line
-                line.append(values[x][y])
-            #put our line in the buffer
+            line=[values[x][y] for x in range(len(item["categories"]))]
             buffer.append(line)
         #write some gaps 
-        for i in range(3):
-            buffer.append([None])
-    print("done.\n")
+        
+        buffer.extend([None]*3)
+    easyCLI.fastPrint("done.\n")
     #self explanitory, write the buffer to the file
-    print("saving results as \""+outputFileName+"\"...")
+    easyCLI.fastPrint("saving results as \""+outputFileName+"\"...")
     with open(outputFileName, "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerows(buffer)
-    print("save successful.\n\n")
+    easyCLI.fastPrint("save successful.\n\n")
     
 
 
@@ -818,32 +813,27 @@ def licenceScreen():
     #very simple and self explanitory, not even any logic
     easyCLI.clear()
     easyCLI.uiHeader()
-    print("Copyright and Licensing Information:\n")
+    print(easyCLI.multilineStringBuilder(["Copyright and Licensing Information:\n",
+    "Yahoo Finance Historical Data Downloader © 2025 redcactus5\n",
+    "This program is NOT endorsed by, produced by, or affiliated with Yahoo Incorporated or its parent companies,\n",
+    "and was not created with their knowledge, consent, support, or involvement.\n",
+    "Yahoo Finance Historical Data Downloader is free software released under the GNU General Public License Version 3 (GPLv3).\n",
+    "Powered by:",
+    " - Python ©2001-2025 Python Software Foundation",
+    " - easyCLI © 2025 redcactus5",
+    " - BeautifulSoup ©2025 Leonard Richardson",
+    " - Playwright © 2025 Microsoft",
+    " - WebKit © 2025 Apple Inc.",
+    " - Nuitka © Copyright 2025 Kay Hayen and Nuitka Contributors\n",
+    "This project includes components licensed under the following licenses:",
+    " - Python Software Foundation License Version 2",
+    " - Apache License 2.0",
+    " - GNU General Public License Version 3 (GPLv3)",
+    " - GNU Library General Public License Version 2 (LGPLv2)",
+    " - BSD 2 clause license",
+    " - MIT License\n",
+    "See the LICENSES/ directory for full license texts and details.\n\n"]))
     
-    print("Yahoo Finance Historical Data Downloader © 2025 redcactus5\n")
-    
-    print("This program is NOT endorsed by, produced by, or affiliated with Yahoo Incorporated or its parent companies,\n"
-          "and was not created with their knowledge, consent, support, or involvement.\n")
-   
-    print("Yahoo Finance Historical Data Downloader is free software released under the GNU General Public License Version 3 (GPLv3).\n")
-    
-    print("Powered by:")
-    print(" - Python ©2001-2025 Python Software Foundation")
-    print(" - easyCLI © 2025 redcactus5")
-    print(" - BeautifulSoup ©2025 Leonard Richardson")
-    print(" - Playwright © 2025 Microsoft")
-    print(" - WebKit © 2025 Apple Inc.")
-    print(" - Nuitka © Copyright 2025 Kay Hayen and Nuitka Contributors\n")
-    
-    print("This project includes components licensed under the following licenses:")
-    print(" - Python Software Foundation License Version 2")
-    print(" - Apache License 2.0")
-    print(" - GNU General Public License Version 3 (GPLv3)")
-    print(" - GNU Library General Public License Version 2 (LGPLv2)")
-    print(" - BSD 2 clause license")
-    print(" - MIT License\n")
-   
-    print("See the LICENSES/ directory for full license texts and details.\n\n")
     
     time.sleep(3)
     
@@ -853,16 +843,19 @@ def licenceScreen():
     
 
 
-
+def waitForPrintFinish():
+    waiting=True
+    while waiting:
+        waiting=(not easyCLI.isFastPrintDone())
 
 
 def main(fileName,links,commands,sortAlphibetical):
     #our main execution funciton, it mostly just stages out our steps
     #clear the screen
-    easyCLI.clear()
+    easyCLI.fastClear()
     #write the header
-    easyCLI.uiHeader()
-    print("starting data retreival process...\n\n")
+    easyCLI.fastUIHeader()
+    easyCLI.fastPrint("starting data retreival process...\n\n")
     #create and start our stopwatch
     timer=easyCLI.Stopwatch()
     timer.start()
@@ -884,6 +877,7 @@ def main(fileName,links,commands,sortAlphibetical):
     outputRenderedResults(displayList,fileName)
     #stop the timer
     timer.stop()
+    waitForPrintFinish()
     print("data retreival complete!\n")
     print("finished in: "+timer.getUnitDeviatedTimeString()+"\n\n\n")
     input("press enter to finish")
