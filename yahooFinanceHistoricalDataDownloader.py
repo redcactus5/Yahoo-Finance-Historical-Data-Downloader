@@ -629,7 +629,7 @@ def generateDateRange(startDate:str,endDate:str):
 
     
 def validateCommands(commands:list[dict]):
-    easyCLI.fastPrint("validating commands...")
+    easyCLI.fastPrint("validating commands...\n")
     validCommands=set(["specific dates","all data","date range"])
     validattributes=set(["date","open","high","low","close","adj close","volume"])
     for commandNumber, command in enumerate(commands):
@@ -661,8 +661,8 @@ def validateCommands(commands:list[dict]):
             raise Exception("command error: command "+str(commandNumber+1)+" has an invalid command value")
         elif(not (parseCommand in validCommands)):
             raise Exception("command error: command has an invalid value of: "+str(parseCommand)+" with a type of "+str(type(parseCommand)))
-        easyCLI.fastPrint("done")
-    easyCLI.fastPrint("validation successful\n\n")
+        easyCLI.fastPrint("done\n")
+    easyCLI.fastPrint("validation successful.\n\n")
     return True
 
 

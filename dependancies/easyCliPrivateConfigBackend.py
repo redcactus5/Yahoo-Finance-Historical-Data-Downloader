@@ -346,7 +346,7 @@ class EasyCLIFastPrintThreadError(Exception):
 
 
 
-class __PrivateInternalAsyncPrintThread(_privateInternalReferenceKeeperObjDoNotEdit.getThreading().Thread):
+class _PrivateInternalAsyncPrintThread(_privateInternalReferenceKeeperObjDoNotEdit.getThreading().Thread):
     def __init__(self):
         super().__init__(daemon=True)
         self._alive=True
@@ -430,24 +430,24 @@ class __PrivateInternalAsyncPrintThread(_privateInternalReferenceKeeperObjDoNotE
     def isNotBusy(self):
         return ((self._printQueue.qsize()==0) and (not self._working))
 
-_PrivateInternalAsyncPrintThreadOBJDoNotEdit=__PrivateInternalAsyncPrintThread()
+_PrivateInternalAsyncPrintThreadOBJDoNotEdit=_PrivateInternalAsyncPrintThread()
     
 def fastPrint(*args, **kwargs):
     if(_PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
-    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThreadOBJDoNotEdit):
+    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThread):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
     elif(_PrivateInternalAsyncPrintThreadOBJDoNotEdit.getIsStoppedOrStopping()):
-        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
-    _PrivateInternalAsyncPrintThreadOBJDoNotEdit.addItemToQueue(args, kwargs)
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
+    _PrivateInternalAsyncPrintThreadOBJDoNotEdit.addItemToQueue(*args, **kwargs)
 
 def fastPrintList(printList):
     if(_PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
-    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThreadOBJDoNotEdit):
+    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThread):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
     elif(_PrivateInternalAsyncPrintThreadOBJDoNotEdit.getIsStoppedOrStopping()):
-        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
     _PrivateInternalAsyncPrintThreadOBJDoNotEdit.addMultipleItemsToQueue(printList)
 
 def fastln(number:int=1):
@@ -464,36 +464,36 @@ def fastln(number:int=1):
 def fastClear():
     if(_PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
-    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThreadOBJDoNotEdit):
+    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThread):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
     elif(_PrivateInternalAsyncPrintThreadOBJDoNotEdit.getIsStoppedOrStopping()):
-        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
     _PrivateInternalAsyncPrintThreadOBJDoNotEdit.addClearToQueue()
 
 def fastUIHeader():
     if(_PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
-    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThreadOBJDoNotEdit):
+    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThread):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
     elif(_PrivateInternalAsyncPrintThreadOBJDoNotEdit.getIsStoppedOrStopping()):
-        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
     _PrivateInternalAsyncPrintThreadOBJDoNotEdit.addUIHeaderToQueue()
 
 def fastOverwriteStringAtPos(yRelativeToCursor:int,absoluteXPos:int,text:str):
     if(_PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
-    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThreadOBJDoNotEdit):
+    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThread):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
     elif(_PrivateInternalAsyncPrintThreadOBJDoNotEdit.getIsStoppedOrStopping()):
-        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
     _PrivateInternalAsyncPrintThreadOBJDoNotEdit.addOverwriteStringAtPosToQueue(absoluteXPos,yRelativeToCursor,text)    
 
 
 def isFastPrintDone():#BE EXTREMELY CAREFUL WITH THIS
     if(_PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
-    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThreadOBJDoNotEdit):
+    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThread):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
     elif(_PrivateInternalAsyncPrintThreadOBJDoNotEdit.getIsStoppedOrStopping()):
-        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+        raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
     _PrivateInternalAsyncPrintThreadOBJDoNotEdit.isNotBusy()   
