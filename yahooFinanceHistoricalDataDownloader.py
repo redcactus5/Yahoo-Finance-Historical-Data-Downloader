@@ -667,7 +667,7 @@ def validateCommands(commands:list[dict]):
 
         
 
-def executeCommand(stock,dates,attributes,catagoryLookupDict,values):
+def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLookupDict:dict,values:list[list]):
     for date in dates:
         #find the line for this date
         line:dict=findLine(stock,date)
@@ -719,63 +719,27 @@ def processStocks(commands:list[dict],stocks:list[dict]):
 
                 #self explanitory conditional, we are just checking command ids
                 if(action=="specific dates"):
-                    #loop through the specific dates to grab
-                    for date in commandDates:
-                        #find the line for this date
-                        line:dict=findLine(stock,date)
-                        #if it doesnt exist, skip it
-                        if(line==False):
-                            print("\nno data for date: "+str(date))
-                            print("skipping...\n")
-                        else:
-                            #otherwise, loop through all the attributes the command wants
-                            for attribute in attributes:
-                                #and grab their values for the line, then write them to the buffer for this stock
-                                insertValue(date,line.get(attribute),attribute,catagoryLookupDict,values)#type: ignore
+                    executeCommand(stock,commandDates,attributes,catagoryLookupDict,values)
 
                 #check the command id
                 elif(action=="all data"):
                     #grab all the dates for this stock
-                    dates=stockDates.keys()
-                    #llop thorugh said dates
-                    for day in dates:
-                        #find the line for the day
-                        line:dict=findLine(stock,day)
-                        #if it doesnt exist skip it(it should always exist if its in there)
-                        if(line==False):
-                            print("\nno data for date: "+str(day))
-                            print("skipping...\n")
-                        else:
-                            #otherwise, loop through all the attributes the command wants
-                            for attribute in attributes:
-                                #and grab their values for the line, then write them to the buffer for this stock
-                                insertValue(day,line.get(attribute),attribute,catagoryLookupDict,values)#type: ignore
+                    dates:list=list(stockDates.keys())
+                    
+                    executeCommand(stock,dates,attributes,catagoryLookupDict,values)
+                    
 
                 #check the command id
                 elif(action=="date range"):
                     #generate all the dates for this range
-                    dates=generateDateRange(commandDates[0],commandDates[1])
-                    #loop through all the dates in the range
-                    for day in dates:
-                        #find the line for the day
-                        line:dict=findLine(stock,day)
-                        #if it doesnt exist skip it
-                        if(line==False):
-                            print("\nno data for date: "+str(day))
-                            print("skipping...\n")
-                        else:
-                            #otherwise, loop through all the attributes the command wants
-                            for attribute in attributes:
-                                #and grab their values for the line, then write them to the buffer for this stock
-                                insertValue(day,line.get(attribute),attribute,catagoryLookupDict,values)#type: ignore
+                    dates:list=generateDateRange(commandDates[0],commandDates[1])
+                    
+                    executeCommand(stock,dates,attributes,catagoryLookupDict,values)
 
 
                 else:
                     raise Exception("command error, "+str(command)+" is not a valid command")
                 
-              
-
-            
 
             #convert the dates back to their origonal format (needs to be replaced)
             for convertedDate in range(len(values[0])):
@@ -783,6 +747,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
                 listedDate[0]=months[int(listedDate[0])]
                 values[0][convertedDate]="".join((listedDate[0]," ",listedDate[1],", ",listedDate[2]))
             
+
             #save this stock's data as a render object
             renderObj={"name":name,"categories":categories,"values":values}
             #put it in our buffer
