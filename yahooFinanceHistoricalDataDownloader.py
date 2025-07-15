@@ -641,16 +641,22 @@ def validateCommands(commands:list[dict]):
                 raise Exception("command error: date "+str(dateIndex)+" has an invalid value of: "+str(date)+" with a type of "+str(type(date)))
 
 
-        commandAttributes=command.get("attributes")
-        if(commandAttributes is None):
+        attributes=command.get("attributes")
+        if(attributes is None):
             raise Exception("command error: command "+str(commandNumber+1)+" has no attributes value or key value")
-        elif(type(commandAttributes)!=list):
+        elif(type(attributes)!=list):
             raise Exception("command error: command "+str(commandNumber+1)+" has no attributes value or key value")
-        for attributeIndex, attribute in enumerate(commandAttributes):
+        for attributeIndex, attribute in enumerate(attributes):
             if((type(attribute)!=str) or (not(attribute in validattributes))):
                 raise Exception("command error: attribute "+str(attributeIndex)+" has an invalid value of: "+str(attribute)+" with a type of "+str(type(attribute)))
         
-        #still need to validate the command itself
+        parseCommand=command.get("command")
+        if(parseCommand is None):
+            raise Exception("command error: command "+str(commandNumber+1)+" has no command value or key value")
+        elif(type(parseCommand)!=list):
+            raise Exception("command error: command "+str(commandNumber+1)+" has no command value or key value")
+
+
         
 
 
