@@ -742,7 +742,7 @@ def executeCommands(commands:list[dict],stocks:list[dict]):
                 #check the command id
                 elif(action=="date range"):
                     #generate all the dates for this range
-                    dates=generateDateRange(command.get("dates")[0],command.get("dates")[1])#type: ignore
+                    dates=generateDateRange(commandDates[0],commandDates[1])
                     #loop through all the dates in the range
                     for day in dates:
                         #find the line for the day
