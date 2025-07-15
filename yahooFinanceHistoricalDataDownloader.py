@@ -628,7 +628,7 @@ def generateDateRange(startDate:str,endDate:str):
 
     
 def validateCommands(commands:list[dict]):
-    validCommmands=set(["specific dates","all data","date range"])
+    validCommands=set(["specific dates","all data","date range"])
     validattributes=set(["date","open","high","low","close","adj close","volume"])
     for commandNumber, command in enumerate(commands):
         commandDates=command.get("dates")
@@ -655,6 +655,10 @@ def validateCommands(commands:list[dict]):
             raise Exception("command error: command "+str(commandNumber+1)+" has no command value or no key value")
         elif(type(parseCommand)!=str):
             raise Exception("command error: command "+str(commandNumber+1)+" has an invalid command value")
+        elif(not (parseCommand in validCommands)):
+            raise Exception("command error: command has an invalid value of: "+str(parseCommand)+" with a type of "+str(type(parseCommand)))
+        
+    return True
 
 
         
