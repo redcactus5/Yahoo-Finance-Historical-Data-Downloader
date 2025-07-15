@@ -667,10 +667,10 @@ def validateCommands(commands:list[dict]):
 
         
 
+def executeCommand(dates,attributes,catagoryLookupDict,values):
 
 
-
-def executeCommands(commands:list[dict],stocks:list[dict]):
+def processStocks(commands:list[dict],stocks:list[dict]):
     print("executing commands...\n")
     #need to update the month reformat logic
     months={1:"Jan",2:"Feb",3:"Mar",4:"Apr",5:"May",6:"Jun",7:"Jul",8:"Aug",9:"Sep",10:"Oct",11:"Nov",12:"Dec"}
@@ -717,7 +717,7 @@ def executeCommands(commands:list[dict],stocks:list[dict]):
                             print("skipping...\n")
                         else:
                             #otherwise, loop through all the attributes the command wants
-                            for attribute in attributes:#type: ignore
+                            for attribute in attributes:
                                 #and grab their values for the line, then write them to the buffer for this stock
                                 insertValue(date,line.get(attribute),attribute,catagoryLookupDict,values)#type: ignore
 
@@ -760,12 +760,12 @@ def executeCommands(commands:list[dict],stocks:list[dict]):
 
                 else:
                     raise Exception("command error, "+str(command)+" is not a valid command")
-                #increment our command count
+                
               
 
             
 
-            #convert the dates back to their origonal format
+            #convert the dates back to their origonal format (needs to be replaced)
             for convertedDate in range(len(values[0])):
                 listedDate:list[str]=values[0][convertedDate].split("/")
                 listedDate[0]=months[int(listedDate[0])]
@@ -899,7 +899,7 @@ def main(fileName,links,commands,sortAlphibetical):
     #save ram, free no longer needed values
     rawData=None
     #execute our commands on that parsed data
-    displayList=executeCommands(commands,dataSets)
+    displayList=processStocks(commands,dataSets)
     #save ram, free no longer needed values
     dataSets=None
     outputRenderedResults(displayList,fileName)
