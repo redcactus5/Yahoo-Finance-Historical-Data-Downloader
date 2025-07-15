@@ -1,0 +1,11 @@
+{
+    "commands":[
+        {
+            "command":"date range",
+            "attributes":["open","close"],
+            "dates":["6/16/2025","7/11/2025"]
+        }
+
+
+    ]
+}

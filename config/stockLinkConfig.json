@@ -1,0 +1,14 @@
+{
+    "links":[
+        "https://finance.yahoo.com/quote/ARM/history/?period1=1720824026&period2=1752192000",
+        "https://finance.yahoo.com/quote/AMD/history/?period1=1720824056&period2=1752192000",
+        "https://finance.yahoo.com/quote/CEG/history/?period1=1720824157&period2=1752192000",
+        "https://finance.yahoo.com/quote/SFM/history/?period1=1720824219&period2=1752192000",
+        "https://finance.yahoo.com/quote/ROK/history/?period1=1720824336&period2=1752192000",
+        "https://finance.yahoo.com/quote/%5EIXIC/history/?period1=1720826113&period2=1752192000",
+        "https://finance.yahoo.com/quote/%5EGSPC/history/?period1=1720823140&period2=1752192000",
+        "https://finance.yahoo.com/quote/%5EDJI/history/?period1=1720823189&period2=1752192000"
+        
+        ],
+    "sort alphabetical":false
+}
