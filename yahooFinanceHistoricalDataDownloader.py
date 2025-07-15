@@ -507,7 +507,7 @@ def equalizeListLens(listSet:list[list]):
 
 
 #make sure all categories exist
-def updatecategories(newcategories:list, oldCategories:list, values:list[list]):
+def updatecategories(newcategories:list, oldCategories:list, values:list[list])->tuple[bool,dict]:
     #lookup table of the catigories and their orders
     categoryList={"date":0,"open":1,"high":2,"low":3,"close":4,"adj close":5,"volume":6}
     (categoriesUpdated)=False
@@ -555,7 +555,7 @@ def updatecategories(newcategories:list, oldCategories:list, values:list[list]):
         newDict.update(builderList)
         return (True,newDict)
     
-    return (False,None)
+    return (False,None)#type: ignore
                     
 
 
@@ -667,7 +667,7 @@ def validateCommands(commands:list[dict]):
 
         
 
-def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLookupDict:dict,values:list[list]):
+def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLookupDict:dict[str,int],values:list[list]):
     for date in dates:
         #find the line for this date
         line:dict=findLine(stock,date)
@@ -680,6 +680,9 @@ def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLooku
             for attribute in attributes:
                 #and grab their values for the line, then write them to the buffer for this stock
                 insertValue(date,line.get(attribute),attribute,catagoryLookupDict,values)#type: ignore
+
+
+
 
 def processStocks(commands:list[dict],stocks:list[dict]):
     print("executing commands...\n")
@@ -695,7 +698,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
             #extract name and create a list for the catagories, and a 2d list for the values
             name=stock.get("name")
             categories=["date"]
-            catagoryLookupDict={"date":0}
+            catagoryLookupDict:dict[str,int]={"date":0}
             values:list[list]=[[]]
             stockDates:dict=stock["dates"]
             #create a variable for our progress through this stock
