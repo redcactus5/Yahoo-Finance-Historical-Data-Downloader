@@ -746,20 +746,20 @@ def executeCommands(commands:list[dict],stocks:list[dict]):
                     #loop through all the dates in the range
                     for day in dates:
                         #find the line for the day
-                        line:dict=findLine(stock,day)#type: ignore
+                        line:dict=findLine(stock,day)
                         #if it doesnt exist skip it
                         if(line==False):
                             print("\nno data for date: "+str(day))
                             print("skipping...\n")
                         else:
                             #otherwise, loop through all the attributes the command wants
-                            for attribute in command.get("attributes"):#type: ignore
+                            for attribute in attributes:
                                 #and grab their values for the line, then write them to the buffer for this stock
-                                insertValue(day,line.get(attribute),attribute,catagoryLookupDict,values)
+                                insertValue(day,line.get(attribute),attribute,catagoryLookupDict,values)#type: ignore
 
 
                 else:
-                    raise Exception("command error, "+str(command.get("command"))+" is not a valid command")
+                    raise Exception("command error, "+str(command)+" is not a valid command")
                 #increment our command count
               
 
