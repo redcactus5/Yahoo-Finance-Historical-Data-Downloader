@@ -430,9 +430,7 @@ class __PrivateInternalAsyncPrintThread(_privateInternalReferenceKeeperObjDoNotE
     def isNotBusy(self):
         return ((self._printQueue.qsize()==0) and (not self._working))
 
-_PrivateInternalAsyncPrintThreadOBJDoNotEdit=None
-if(__name__=="__main__"):
-    __PrivateInternalAsyncPrintThread()
+_PrivateInternalAsyncPrintThreadOBJDoNotEdit=__PrivateInternalAsyncPrintThread()
     
 def fastPrint(*args, **kwargs):
     if(_PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
