@@ -468,7 +468,7 @@ def findDateInsertionPoint(date:str,dates:list[str]):
        # find insertion index with bisect (assuming dates sorted ascending)
     index = bisect.bisect_left(dates, date)
 
-    datesLen=len(dates)
+    
 
     if ((index < len(dates)) and (dates[index] == date)):
         # date exists
@@ -566,16 +566,16 @@ def updatecategories(newcategories:list, oldCategories:list, values:list[list])-
 
 
 
-def insertValue(date:str, value:str, category:str, catagoryLookupDict:dict, values:list[list]):
+def insertValue(date:str, value:str, category:str, categoryLookupDict:dict, values:list[list]):
     #find where to insert it and make sure that all hte catigory lists are equal size
     point=findDateInsertionPoint(date,values[0])
     equalizeListLens(values)
     #i am telling you linter, this will be an int, i wrote the code that makes the dict
-    catagoryIndex:int=catagoryLookupDict[category]
+    categoryIndex:int=categoryLookupDict[category]
     #if we are not creating a new spot for it
     if(point[0]==0):
         #overwrite whatever what there before with value
-        values[catagoryIndex][point[1]]=value
+        values[categoryIndex][point[1]]=value
     #if it is going before the insertion point 
     elif(point[0]==1):
         #make a spot for it
@@ -584,7 +584,7 @@ def insertValue(date:str, value:str, category:str, catagoryLookupDict:dict, valu
         #write its date
         values[0][point[1]]=date
         #write the data
-        values[catagoryIndex][point[1]]=value
+        values[categoryIndex][point[1]]=value
     #if it is going after the end
     elif(point[0]==2):
         #make a spot for it at the end
@@ -593,7 +593,7 @@ def insertValue(date:str, value:str, category:str, catagoryLookupDict:dict, valu
         #write its date
         values[0][len(values[0])-1]=date
         #then write its value
-        values[catagoryIndex][len(values[0])-1]=value
+        values[categoryIndex][len(values[0])-1]=value
 
     
 
