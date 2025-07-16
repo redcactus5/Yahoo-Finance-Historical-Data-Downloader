@@ -210,7 +210,7 @@ def parseDataSet(retrievedData):
 
     if((len(headerRow)>0) and all((datapoint.get_text(strip=True).strip() == ValidatorRowStrings[index]) for index, datapoint in enumerate(headerRow))):
         #if this is what we want
-
+        rows.pop(0)
         ValidatorRowStringsLen=len(ValidatorRowStrings)
         #go through every row
         for rowIndex, row in enumerate(rows):
@@ -228,9 +228,12 @@ def parseDataSet(retrievedData):
                     if(pointIndex==0):#do the special case for saving date
                         parsedDate = datetime.datetime.strptime(point.get_text(strip=True), "%b %d, %Y")
                         fixedDate = parsedDate.strftime("%m/%d/%Y")
+
+                        
                         dates[fixedDate]=rowIndex
                     else:#otherwise save it like normal
                         lineData[datapointOptionList[pointIndex]]=str(point.get_text(strip=True))#type: ignore
+
                 #save what we extracted
                 dataList.append(lineData)
     else:
@@ -239,7 +242,7 @@ def parseDataSet(retrievedData):
 
     easyCLI.fastPrint("done.\n")
     
-    
+
     #return the data we extracted
     return {"name":str(retrievedData[0]),"data":dataList,"dates":dates}
 
@@ -778,6 +781,7 @@ def outputRenderedResults(displayList:list[dict],outputFileName:str):
         buffer.append(item.get("categories"))
         #grab the data
         values=item["values"]
+        
         #loop through the y indexes
         for y in range(len(values[0])):
             #create a varaible for the row
@@ -846,11 +850,6 @@ def licenceScreen():
     
 
 
-def waitForPrintFinish():
-    waiting=True
-    
-    while waiting:
-        waiting=(not easyCLI.isFastUIDone())
         
 
 
@@ -882,7 +881,7 @@ def main(fileName,links,commands,sortAlphibetical):
     outputRenderedResults(displayList,fileName)
     #stop the timer
     timer.stop()
-    waitForPrintFinish()
+    easyCLI.waitForFastWriterFinish()
     print("data retreival complete!\n")
     print("finished in: "+timer.getUnitDeviatedTimeString()+"\n\n\n")
     input("press enter to finish")
