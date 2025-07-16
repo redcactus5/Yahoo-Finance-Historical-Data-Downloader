@@ -394,8 +394,10 @@ class _PrivateInternalAsyncWriterThread(_privateInternalReferenceKeeperObjDoNotE
 
 
     def run(self):
-        
+        dispatcher=self._dispatcher
+        #because the pain of multithreaded error propigation
         try:
+            #init our vars here for speed
             item=None
             start=0
             currentTime=0
@@ -405,7 +407,7 @@ class _PrivateInternalAsyncWriterThread(_privateInternalReferenceKeeperObjDoNotE
                 self._working=True
                 start=self.timeRef.perf_counter()
                 if(self._stopping):
-                    handler = self._dispatcher.get(item[0])
+                    handler = dispatcher.get(item[0])
 
                     if handler is None:
                         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint internal variables altered externally")
