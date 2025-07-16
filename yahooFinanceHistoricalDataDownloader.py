@@ -238,6 +238,7 @@ def parseDataSet(retrievedData):
 
                 #save what we extracted
                 dataList.append(lineData)
+                #incriment rowcount since we found a row
                 rowCount+=1
     else:
         raise Exception("error, invalid table")
@@ -829,8 +830,8 @@ def licenceScreen():
     easyCLI.uiHeader()
     print(easyCLI.multilineStringBuilder(["Copyright and Licensing Information:\n",
     "Yahoo Finance Historical Data Downloader © 2025 redcactus5\n",
-    "This program is NOT endorsed by, produced by, or affiliated with Yahoo Incorporated or its parent companies,\n",
-    "and was not created with their knowledge, consent, support, or involvement.\n",
+    "This program is NOT endorsed by, produced by, or affiliated with Yahoo Incorporated its parent companies, or its subsidiaries,\n",
+    "and was not created with their knowledge, consent, support, or involvement, in any way.\n",
     "Yahoo Finance Historical Data Downloader is free software released under the GNU General Public License Version 3 (GPLv3).\n",
     "Powered by:",
     " - Python ©2001-2025 Python Software Foundation",
@@ -918,7 +919,8 @@ def main(fileName):
     print("data retreival complete!\n")
     print("finished in: "+timer.getUnitDeviatedTimeString()+"\n\n\n")
     input("press enter to finish")
-    easyCLI.ln(3)
+    easyCLI.ln(1)
+    
 
 
 
