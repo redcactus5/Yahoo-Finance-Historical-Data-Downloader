@@ -214,7 +214,8 @@ def parseDataSet(retrievedData):
         rows.pop(0)
         ValidatorRowStringsLen=len(ValidatorRowStrings)
         #go through every row
-        for rowIndex, row in enumerate(rows):
+        rowCount=0
+        for row in rows:
             lineData={}
             #extract the cells
             rowData:list[Tag]=row.find_all("td")#type: ignore
@@ -229,12 +230,13 @@ def parseDataSet(retrievedData):
                     if(pointIndex==0):#do the special case for saving date
                         parsedDate = datetime.strptime(point.get_text(strip=True), "%b %d, %Y").date()
 
-                        dates[parsedDate]=rowIndex-1
+                        dates[parsedDate]=rowCount
                     else:#otherwise save it like normal
                         lineData[datapointOptionList[pointIndex]]=str(point.get_text(strip=True))#type: ignore
 
                 #save what we extracted
                 dataList.append(lineData)
+                rowCount+=1
     else:
         raise Exception("error, invalid table")
     
@@ -439,11 +441,8 @@ def findLine(dataset:dict,date:date)->dict|bool:
     #otherwise grab the dataset
     dataList:list=dataset["data"]
     #and extract the index of that line from it
-    try:
-        line=dataList[index]
-    except Exception:
-        easyCLI.waitForFastWriterFinish()
-        raise Exception("here is the issue. index:"+str(index)+" length:"+str(len(dataList)))
+    line=dataList[index]
+
     return line
 
     
