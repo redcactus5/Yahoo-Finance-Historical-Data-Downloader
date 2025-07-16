@@ -6,7 +6,7 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>. 
 '''
 
-from dependancies.easyCliPrivateConfigBackend import _privateInternalGetTimeRef
+from easyCliPrivateConfigBackend import _privateInternalGetTimeRef
 
 #literally just an error for the timer so it has its own
 class EasyCLIStopwatchError(Exception):

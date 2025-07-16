@@ -18,7 +18,7 @@ import json
 from playwright.sync_api import sync_playwright
 import time
 import random
-import dependancies.easyCLI as easyCLI
+import easyCLI as easyCLI
 import csv
 import os
 import datetime
@@ -826,7 +826,7 @@ class YahooFinanceGrabberHeader(easyCLI.UIHeaderClass):
 
     def drawUIHeader(self):
         easyCLI.clear()
-        print("Yahoo Finance Historical Data Downloader v0.5 by redcacus5\n\n")
+        print("Yahoo Finance Historical Data Downloader v0.6 by redcacus5\n\n")
         
 
 

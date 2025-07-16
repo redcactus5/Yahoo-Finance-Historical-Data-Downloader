@@ -7,29 +7,29 @@ You should have received a copy of the GNU General Public License along with thi
 '''
 
 
-import dependancies.easyCliPrivateConfigBackend as easyCliPrivateConfigBackend
-from dependancies.easyCliPrivateConfigBackend import UIHeaderClass
+import easyCliPrivateConfigBackend as easyCliPrivateConfigBackend
+from easyCliPrivateConfigBackend import UIHeaderClass
 #handy newline function. not necessary just nice to have
-from dependancies.easyCliPrivateConfigBackend import ln
+from easyCliPrivateConfigBackend import ln
 
 #this is easy cli, a simple and easy to use cli framework!
 
 #warning, this library is not thread or multiprocessing safe, though can be used safely if you use best practices
 
-from dependancies.easyCLIStopwatch import Stopwatch
-from dependancies.easyCLIStopwatch import EasyCLIStopwatchError
-from dependancies.easyCliPrivateConfigBackend import EasyCLIFastPrintThreadError
+from easyCLIStopwatch import Stopwatch
+from easyCLIStopwatch import EasyCLIStopwatchError
+from easyCliPrivateConfigBackend import EasyCLIFastPrintThreadError
 
-from dependancies.easyCliPrivateConfigBackend import fastPrint
-from dependancies.easyCliPrivateConfigBackend import fastPrintList
-from dependancies.easyCliPrivateConfigBackend import fastln
-from dependancies.easyCliPrivateConfigBackend import uiHeader
-from dependancies.easyCliPrivateConfigBackend import fastClear
-from dependancies.easyCliPrivateConfigBackend import fastUIHeader
-from dependancies.easyCliPrivateConfigBackend import overwriteStringAtPos
-from dependancies.easyCliPrivateConfigBackend import ln
-from dependancies.easyCliPrivateConfigBackend import isFastWriterDone
-from dependancies.easyCliPrivateConfigBackend import waitForFastWriterFinish
+from easyCliPrivateConfigBackend import fastPrint
+from easyCliPrivateConfigBackend import fastPrintList
+from easyCliPrivateConfigBackend import fastln
+from easyCliPrivateConfigBackend import uiHeader
+from easyCliPrivateConfigBackend import fastClear
+from easyCliPrivateConfigBackend import fastUIHeader
+from easyCliPrivateConfigBackend import overwriteStringAtPos
+from easyCliPrivateConfigBackend import ln
+from easyCliPrivateConfigBackend import isFastWriterDone
+from easyCliPrivateConfigBackend import waitForFastWriterFinish
 #note: clears the screen as part of the process
 def recheckTerminalType():
     easyCliPrivateConfigBackend._PrivateAnsiCapableHandlerObject.recheckAnsiCapable()
