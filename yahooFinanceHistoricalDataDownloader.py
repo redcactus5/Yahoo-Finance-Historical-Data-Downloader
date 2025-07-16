@@ -632,7 +632,7 @@ def generateDateRange(startDate:str,endDate:str):
     #loop through every date in between, including the start and end, and add that date to the list
     while current <= endDateObject:
         #compact the current date into a string in our format
-        dateRange.append("/".join((str(current.month),str(current.day),str(current.year))))
+        dateRange.append(datetime.datetime.strftime(current, "%m/%d/%Y"))
         #incriment the day
         current = current + timedelta(days=1)
     return dateRange
@@ -695,10 +695,6 @@ def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLooku
     for date in dates:
         #find the line for this date
         rawLine=findLine(stock,date)
-        easyCLI.fastPrint("start")
-        easyCLI.fastPrint(stock["dates"])
-        easyCLI.fastPrint(date)
-        easyCLI.fastPrint("end")
         #if it doesnt exist, skip it
         if(rawLine==False):
             easyCLI.fastPrint("\nno data for date: "+str(date))
