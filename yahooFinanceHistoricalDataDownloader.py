@@ -228,9 +228,7 @@ def parseDataSet(retrievedData):
                     #if this is the date index
                     if(pointIndex==0):#do the special case for saving date
                         parsedDate = datetime.strptime(point.get_text(strip=True), "%b %d, %Y").date()
-                        
 
-                        
                         dates[parsedDate]=rowIndex
                     else:#otherwise save it like normal
                         lineData[datapointOptionList[pointIndex]]=str(point.get_text(strip=True))#type: ignore
@@ -640,7 +638,7 @@ def validateCommands(commands:list[dict]):
         #corrects the dates, something isnt working right, need more research
         dateList:list[str]=command["dates"]
         if(len(dateList)>0): 
-            newDateList=[datetime.datetime.strptime(date, "%m/%d/%Y") for date in dateList]
+            newDateList=[datetime.strptime(date, "%m/%d/%Y").date() for date in dateList]
             command["dates"]=newDateList
 
 
@@ -671,14 +669,14 @@ def validateCommands(commands:list[dict]):
 
 
 
-def executeCommand(stock:dict,dates:list[datetime.datetime],attributes:list[str],catagoryLookupDict:dict[str,int],values:list[list]):
+def executeCommand(stock:dict,dates:list[date],attributes:list[str],catagoryLookupDict:dict[str,int],values:list[list]):
    
     for date in dates:
         #find the line for this date
         rawLine=findLine(stock,date)
         #if it doesnt exist, skip it
         if(rawLine==False):
-            easyCLI.fastPrint("\nno data for date: "+datetime.datetime.strftime(date,"%m/%d/%Y"))
+            easyCLI.fastPrint("\nno data for date: "+date.strftime("%m/%d/%Y"))
             easyCLI.fastPrint("skipping...\n")
         elif(type(rawLine)==dict):
             line:dict=rawLine
@@ -716,7 +714,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
                 #grab and validate the values we need from the command
                 
                 action:str=command["command"]
-                commandDates:list[datetime.datetime]=command["dates"]
+                commandDates:list[date]=command["dates"]
                 attributes:list[str]=command["attributes"]
                 #make sure the lists have the attributes in the command
                 possibleNewDict=updatecategories(attributes,categories,values)
@@ -751,7 +749,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
 
             #convert the dates back to their origonal format (needs to be replaced)
             
-            fixedDates=[datetime.datetime.strftime(date,"%b %d, %Y") for date in values[0]]
+            fixedDates=[datetime.strftime(date,"%b %d, %Y") for date in values[0]]
             values[0]=fixedDates
             
             
@@ -774,22 +772,26 @@ def outputRenderedResults(displayList:list[dict],outputFileName:str):
     easyCLI.fastPrint("rendering results...")
     #create a buffer
     buffer=[]
+
+    gap=[[None]]*3
+
     #loop through every render object
     for item in displayList:
         #render the header data
-        buffer.append([item.get("name"),])
-        buffer.append(item.get("categories"))
+        buffer.append([item["name"],])
+        categories=item["categories"]
+        buffer.append(categories)
         #grab the data
         values=item["values"]
-        
+        categoriesLen=len(categories)
         #loop through the y indexes
         for y in range(len(values[0])):
             #create a varaible for the row
-            line=[values[x][y] for x in range(len(item["categories"]))]
+            line=[values[x][y] for x in range(categoriesLen)]
             buffer.append(line)
         #write some gaps 
         
-        buffer.extend([[None]]*3)
+        buffer.extend(gap)
     easyCLI.fastPrint("done.\n")
     #self explanitory, write the buffer to the file
     easyCLI.fastPrint("saving results as \""+outputFileName+"\"...")
