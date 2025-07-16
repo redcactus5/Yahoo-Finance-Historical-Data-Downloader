@@ -213,8 +213,10 @@ def parseDataSet(retrievedData):
         #if this is what we want
         rows.pop(0)
         ValidatorRowStringsLen=len(ValidatorRowStrings)
-        #go through every row
+        
+        #because we dont add some rows, we use this varaible to avoid desync
         rowCount=0
+        #go through every row
         for row in rows:
             lineData={}
             #extract the cells
