@@ -273,7 +273,7 @@ def parseDataSets(rawDataList,sortAlphabetical):
 
 
 def loadLinks() -> tuple[list[str],bool] | bool:
-    print("loading target stocks...")
+
     #create a dictionary for our link config and load its location string
     global linkConfigFile
     jsonDict:dict=dict()
@@ -346,7 +346,7 @@ def loadLinks() -> tuple[list[str],bool] | bool:
         if(idpos!=-1):
             links[link]=links[link][0:idpos+len(endID)]+str(int(time.time()))
     
-    print("done.\n\n")
+
     return (links,shouldSort)
 
 
@@ -355,7 +355,7 @@ def loadLinks() -> tuple[list[str],bool] | bool:
 
 
 def loadCommands():
-    print("loading commands...")
+
     #create our main varaibles
     global commandFile
     jsonDict:dict=dict()
@@ -420,10 +420,7 @@ def loadCommands():
                 
                 
                 
-                
-    
 
-    print("done.\n")
     return commandList
 
 
