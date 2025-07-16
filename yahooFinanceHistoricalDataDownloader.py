@@ -411,16 +411,7 @@ def loadCommands():
     if(type(commandList)!=list):
         raise Exception("config error: config command list corrupted or not found")
     
-    print("loadingDates...")
-    for command in commandList:
-        rawDateList=command.get("dates")
-        if((type(rawDateList)==list)):
-            dateList:list[str]=rawDateList
-            if(len(dateList)>0):
-                newDateList=[datetime.datetime.strptime(date, "%m/%d/%Y").strftime("%m/%d/%Y") for date in dateList]
-                command["dates"]=newDateList
-        else:
-            raise Exception()
+    
             
                 
                 
@@ -664,6 +655,14 @@ def validateCommands(commands:list[dict]):
             if(type(date)!=str):
                 raise Exception("command error: date "+str(dateIndex)+" has an invalid value of: "+str(date)+" with a type of "+str(type(date)))
 
+        
+        
+        dateList:list[str]=command["dates"]
+        if(len(dateList)>0):
+            newDateList=[datetime.datetime.strptime(date, "%m/%d/%Y").strftime("%m/%d/%Y") for date in dateList]
+            command["dates"]=newDateList
+
+
 
         attributes=command.get("attributes")
         if(attributes is None):
@@ -684,6 +683,8 @@ def validateCommands(commands:list[dict]):
             raise Exception("command error: command has an invalid value of: "+str(parseCommand)+" with a type of "+str(type(parseCommand)))
         easyCLI.fastPrint("done\n")
     easyCLI.fastPrint("validation successful.\n\n")
+    print("loadingDates...")
+
     return True
 
 
