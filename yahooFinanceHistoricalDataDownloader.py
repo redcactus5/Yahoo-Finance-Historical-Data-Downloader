@@ -18,7 +18,7 @@ import json
 from playwright.sync_api import sync_playwright
 import time
 import random
-import easyCLI as easyCLI
+import dependancies.easyCLI as easyCLI
 import csv
 import os
 from datetime import datetime
@@ -229,7 +229,7 @@ def parseDataSet(retrievedData):
                     if(pointIndex==0):#do the special case for saving date
                         parsedDate = datetime.strptime(point.get_text(strip=True), "%b %d, %Y").date()
 
-                        dates[parsedDate]=rowIndex
+                        dates[parsedDate]=rowIndex-1
                     else:#otherwise save it like normal
                         lineData[datapointOptionList[pointIndex]]=str(point.get_text(strip=True))#type: ignore
 
@@ -439,7 +439,11 @@ def findLine(dataset:dict,date:date)->dict|bool:
     #otherwise grab the dataset
     dataList:list=dataset["data"]
     #and extract the index of that line from it
-    line=dataList[index]
+    try:
+        line=dataList[index]
+    except Exception:
+        easyCLI.waitForFastWriterFinish()
+        raise Exception("here is the issue. index:"+str(index)+" length:"+str(len(dataList)))
     return line
 
     
@@ -866,7 +870,7 @@ def main(fileName):
     timer=easyCLI.Stopwatch()
     timer.start()
     #startup checks and loading of config files
-    print("loading links and commands...")
+    easyCLI.fastPrint("loading links and commands...")
     
     
     rawLinks=loadLinks()
@@ -890,7 +894,7 @@ def main(fileName):
     else:
         raise Exception("error: link loading failed")
  
-    print("done.\n\n")
+    easyCLI.fastPrint("done.\n\n")
     validateCommands(commands)
     #grab the webpages
     webPages=retrieveWebPages(links[0])
