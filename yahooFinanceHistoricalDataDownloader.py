@@ -827,7 +827,7 @@ def licenceScreen():
     easyCLI.uiHeader()
     print(easyCLI.multilineStringBuilder(["Copyright and Licensing Information:\n",
     "Yahoo Finance Historical Data Downloader © 2025 redcactus5\n",
-    "This program is NOT endorsed by, produced by, or affiliated with Yahoo Incorporated its parent companies,",
+    "This program is NOT endorsed by, produced by, or affiliated with Yahoo Incorporated, its parent companies,",
     "or its subsidiaries, and was not created with their knowledge, consent, support, or involvement, in any way.\n",
     "Yahoo Finance Historical Data Downloader is free software released under the GNU General Public License,",
     "Version 3 (GPLv3).\n",
