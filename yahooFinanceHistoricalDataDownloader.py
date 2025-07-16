@@ -844,7 +844,7 @@ def licenceScreen():
     "See the LICENSES/ directory for full license texts and details.\n\n"]))
     
     
-    time.sleep(3)
+    time.sleep(5)
     
     print("press enter to agree to the terms of the licenses and continue")
     input()
