@@ -656,9 +656,9 @@ def validateCommands(commands:list[dict]):
                 raise Exception("command error: date "+str(dateIndex)+" has an invalid value of: "+str(date)+" with a type of "+str(type(date)))
 
         
-        
+        #corrects the dates, something isnt working right, need more research
         dateList:list[str]=command["dates"]
-        if(len(dateList)>0):
+        if(len(dateList)>0): 
             newDateList=[datetime.datetime.strptime(date, "%m/%d/%Y").strftime("%m/%d/%Y") for date in dateList]
             command["dates"]=newDateList
 
@@ -683,7 +683,7 @@ def validateCommands(commands:list[dict]):
             raise Exception("command error: command has an invalid value of: "+str(parseCommand)+" with a type of "+str(type(parseCommand)))
         easyCLI.fastPrint("done\n")
     easyCLI.fastPrint("validation successful.\n\n")
-    print("loadingDates...")
+
 
     return True
 
@@ -695,6 +695,10 @@ def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLooku
     for date in dates:
         #find the line for this date
         rawLine=findLine(stock,date)
+        easyCLI.fastPrint("start")
+        easyCLI.fastPrint(stock["dates"])
+        easyCLI.fastPrint(date)
+        easyCLI.fastPrint("end")
         #if it doesnt exist, skip it
         if(rawLine==False):
             easyCLI.fastPrint("\nno data for date: "+str(date))
