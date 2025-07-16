@@ -360,7 +360,6 @@ class _PrivateInternalAsyncWriterThread(_privateInternalReferenceKeeperObjDoNotE
         self._stopping=False
         self._stopped=False
         self._working=False
-        self._queueLen=0
         self.start()  
         _privateInternalGetAtExitRef().register(self.stop)
 
@@ -378,13 +377,11 @@ class _PrivateInternalAsyncWriterThread(_privateInternalReferenceKeeperObjDoNotE
 
             while(self._alive):
                 item=self._printQueue.get()
-                self._queueLen-=1
                 self._working=True
                 if(not(self._stopping)):
                     if(item[0]==0):
                         args, kwargs = item[1]
                         print(*args, **kwargs)
-
                     elif(item[0]==1):
                         _PrivateClearHandlerObject.clear()
                     elif(item[0]==2):
@@ -410,32 +407,25 @@ class _PrivateInternalAsyncWriterThread(_privateInternalReferenceKeeperObjDoNotE
         
 
     def addItemToQueue(self,*args, **kwargs):
-        self._queueLen+=1
         self._printQueue.put_nowait((0,(args,kwargs)))
 
 
     def addMultipleItemsToQueue(self,items):
         for item in items:
-            self._queueLen+=1
             self._printQueue.put_nowait((0,item))
-            
     
     def addClearToQueue(self):
-        self._queueLen+=1
         self._printQueue.put_nowait((1,None))
 
     def addOverwriteStringAtPosToQueue(self,x,y,text):
-        self._queueLen+=1
         self._printQueue.put_nowait((3,(x,y,text)))
 
     def addUIHeaderToQueue(self):
-        self._queueLen+=1
         self._printQueue.put_nowait((2,None))
 
     def stop(self):
         self._stopping=True
         self._alive=False
-        self._queueLen+=1
         self._printQueue.put_nowait((4,None))
         self.working=False
         self.join(timeout=15)
