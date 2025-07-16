@@ -227,10 +227,10 @@ def parseDataSet(retrievedData):
                     #if this is the date index
                     if(pointIndex==0):#do the special case for saving date
                         parsedDate = datetime.datetime.strptime(point.get_text(strip=True), "%b %d, %Y")
-                        fixedDate = parsedDate.strftime("%m/%d/%Y")
+                        
 
                         
-                        dates[fixedDate]=rowIndex
+                        dates[parsedDate]=rowIndex
                     else:#otherwise save it like normal
                         lineData[datapointOptionList[pointIndex]]=str(point.get_text(strip=True))#type: ignore
 
