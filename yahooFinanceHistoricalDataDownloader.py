@@ -410,6 +410,24 @@ def loadCommands():
     #safety check
     if(type(commandList)!=list):
         raise Exception("config error: config command list corrupted or not found")
+    
+    print("loadingDates...")
+    for command in commandList:
+        rawDateList=command.get("dates")
+        if((type(rawDateList)==list)):
+            dateList:list[str]=rawDateList
+            if(len(dateList)>0):
+                newDateList=[datetime.datetime.strptime(date, "%m/%d/%Y").strftime("%m/%d/%Y") for date in dateList]
+                command["dates"]=newDateList
+        else:
+            raise Exception()
+            
+                
+                
+                
+                
+    
+
     print("done.\n")
     return commandList
 
@@ -892,6 +910,7 @@ def main(fileName,links,commands,sortAlphibetical):
 
 def startup():
     #startup checks and loading of config files
+    print("loading links and commands...")
     canStart=True
     commands=None
     rawLinks=loadLinks()
@@ -907,6 +926,7 @@ def startup():
             canStart=False
     #if we can start
     if(canStart):
+        print("done.")
         licenceScreen()
         #if the user wants to download the data
         if(easyCLI.booleanQuestionScreen("would you like to download the preconfigured market data?",None)):
