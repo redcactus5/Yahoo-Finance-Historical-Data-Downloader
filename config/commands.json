@@ -1,7 +1,7 @@
 {
     "commands":[
         {
-            "command":"specific dates",
+            "command":"all data",
             "attributes":["open","close"],
             "dates":["6/16/2025","7/11/2025"]
         }
