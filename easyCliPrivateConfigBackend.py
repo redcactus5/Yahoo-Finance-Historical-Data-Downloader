@@ -563,7 +563,7 @@ def waitForFastWriterFinish(timeoutMS=None,shouldRaiseException:bool=True):#BE E
     waitTime=_PrivateInternalAsyncWriterThreadOBJDoNotEdit._getWaitTime()
     timeref=_privateInternalGetTimeRef()
     waiting=True
-    print("hello")
+    
     if((timeoutMS is None)or((not((type(timeoutMS)==float)or(type(timeoutMS)==int)))and(timeoutMS<=0))):
         #self explanitory
         while waiting:

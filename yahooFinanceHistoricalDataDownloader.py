@@ -855,7 +855,7 @@ def licenceScreen():
         
 
 
-def main(fileName,links,commands,sortAlphibetical):
+def main(fileName):
     #our main execution funciton, it mostly just stages out our steps
     #clear the screen
     easyCLI.fastClear()
@@ -865,15 +865,41 @@ def main(fileName,links,commands,sortAlphibetical):
     #create and start our stopwatch
     timer=easyCLI.Stopwatch()
     timer.start()
+    #startup checks and loading of config files
+    print("loading links and commands...")
+    
+    
+    rawLinks=loadLinks()
+    links:tuple=tuple()
+    if((type(rawLinks)==False)and(rawLinks==False)):
+        return False
+    elif(type(rawLinks)==tuple):
+        links:tuple=rawLinks
+        rawLinks=None
+    else:
+        raise Exception("error: link loading failed")
+    
+
+    rawCommands=loadCommands()
+    commands:list=list()
+    if((type(rawLinks)==False)and(rawLinks==False)):
+        return False
+    elif(type(rawCommands)==list):
+        commands=rawCommands
+        rawCommands=None
+    else:
+        raise Exception("error: link loading failed")
+ 
+    print("done.\n\n")
     validateCommands(commands)
     #grab the webpages
-    webPages=retrieveWebPages(links)
+    webPages=retrieveWebPages(links[0])
     #extract their raw data
     rawData=retrieveHtmlListTablesAndName(webPages)
     #save ram, free no longer needed values
     webPages=None
     #parse that raw data
-    dataSets=parseDataSets(rawData,sortAlphibetical)
+    dataSets=parseDataSets(rawData,links[1])
     #save ram, free no longer needed values
     rawData=None
     #execute our commands on that parsed data
@@ -887,41 +913,24 @@ def main(fileName,links,commands,sortAlphibetical):
     print("data retreival complete!\n")
     print("finished in: "+timer.getUnitDeviatedTimeString()+"\n\n\n")
     input("press enter to finish")
+    easyCLI.ln(3)
 
 
 
 
 
-def startup():
-    #startup checks and loading of config files
-    print("loading links and commands...")
-    canStart=True
-    commands=None
-    rawLinks=loadLinks()
-    links:tuple=tuple()
-    if(rawLinks==False):
-        canStart=False
-    elif(type(rawLinks)==tuple):
-        links:tuple=rawLinks
-        rawLinks=None
-    if(canStart):
-        commands=loadCommands()
-        if(commands==False):
-            canStart=False
-    #if we can start
-    if(canStart):
-        print("done.")
-        licenceScreen()
-        #if the user wants to download the data
-        if(easyCLI.booleanQuestionScreen("would you like to download the preconfigured market data?",None)):
-            #have the menter the file name they want
-            fileName=easyCLI.enterFileNameScreen("please enter the name of the output file.\nwarning, if the file already exists, it will be overwritten.","(do not include the file extention)")+".csv"
-            #then start the main program
-            main(fileName,links[0],commands,links[1])
-        #otherwise
-        else:
-            easyCLI.clear()
-            print("well, thanks anyway!")
+def startup():  
+    licenceScreen()
+    #if the user wants to download the data
+    if(easyCLI.booleanQuestionScreen("would you like to download the preconfigured market data?",None)):
+        #have the menter the file name they want
+        fileName=easyCLI.enterFileNameScreen("please enter the name of the output file.\nwarning, if the file already exists, it will be overwritten.","(do not include the file extention)")+".csv"
+        #then start the main program
+        main(fileName)
+    #otherwise
+    else:
+        easyCLI.clear()
+        print("well, thanks anyway!")
 
 
 
