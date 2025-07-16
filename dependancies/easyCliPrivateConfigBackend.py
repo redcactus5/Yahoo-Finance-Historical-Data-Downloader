@@ -186,6 +186,13 @@ class _ClearHandler:
         self.localSY=_privateInternalGetSYSRef()
         self.localOS=_privateInternalGetOSRef()
         self.clearMode:int=0
+        self._clearOperationDispatcher = {
+            0: lambda: self._InternalAutoClearConfig(),
+            1: lambda: self.localOS.system('cls'),
+            2: lambda: self.localOS.system('clear'),
+            3: lambda: print("\033[2J\033[3J\033[H", end=''),
+            4: lambda: ln(100),
+        }
 
         
     def _InternalAutoClearConfig(self)->None:
@@ -275,20 +282,12 @@ class _ClearHandler:
 
     def clear(self):
         #this is what is usually called. notice how small it is? that means its faster than init!   
-        if(self.clearMode==1):
-            self.localOS.system('cls')
-        elif(self.clearMode==2):
-            self.localOS.system('clear')
-        elif(self.clearMode==3):
-            print("\033[2J\033[3J\033[H", end='')
-        elif(self.clearMode==4):
-            ln(100)
-        elif(self.clearMode==0):
-            self._InternalAutoClearConfig()
-            
-
-        else:
+        clearOp = self._clearOperationDispatcher.get(self.clearMode)
+        if(clearOp is None):
             raise Exception("critical error: clear mode set to invalid value!\nvalue: "+str(self.clearMode))
+        else:
+            clearOp()
+            
 
     
 

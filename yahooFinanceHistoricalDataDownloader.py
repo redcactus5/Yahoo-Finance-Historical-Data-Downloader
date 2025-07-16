@@ -214,7 +214,7 @@ def parseDataSet(retrievedData):
         rows.pop(0)
         ValidatorRowStringsLen=len(ValidatorRowStrings)
         
-        #because we dont add some rows, we use this varaible to avoid desync
+        #because we dont add some rows, we use this varaible to avoid desync. I tried using an index counter, but we desync when we skip an index.
         rowCount=0
         #go through every row
         for row in rows:

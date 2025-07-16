@@ -27,7 +27,6 @@ from dependancies.easyCliPrivateConfigBackend import uiHeader
 from dependancies.easyCliPrivateConfigBackend import fastClear
 from dependancies.easyCliPrivateConfigBackend import fastUIHeader
 from dependancies.easyCliPrivateConfigBackend import overwriteStringAtPos
-from dependancies.easyCliPrivateConfigBackend import ln
 from dependancies.easyCliPrivateConfigBackend import isFastWriterDone
 from dependancies.easyCliPrivateConfigBackend import waitForFastWriterFinish
 #note: clears the screen as part of the process
