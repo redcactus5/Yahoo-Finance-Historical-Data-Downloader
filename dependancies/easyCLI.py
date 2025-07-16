@@ -28,7 +28,7 @@ from dependancies.easyCliPrivateConfigBackend import fastClear
 from dependancies.easyCliPrivateConfigBackend import fastUIHeader
 from dependancies.easyCliPrivateConfigBackend import overwriteStringAtPos
 from dependancies.easyCliPrivateConfigBackend import ln
-from dependancies.easyCliPrivateConfigBackend import isFastPrintDone
+from dependancies.easyCliPrivateConfigBackend import isFastWriterDone
 #note: clears the screen as part of the process
 def recheckTerminalType():
     easyCliPrivateConfigBackend._PrivateAnsiCapableHandlerObject.recheckAnsiCapable()

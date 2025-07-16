@@ -17,12 +17,14 @@ class _InternalPrivateLibReferenceKeeper:
         import threading
         import queue
         import atexit
+        import time
         self.sysLibReference=sys
         self.osLibReference=os
         self.ctypeLibreference=ctypes
         self.threadingLibReference=threading
         self.queueLibReference=queue
         self.atexitLibReference=atexit
+        self.timeLibReference=time
 
     def getSYS(self):
         return self.sysLibReference
@@ -41,6 +43,9 @@ class _InternalPrivateLibReferenceKeeper:
     
     def getAtExit(self):
         return self.atexitLibReference
+    
+    def getTime(self):
+        return self.timeLibReference
     
 _privateInternalReferenceKeeperObjDoNotEdit=_InternalPrivateLibReferenceKeeper()
 
@@ -68,7 +73,8 @@ def _privateInternalGetAtExitRef():
     return _privateInternalReferenceKeeperObjDoNotEdit.getAtExit()
 
 
-
+def _privateInternalGetTimeRef():
+    return _privateInternalReferenceKeeperObjDoNotEdit.getTime()
 
 
     
@@ -346,7 +352,7 @@ class EasyCLIFastPrintThreadError(Exception):
 
 
 
-class _PrivateInternalAsyncPrintThread(_privateInternalReferenceKeeperObjDoNotEdit.getThreading().Thread):
+class _PrivateInternalAsyncWriterThread(_privateInternalReferenceKeeperObjDoNotEdit.getThreading().Thread):
     def __init__(self):
         super().__init__(daemon=True)
         self._alive=True
@@ -430,25 +436,25 @@ class _PrivateInternalAsyncPrintThread(_privateInternalReferenceKeeperObjDoNotEd
     def isNotBusy(self):
         return ((self._printQueue.qsize()==0) and (not self._working))
 
-_PrivateInternalAsyncPrintThreadOBJDoNotEdit=_PrivateInternalAsyncPrintThread()
+_PrivateInternalAsyncWriterThreadOBJDoNotEdit=_PrivateInternalAsyncWriterThread()
     
 def fastPrint(*args, **kwargs):
-    if(_PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
+    if(_PrivateInternalAsyncWriterThreadOBJDoNotEdit is None):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
-    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThread):
+    elif(type(_PrivateInternalAsyncWriterThreadOBJDoNotEdit)!=_PrivateInternalAsyncWriterThread):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
-    elif(_PrivateInternalAsyncPrintThreadOBJDoNotEdit.getIsStoppedOrStopping()):
+    elif(_PrivateInternalAsyncWriterThreadOBJDoNotEdit.getIsStoppedOrStopping()):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
-    _PrivateInternalAsyncPrintThreadOBJDoNotEdit.addItemToQueue(*args, **kwargs)
+    _PrivateInternalAsyncWriterThreadOBJDoNotEdit.addItemToQueue(*args, **kwargs)
 
 def fastPrintList(printList):
-    if(_PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
+    if(_PrivateInternalAsyncWriterThreadOBJDoNotEdit is None):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
-    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThread):
+    elif(type(_PrivateInternalAsyncWriterThreadOBJDoNotEdit)!=_PrivateInternalAsyncWriterThread):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
-    elif(_PrivateInternalAsyncPrintThreadOBJDoNotEdit.getIsStoppedOrStopping()):
+    elif(_PrivateInternalAsyncWriterThreadOBJDoNotEdit.getIsStoppedOrStopping()):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
-    _PrivateInternalAsyncPrintThreadOBJDoNotEdit.addMultipleItemsToQueue(printList)
+    _PrivateInternalAsyncWriterThreadOBJDoNotEdit.addMultipleItemsToQueue(printList)
 
 def fastln(number:int=1):
     if(type(number)!=int):
@@ -462,38 +468,73 @@ def fastln(number:int=1):
     
 
 def fastClear():
-    if(_PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
+    if(_PrivateInternalAsyncWriterThreadOBJDoNotEdit is None):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
-    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThread):
+    elif(type(_PrivateInternalAsyncWriterThreadOBJDoNotEdit)!=_PrivateInternalAsyncWriterThread):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
-    elif(_PrivateInternalAsyncPrintThreadOBJDoNotEdit.getIsStoppedOrStopping()):
+    elif(_PrivateInternalAsyncWriterThreadOBJDoNotEdit.getIsStoppedOrStopping()):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
-    _PrivateInternalAsyncPrintThreadOBJDoNotEdit.addClearToQueue()
+    _PrivateInternalAsyncWriterThreadOBJDoNotEdit.addClearToQueue()
 
 def fastUIHeader():
-    if(_PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
+    if(_PrivateInternalAsyncWriterThreadOBJDoNotEdit is None):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
-    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThread):
+    elif(type(_PrivateInternalAsyncWriterThreadOBJDoNotEdit)!=_PrivateInternalAsyncWriterThread):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
-    elif(_PrivateInternalAsyncPrintThreadOBJDoNotEdit.getIsStoppedOrStopping()):
+    elif(_PrivateInternalAsyncWriterThreadOBJDoNotEdit.getIsStoppedOrStopping()):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
-    _PrivateInternalAsyncPrintThreadOBJDoNotEdit.addUIHeaderToQueue()
+    _PrivateInternalAsyncWriterThreadOBJDoNotEdit.addUIHeaderToQueue()
 
 def fastOverwriteStringAtPos(yRelativeToCursor:int,absoluteXPos:int,text:str):
-    if(_PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
+    if(_PrivateInternalAsyncWriterThreadOBJDoNotEdit is None):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
-    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThread):
+    elif(type(_PrivateInternalAsyncWriterThreadOBJDoNotEdit)!=_PrivateInternalAsyncWriterThread):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
-    elif(_PrivateInternalAsyncPrintThreadOBJDoNotEdit.getIsStoppedOrStopping()):
+    elif(_PrivateInternalAsyncWriterThreadOBJDoNotEdit.getIsStoppedOrStopping()):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
-    _PrivateInternalAsyncPrintThreadOBJDoNotEdit.addOverwriteStringAtPosToQueue(absoluteXPos,yRelativeToCursor,text)    
+    _PrivateInternalAsyncWriterThreadOBJDoNotEdit.addOverwriteStringAtPosToQueue(absoluteXPos,yRelativeToCursor,text)    
 
 
-def isFastPrintDone():#BE EXTREMELY CAREFUL WITH THIS
-    if(_PrivateInternalAsyncPrintThreadOBJDoNotEdit is None):
+def isFastWriterDone():#BE EXTREMELY CAREFUL WITH THIS
+    if(_PrivateInternalAsyncWriterThreadOBJDoNotEdit is None):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
-    elif(type(_PrivateInternalAsyncPrintThreadOBJDoNotEdit)!=_PrivateInternalAsyncPrintThread):
+    elif(type(_PrivateInternalAsyncWriterThreadOBJDoNotEdit)!=_PrivateInternalAsyncWriterThread):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
-    elif(_PrivateInternalAsyncPrintThreadOBJDoNotEdit.getIsStoppedOrStopping()):
+    elif(_PrivateInternalAsyncWriterThreadOBJDoNotEdit.getIsStoppedOrStopping()):
         raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
-    _PrivateInternalAsyncPrintThreadOBJDoNotEdit.isNotBusy()   
+    return _PrivateInternalAsyncWriterThreadOBJDoNotEdit.isNotBusy()   
+
+
+def waitForFastWriterFinish(timeout=None,shouldRaiseException:bool=True):#BE EXTREMELY CAREFUL WITH THIS
+    waiting=True
+    if((timeout is None)or((not((type(timeout)==float)or(type(timeout)==int)))and(timeout<=0))):
+        while waiting:
+            if(_PrivateInternalAsyncWriterThreadOBJDoNotEdit is None):
+                raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
+            elif(type(_PrivateInternalAsyncWriterThreadOBJDoNotEdit)!=_PrivateInternalAsyncWriterThread):
+                raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+            elif(_PrivateInternalAsyncWriterThreadOBJDoNotEdit.getIsStoppedOrStopping()):
+                raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
+            waiting=(not _PrivateInternalAsyncWriterThreadOBJDoNotEdit.isNotBusy())
+    elif((not(timeout is None))and((type(timeout)==float)or(type(timeout)==int))and(timeout>0)):
+        timeref=_privateInternalGetTimeRef()
+        start=timeref.perf_counter()
+        while waiting:
+            if(_PrivateInternalAsyncWriterThreadOBJDoNotEdit is None):
+                raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object not found")
+            elif(type(_PrivateInternalAsyncWriterThreadOBJDoNotEdit)!=_PrivateInternalAsyncWriterThread):
+                raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is not the correct Datatype")
+            elif(_PrivateInternalAsyncWriterThreadOBJDoNotEdit.getIsStoppedOrStopping()):
+                raise EasyCLIFastPrintThreadError("easyCLI error: fastPrint controller object is stopped")
+            waiting=(not _PrivateInternalAsyncWriterThreadOBJDoNotEdit.isNotBusy())
+            if((start-timeref.perf_counter())>timeout):
+                if(shouldRaiseException):
+                    raise EasyCLIFastPrintThreadError("easyCLI error: fast writer wait timeout exceeded")
+                else:
+                    waiting=False
+                    break
+    else:
+        raise TypeError("error: timeout is not of supported type of int float or None. type of timeout: "+str(type(timeout)))
+
+
+    

@@ -848,10 +848,10 @@ def licenceScreen():
 
 def waitForPrintFinish():
     waiting=True
+    
     while waiting:
-        waiting=(not easyCLI.isFastPrintDone())
-        print(easyCLI.isFastPrintDone())
-        print(easyCLI.easyCliPrivateConfigBackend._PrivateInternalAsyncPrintThreadOBJDoNotEdit._printQueue.qsize())
+        waiting=(not easyCLI.isFastUIDone())
+        
 
 
 def main(fileName,links,commands,sortAlphibetical):

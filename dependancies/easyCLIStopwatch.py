@@ -6,6 +6,8 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>. 
 '''
 
+from dependancies.easyCliPrivateConfigBackend import _privateInternalGetTimeRef
+
 #literally just an error for the timer so it has its own
 class EasyCLIStopwatchError(Exception):
     def __init__(self, message="generic timer error"):
@@ -15,8 +17,8 @@ class EasyCLIStopwatchError(Exception):
 class Stopwatch:
     def __init__(self):
         #init our vars, and grab a personal reference to the time standard lib
-        import time
-        self.timeLib=time
+        
+        self.timeLib=_privateInternalGetTimeRef()
         self.startTime=0
         self.endTime=0
         self.totalElapsedTime=0
