@@ -173,7 +173,7 @@ def retrieveHtmlListTablesAndName(htmlDataList):
     easyCLI.fastPrint("extracting tables...\n")
     
     for pagenumber, page in enumerate(htmlDataList):
-        print("extracting table "+str(pagenumber+1)+" of "+str(len(htmlDataList)))
+        easyCLI.fastPrint("extracting table "+str(pagenumber+1)+" of "+str(len(htmlDataList)))
         rawDataList.append(retrieveTableAndName(page))
         
     easyCLI.fastPrint("done.\n\n")
@@ -283,6 +283,7 @@ def loadLinks() -> tuple[list[str],bool] | bool:
     }
     #if we cant find the list, save our template in its place, then exit
     if(not os.path.exists(linkConfigFile)):
+        easyCLI.waitForFastWriterFinish()
         easyCLI.clear()
         easyCLI.uiHeader()
         print("no yahoo finance historical data page link file found!")
@@ -308,6 +309,7 @@ def loadLinks() -> tuple[list[str],bool] | bool:
         #check if the template is found
         if(len(links)==1):
             if(links[0]=="put historical data links here"):
+                easyCLI.waitForFastWriterFinish()
                 #if so, print a message then exit
                 easyCLI.clear()
                 easyCLI.uiHeader()
@@ -372,6 +374,7 @@ def loadCommands():
     #if we cant find the file
     if(not os.path.exists(commandFile)):
         #save our template in its place then exit
+        easyCLI.waitForFastWriterFinish()
         easyCLI.clear()
         easyCLI.uiHeader()
         print("no command file found!")
@@ -400,6 +403,7 @@ def loadCommands():
                         if(len(commandList[0].get("dates"))==1):#type: ignore
                             if(commandList[0].get("dates")[0]=="put dates here"):#type: ignore
                                 #if it is, print a message then exit
+                                easyCLI.waitForFastWriterFinish()
                                 easyCLI.clear()
                                 easyCLI.uiHeader()
                                 print("found command file is the template file!")
@@ -638,7 +642,7 @@ def validateCommands(commands:list[dict]):
                 raise Exception("command error: date "+str(dateIndex)+" has an invalid value of: "+str(date)+" with a type of "+str(type(date)))
 
         
-        #corrects the dates, something isnt working right, need more research
+        #convert the dates to date objects
         dateList:list[str]=command["dates"]
         if(len(dateList)>0): 
             newDateList=[datetime.strptime(date, "%m/%d/%Y").date() for date in dateList]
@@ -795,13 +799,13 @@ def outputRenderedResults(displayList:list[dict],outputFileName:str):
         #write some gaps 
         
         buffer.extend(gap)
-    easyCLI.fastPrint("done.\n")
+    easyCLI.fastPrint("done.\n\n")
     #self explanitory, write the buffer to the file
     easyCLI.fastPrint("saving results as \""+outputFileName+"\"...")
     with open(outputFileName, "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerows(buffer)
-    easyCLI.fastPrint("save successful.\n\n")
+    easyCLI.fastPrint("save successful.\n\n\n")
     
 
 
@@ -871,7 +875,7 @@ def main(fileName):
     timer=easyCLI.Stopwatch()
     timer.start()
     #startup checks and loading of config files
-    easyCLI.fastPrint("loading links and commands...")
+    easyCLI.fastPrint("loading urls and commands...")
     
     
     rawLinks=loadLinks()
@@ -882,7 +886,7 @@ def main(fileName):
         links:tuple=rawLinks
         rawLinks=None
     else:
-        raise Exception("error: link loading failed")
+        raise Exception("error: url loading failed")
     
 
     rawCommands=loadCommands()
@@ -893,7 +897,7 @@ def main(fileName):
         commands=rawCommands
         rawCommands=None
     else:
-        raise Exception("error: link loading failed")
+        raise Exception("error: command loading failed")
  
     easyCLI.fastPrint("done.\n\n")
     validateCommands(commands)
