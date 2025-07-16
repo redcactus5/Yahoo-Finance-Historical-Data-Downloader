@@ -21,7 +21,8 @@ import random
 import easyCLI as easyCLI
 import csv
 import os
-import datetime
+from datetime import datetime
+from datetime import date
 from datetime import timedelta
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 import bisect
@@ -226,7 +227,7 @@ def parseDataSet(retrievedData):
                 for pointIndex, point in enumerate(rowData):
                     #if this is the date index
                     if(pointIndex==0):#do the special case for saving date
-                        parsedDate = datetime.datetime.strptime(point.get_text(strip=True), "%b %d, %Y")
+                        parsedDate = datetime.strptime(point.get_text(strip=True), "%b %d, %Y").date()
                         
 
                         
@@ -427,7 +428,7 @@ def loadCommands():
 
 
         
-def findLine(dataset:dict,date:str)->dict|bool:
+def findLine(dataset:dict,date:date)->dict|bool:
     #use our date and dataset values smarktly to find the exact line we want then return it
     #grab our dates dict
     lookup:dict=dataset["dates"]
@@ -443,34 +444,13 @@ def findLine(dataset:dict,date:str)->dict|bool:
     line=dataList[index]
     return line
 
-
-def compareDates(date1:str,date2:str):
     
-    #2 is date1 is bigger
-    #1 is date1 is smaller
-    #0 is both dates are the same
-
-    #self explanitory logic, create date objects for the two dates
-    date1obj= datetime.datetime.strptime(date1, "%m/%d/%Y")
-    
-    date2obj=datetime.datetime.strptime(date2, "%m/%d/%Y")
-
-    #then compare them and return the result
-    if(date1obj > date2obj):
-        return 2
-    elif(date1obj < date2obj):
-        return 1
-    elif(date1obj == date2obj):
-        return 0 
-    else: 
-        raise Exception("date comparison error, no comaprison case hit")
-        
     
     
 
 
 
-def findDateInsertionPoint(date:str,dates:list[str]):
+def findDateInsertionPoint(date:date,dates:list[date]):
     #very self explanitory
 
 
@@ -578,7 +558,7 @@ def updatecategories(newcategories:list, oldCategories:list, values:list[list])-
 
 
 
-def insertValue(date:str, value:str, category:str, categoryLookupDict:dict, values:list[list]):
+def insertValue(date:date, value:str, category:str, categoryLookupDict:dict, values:list[list]):
     #find where to insert it and make sure that all hte catigory lists are equal size
     point=findDateInsertionPoint(date,values[0])
     equalizeListLens(values)
@@ -613,26 +593,27 @@ def insertValue(date:str, value:str, category:str, categoryLookupDict:dict, valu
         
         
         
-def generateDateRange(startDate:str,endDate:str):
+def generateDateRange(startDate:date,endDate:date):
     #make sure we are generating in ascending order, and if currently not, correct it so that we are
-    order=compareDates(startDate,endDate)
-    if(order==0):
+
+    if(startDate == endDate):
         return [startDate]
-    elif(order==1):
+    elif(startDate < endDate):
         start=startDate
         end=endDate
-    else:
+    elif(startDate > endDate):
         start=endDate
         end=startDate
+    else:
+        raise Exception("date comparison error, no comaprison case hit")
     #create a list to store every date in the range, inclusive
     dateRange=[]
-    #create our end and index value, and set index to start
-    endDateObject= datetime.datetime.strptime(end, "%m/%d/%Y")
-    current=datetime.datetime.strptime(start, "%m/%d/%Y")
+    #create our index value, and set index to start
+    current=start.replace()
     #loop through every date in between, including the start and end, and add that date to the list
-    while current <= endDateObject:
+    while current <= end:
         #compact the current date into a string in our format
-        dateRange.append(datetime.datetime.strftime(current, "%m/%d/%Y"))
+        dateRange.append(current)
         #incriment the day
         current = current + timedelta(days=1)
     return dateRange
@@ -659,7 +640,7 @@ def validateCommands(commands:list[dict]):
         #corrects the dates, something isnt working right, need more research
         dateList:list[str]=command["dates"]
         if(len(dateList)>0): 
-            newDateList=[datetime.datetime.strptime(date, "%m/%d/%Y").strftime("%m/%d/%Y") for date in dateList]
+            newDateList=[datetime.datetime.strptime(date, "%m/%d/%Y") for date in dateList]
             command["dates"]=newDateList
 
 
@@ -690,14 +671,14 @@ def validateCommands(commands:list[dict]):
 
 
 
-def executeCommand(stock:dict,dates:list[str],attributes:list[str],catagoryLookupDict:dict[str,int],values:list[list]):
+def executeCommand(stock:dict,dates:list[datetime.datetime],attributes:list[str],catagoryLookupDict:dict[str,int],values:list[list]):
    
     for date in dates:
         #find the line for this date
         rawLine=findLine(stock,date)
         #if it doesnt exist, skip it
         if(rawLine==False):
-            easyCLI.fastPrint("\nno data for date: "+str(date))
+            easyCLI.fastPrint("\nno data for date: "+datetime.datetime.strftime(date,"%m/%d/%Y"))
             easyCLI.fastPrint("skipping...\n")
         elif(type(rawLine)==dict):
             line:dict=rawLine
@@ -735,7 +716,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
                 #grab and validate the values we need from the command
                 
                 action:str=command["command"]
-                commandDates:list[str]=command["dates"]
+                commandDates:list[datetime.datetime]=command["dates"]
                 attributes:list[str]=command["attributes"]
                 #make sure the lists have the attributes in the command
                 possibleNewDict=updatecategories(attributes,categories,values)
@@ -770,7 +751,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
 
             #convert the dates back to their origonal format (needs to be replaced)
             
-            fixedDates=[datetime.datetime.strptime(s, "%m/%d/%Y").strftime("%b %d, %Y") for s in values[0]]
+            fixedDates=[datetime.datetime.strftime(date,"%b %d, %Y") for date in values[0]]
             values[0]=fixedDates
             
             
