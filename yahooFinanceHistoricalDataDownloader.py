@@ -918,7 +918,7 @@ def main(fileName):
     print("data retreival complete!\n")
     print("finished in: "+timer.getUnitDeviatedTimeString()+"\n\n\n")
     input("press enter to finish")
-    easyCLI.ln(1)
+    easyCLI.ln(3)
     
 
 
@@ -957,5 +957,7 @@ if(__name__=="__main__"):
         input("press enter to finish")
     else:
         startup()
+        print("now exiting...")
+        easyCLI.ln(1)
         
          
