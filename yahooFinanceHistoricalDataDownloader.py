@@ -940,7 +940,7 @@ def startup():
     #otherwise
     else:
         easyCLI.clear()
-        print("well, thanks anyway!")
+        print("well, thanks anyway!\n")
 
 
 
