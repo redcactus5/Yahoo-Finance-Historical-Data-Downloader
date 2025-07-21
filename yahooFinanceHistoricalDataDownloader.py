@@ -739,13 +739,12 @@ def processStocks(commands:list[dict],stocks:list[dict]):
                     raise Exception("command error, "+str(command)+" is not a valid command")
                 
 
-            #convert the dates back to their original format (needs to be replaced)
-            
+            #convert the dates back to their original format
             fixedDates=[datetime.strftime(date,"%b %d, %Y") for date in values[0]]
             values[0]=fixedDates
             
             
-            skipBuffer=[]
+            
             #save this stock's data as a render object
             renderObj={"name":name,"categories":categories,"values":values}
             #put it in our buffer
