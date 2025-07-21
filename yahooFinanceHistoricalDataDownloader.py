@@ -18,7 +18,7 @@ import json
 from playwright.sync_api import sync_playwright
 import time
 import random
-import dependancies.easyCLI as easyCLI
+import dependencies.easyCLI as easyCLI
 import csv
 import os
 from datetime import datetime
@@ -35,7 +35,7 @@ def shuffle(inputList:list):
     randomPosList=list(range(len(copyList)))
     #shuffle it
     random.shuffle(randomPosList)
-    #put the items in copylist in the shuffled order
+    #put the items in copyList in the shuffled order
     scrambledList = [copyList[i] for i in randomPosList]
     return (scrambledList,randomPosList)
 
@@ -60,12 +60,12 @@ def retrieveWebPages(links:list[str]):
             
             easyCLI.fastPrint("done.\n")
             #loop through links
-            lenstring=str(len(links))
+            lenString=str(len(links))
             for urlIndex, url in enumerate(links):
                 #keep track of retries
                 tryCount=1
                 while(True):
-                    easyCLI.fastPrint("page "+str(urlIndex+1)+" of "+lenstring)
+                    easyCLI.fastPrint("page "+str(urlIndex+1)+" of "+lenString)
                     easyCLI.fastPrint("requesting page from server...")
                     page = browser.new_page()
                     try:
@@ -161,8 +161,8 @@ def retrieveHtmlListTablesAndName(htmlDataList):
     rawDataList=[]
     easyCLI.fastPrint("extracting tables...\n")
     
-    for pagenumber, page in enumerate(htmlDataList):
-        easyCLI.fastPrint("extracting table "+str(pagenumber+1)+" of "+str(len(htmlDataList)))
+    for pageNumber, page in enumerate(htmlDataList):
+        easyCLI.fastPrint("extracting table "+str(pageNumber+1)+" of "+str(len(htmlDataList)))
         rawDataList.append(retrieveTableAndName(page))
         
     easyCLI.fastPrint("done.\n\n")
@@ -180,7 +180,7 @@ def parseDataSet(retrievedData):
     rows=table.find_all("tr")
     #make an array to store the data for this table
     dataList=[]
-    #also a dictionary to store asociated dates and indexes of datalist they are for
+    #also a dictionary to store associated dates and indexes of dataList they are for
     dates={}
 
 
@@ -203,19 +203,19 @@ def parseDataSet(retrievedData):
         rows.pop(0)
         ValidatorRowStringsLen=len(ValidatorRowStrings)
         
-        #because we dont add some rows, we use this varaible to avoid desync. I tried using an index counter, but we desync when we skip an index.
+        #because we dont add some rows, we use this variable to avoid desync. I tried using an index counter, but we desync when we skip an index.
         rowCount=0
         #go through every row
         for row in rows:
             lineData={}
             #extract the cells
             rowData:list[Tag]=row.find_all("td")#type: ignore
-            #if this is a row we arent suppposed to ignore
+            #if this is a row we aren't supposed to ignore
             
             if(len(rowData)==ValidatorRowStringsLen):#type: ignore
 
 
-                #go through its collumns
+                #go through its columns
                 for pointIndex, point in enumerate(rowData):
                     #if this is the date index
                     if(pointIndex==0):#do the special case for saving date
@@ -227,7 +227,7 @@ def parseDataSet(retrievedData):
 
                 #save what we extracted
                 dataList.append(lineData)
-                #incriment rowcount since we found a row
+                #increment rowcount since we found a row
                 rowCount+=1
     else:
         raise Exception("error, invalid table")
@@ -249,7 +249,7 @@ def parseDataSets(rawDataList,sortAlphabetical):
 
     parsedData:list[dict]=[parseDataSet(dataSet) for dataSet in rawDataList]
     
-    #if alphibetical sorting mode is on
+    #if alphabetical sorting mode is on
     if(sortAlphabetical):
         parsedData=sorted(parsedData, key=lambda dataSet: dataSet["name"])
     
@@ -325,17 +325,17 @@ def loadLinks() -> tuple[list[str],bool] | bool:
     if(type(shouldSort)!=bool):
         raise Exception("config error: config sort value corrupted or not found")
 
-    #some link shenanagins to grav the data for the current date
+    #some link shenanigans to grab the data for the current date
     endID="period2="
     #loop through the links
     for link in range(len(links)):
         if(type(links[link])!=str):#check if the link actually exists
             raise Exception("link error: non string link found")
         #look for the part we are interested in
-        idpos=links[link].find(endID)
+        idPos=links[link].find(endID)
         #if we find it, overwrite the old unix time value with the current one
-        if(idpos!=-1):
-            links[link]=links[link][0:idpos+len(endID)]+str(int(time.time()))
+        if(idPos!=-1):
+            links[link]=links[link][0:idPos+len(endID)]+str(int(time.time()))
     
 
     return (links,shouldSort)
@@ -347,7 +347,7 @@ def loadLinks() -> tuple[list[str],bool] | bool:
 
 def loadCommands():
 
-    #create our main varaibles
+    #create our main variables
     global COMMANDFILE
     jsonDict:dict=dict()
     #create our template
@@ -422,12 +422,12 @@ def loadCommands():
 
         
 def findLine(dataset:dict,date:date)->dict|bool:
-    #use our date and dataset values smarktly to find the exact line we want then return it
+    #use our date and dataset values smartly to find the exact line we want then return it
     #grab our dates dict
     lookup:dict=dataset["dates"]
     #grab the dataList index for this date
     rawIndex=lookup.get(date)
-    #if that date doesnt exist, send back that information
+    #if that date doesn't exist, send back that information
     if(rawIndex is None):
         return False
     index:int=rawIndex
@@ -445,7 +445,7 @@ def findLine(dataset:dict,date:date)->dict|bool:
 
 
 def findDateInsertionPoint(date:date,dates:list[date]):
-    #very self explanitory
+    #very self explanatory
 
 
     #empty list special case
@@ -479,9 +479,9 @@ def equalizeListLens(listSet:list[list]):
     #find the longest sublist
     maxLen = max(len(subList) for subList in listSet)
 
-    #go through and make every list that long if it isnt already
+    #go through and make every list that long if it isn't already
     for subList in listSet:
-        #if it isnt long enough
+        #if it isn't long enough
         if(len(subList)<maxLen):
             #calculate how much longer it needs to be
             neededSpace=maxLen-len(subList)
