@@ -507,7 +507,7 @@ def updatecategories(newcategories:list, oldCategories:list, values:list[list])-
         
             #if we dont need to ignore this one
         elif(not(cat in oldCategoriesSet)):
-            (categoriesUpdated)=True
+            categoriesUpdated=True
             #find where in the vategory list it is supposed to go
             newPos:int=categoryList[cat]
             oldCategoriesSet.add(cat)
