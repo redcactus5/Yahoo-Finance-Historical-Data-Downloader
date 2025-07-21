@@ -6,10 +6,10 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>. 
 '''
 
-linkConfigFile="config/stockLinkConfig.json"
-commandFile="config/commands.json"
-browserPath="webproxy/Playwright.exe"
-tryLimit=5
+URLLISTFILE="config/stockLinkConfig.json"
+COMMANDFILE="config/commands.json"
+BROWSERPATH="webproxy/Playwright.exe"
+DOWNLOADRETRYLIMIT=5
 
 
 from bs4 import BeautifulSoup
@@ -31,30 +31,19 @@ import bisect
 def shuffle(inputList:list):
     #make a copy of our input
     copyList=inputList.copy()
-    #create an empty list to hold the scambled values
-    scrambledList=[None]*len(copyList)
-    #create a list to store the origonal positions of our scrambled values
-    newToOldLookupTable=[]
     #create a list of indexes
     randomPosList=list(range(len(copyList)))
     #shuffle it
     random.shuffle(randomPosList)
-    
-    #put the items in copylist in the shuffled order, and save teir origonal positions
-    for item in range(len(copyList)):
-        scrambledList[item]=copyList[randomPosList[item]]
-        newToOldLookupTable.append(randomPosList[item])
-        
-        
-    
-
-    return (scrambledList,newToOldLookupTable)
+    #put the items in copylist in the shuffled order
+    scrambledList = [copyList[i] for i in randomPosList]
+    return (scrambledList,randomPosList)
 
 
 def retrieveWebPages(links:list[str]):
     #grab our constants
-    global browserPath
-    global tryLimit
+    global BROWSERPATH
+    global DOWNLOADRETRYLIMIT
     easyCLI.fastPrint("starting webpage retrieval...\n")
     #make a list for what we download
     pages=[None]*len(links)
@@ -66,7 +55,7 @@ def retrieveWebPages(links:list[str]):
     #the print statements explain most of it
     with sync_playwright() as p:
         easyCLI.fastPrint("launching retriever proxy...")
-        browser = p.webkit.launch(executable_path=browserPath,headless=True)
+        browser = p.webkit.launch(executable_path=BROWSERPATH,headless=True)
         try:
             
             easyCLI.fastPrint("done.\n")
@@ -118,7 +107,7 @@ def retrieveWebPages(links:list[str]):
                         #cleanup the fail
                         page.close()
                         tryCount+=1
-                        if(tryCount>tryLimit):#if we go past our retry limit, give up
+                        if(tryCount>DOWNLOADRETRYLIMIT):#if we go past our retry limit, give up
                             raise Exception("download error: retry limit exceeded for url: "+str(links[urlIndex]))
                         easyCLI.fastPrint("\ndownload timed out")
                         easyCLI.fastPrint("retrying...\n")
@@ -275,29 +264,29 @@ def parseDataSets(rawDataList,sortAlphabetical):
 def loadLinks() -> tuple[list[str],bool] | bool:
 
     #create a dictionary for our link config and load its location string
-    global linkConfigFile
+    global URLLISTFILE
     jsonDict:dict=dict()
     #create our template
     template={
         "links":["put historical data links here"],"sort alphabetical":"set to true if you want your stocks sorted aphibetically"
     }
     #if we cant find the list, save our template in its place, then exit
-    if(not os.path.exists(linkConfigFile)):
+    if(not os.path.exists(URLLISTFILE)):
         easyCLI.waitForFastWriterFinish()
         easyCLI.clear()
         easyCLI.uiHeader()
         print("no yahoo finance historical data page link file found!")
         print("now generating template file...")
-        with open(linkConfigFile,"w") as config:
+        with open(URLLISTFILE,"w") as config:
             json.dump(template,config)
         print("successful.\n\n")
-        print("please enter your historical data links into the \""+linkConfigFile+"\" then restart the program to download data.\n\n")
+        print("please enter your historical data links into the \""+URLLISTFILE+"\" then restart the program to download data.\n\n")
         input("press enter to finish")
         return False
     
 
     #load the links file
-    with open(linkConfigFile) as config:
+    with open(URLLISTFILE) as config:
         jsonDict=json.load(config)
 
     #create a list for our links
@@ -314,7 +303,7 @@ def loadLinks() -> tuple[list[str],bool] | bool:
                 easyCLI.clear()
                 easyCLI.uiHeader()
                 print("found link file is the template file!")
-                print("please enter your historical data links into the \""+linkConfigFile+"\" then restart the program to download data.\n\n")
+                print("please enter your historical data links into the \""+URLLISTFILE+"\" then restart the program to download data.\n\n")
                 input("press enter to finish")
                 return False
 
@@ -359,7 +348,7 @@ def loadLinks() -> tuple[list[str],bool] | bool:
 def loadCommands():
 
     #create our main varaibles
-    global commandFile
+    global COMMANDFILE
     jsonDict:dict=dict()
     #create our template
     template={
@@ -372,23 +361,23 @@ def loadCommands():
             ]
     }
     #if we cant find the file
-    if(not os.path.exists(commandFile)):
+    if(not os.path.exists(COMMANDFILE)):
         #save our template in its place then exit
         easyCLI.waitForFastWriterFinish()
         easyCLI.clear()
         easyCLI.uiHeader()
         print("no command file found!")
         print("now generating template file...")
-        with open(commandFile,"w") as config:
+        with open(COMMANDFILE,"w") as config:
             json.dump(template,config)
         print("successful.\n\n")
-        print("please enter your commands into the \""+commandFile+"\" then restart the program to download data.\n\n")
+        print("please enter your commands into the \""+COMMANDFILE+"\" then restart the program to download data.\n\n")
         input("press enter to finish")
         return False
     
 
     #load our file 
-    with open(commandFile,"r") as config:
+    with open(COMMANDFILE,"r") as config:
         jsonDict=json.load(config)
     #create a variable for our commands
     commandList:list[dict]=[]
@@ -407,7 +396,7 @@ def loadCommands():
                                 easyCLI.clear()
                                 easyCLI.uiHeader()
                                 print("found command file is the template file!")
-                                print("please enter your commands into the \""+commandFile+"\" then restart the program to download data.\n\n")
+                                print("please enter your commands into the \""+COMMANDFILE+"\" then restart the program to download data.\n\n")
                                 input("press enter to finish")
                                 return False
 
