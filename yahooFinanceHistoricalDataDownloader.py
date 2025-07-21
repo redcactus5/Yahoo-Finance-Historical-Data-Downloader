@@ -536,7 +536,7 @@ def updatecategories(newcategories:list, oldCategories:list, values:list[list])-
                 
     
     
-    if((categoriesUpdated)):
+    if(categoriesUpdated):
         newDict={}
         builderList=[(catagory,index) for index, catagory in enumerate(oldCategories)]
         newDict.update(builderList)
