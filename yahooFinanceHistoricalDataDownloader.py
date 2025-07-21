@@ -872,7 +872,7 @@ def main(fileName):
 
     rawCommands=loadCommands()
     commands:list=list()
-    if((type(rawLinks)==False)and(rawLinks==False)):
+    if((type(rawLinks)==bool)and(rawLinks==False)):
         return False
     elif(type(rawCommands)==list):
         commands=rawCommands
