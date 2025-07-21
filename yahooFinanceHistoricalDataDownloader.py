@@ -494,13 +494,13 @@ def equalizeListLens(listSet:list[list]):
 
 
 #make sure all categories exist
-def updatecategories(newcategories:list, oldCategories:list, values:list[list])->tuple[bool,dict]:
-    #lookup table of the catigories and their orders
+def updateCategories(newCategories:list, oldCategories:list, values:list[list])->tuple[bool,dict]:
+    #lookup table of the categories and their orders
     categoryList={"date":0,"open":1,"high":2,"low":3,"close":4,"adj close":5,"volume":6}
     (categoriesUpdated)=False
-    #loop through the catigories we are adding
+    #loop through the categories we are adding
     oldCategoriesSet=set(oldCategories)
-    for cat in newcategories:
+    for cat in newCategories:
         #if this is valid
         if((not(cat in categoryList)) or cat=="date"):
             raise Exception("command error, provided category: "+str(cat)+" is not a valid category\n valid categories "+", ".join(categoryList))
@@ -508,7 +508,7 @@ def updatecategories(newcategories:list, oldCategories:list, values:list[list])-
             #if we dont need to ignore this one
         elif(not(cat in oldCategoriesSet)):
             categoriesUpdated=True
-            #find where in the vategory list it is supposed to go
+            #find where in the category list it is supposed to go
             newPos:int=categoryList[cat]
             oldCategoriesSet.add(cat)
             #go through all currently existing categories
@@ -553,7 +553,7 @@ def updatecategories(newcategories:list, oldCategories:list, values:list[list])-
 
 
 def insertValue(date:date, value:str, category:str, categoryLookupDict:dict, values:list[list]):
-    #find where to insert it and make sure that all hte catigory lists are equal size
+    #find where to insert it and make sure that all hte category lists are equal size
     point=findDateInsertionPoint(date,values[0])
     equalizeListLens(values)
     #i am telling you linter, this will be an int, i wrote the code that makes the dict
@@ -565,8 +565,8 @@ def insertValue(date:date, value:str, category:str, categoryLookupDict:dict, val
     #if it is going before the insertion point 
     elif(point[0]==1):
         #make a spot for it
-        for collumn in range(len(values)):
-            values[collumn].insert(point[1],None)
+        for column in range(len(values)):
+            values[column].insert(point[1],None)
         #write its date
         values[0][point[1]]=date
         #write the data
@@ -574,8 +574,8 @@ def insertValue(date:date, value:str, category:str, categoryLookupDict:dict, val
     #if it is going after the end
     elif(point[0]==2):
         #make a spot for it at the end
-        for collumn in range(len(values)):
-            values[collumn].append(None)
+        for column in range(len(values)):
+            values[column].append(None)
         #write its date
         values[0][len(values[0])-1]=date
         #then write its value
@@ -713,7 +713,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
                 commandDates:list[date]=command["dates"]
                 attributes:list[str]=command["attributes"]
                 #make sure the lists have the attributes in the command
-                possibleNewDict=updatecategories(attributes,categories,values)
+                possibleNewDict=updateCategories(attributes,categories,values)
                 if(possibleNewDict[0]):
                     catagoryLookupDict=possibleNewDict[1]
                 #overwrite the old values with the corrected ones
