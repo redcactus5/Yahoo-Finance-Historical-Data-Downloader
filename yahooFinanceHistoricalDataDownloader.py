@@ -425,7 +425,7 @@ def findLine(dataset:dict,date:date)->dict|bool:
     #use our date and dataset values smarktly to find the exact line we want then return it
     #grab our dates dict
     lookup:dict=dataset["dates"]
-    #brab the dataList index for this date
+    #grab the dataList index for this date
     rawIndex=lookup.get(date)
     #if that date doesnt exist, send back that information
     if(rawIndex is None):
