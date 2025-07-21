@@ -515,13 +515,13 @@ def updateCategories(newCategories:list, oldCategories:list, values:list[list])-
             for existing in range(len(oldCategories)):
                 #find where in the master category list the old one is
                 existingPos:int=categoryList[oldCategories[existing]]
-                #if the new catigory must go behind the one at index zero
+                #if the new category must go behind the one at index zero
                 if((existing==0)and(newPos<existingPos)):
                     #insert it there and give it an empty list
                     oldCategories.insert(existing,cat)
                     values.insert(existing,[])
                     break
-                    #if the new catigory must after the end of the one at index zero
+                    #if the new category must after the end of the one at index zero
                 elif((existing==len(oldCategories)-1)and(newPos>existingPos)):
                     #append it there and give it an empty list
                     oldCategories.append(cat)
@@ -538,7 +538,7 @@ def updateCategories(newCategories:list, oldCategories:list, values:list[list])-
     
     if(categoriesUpdated):
         newDict={}
-        builderList=[(catagory,index) for index, catagory in enumerate(oldCategories)]
+        builderList=[(category,index) for index, category in enumerate(oldCategories)]
         newDict.update(builderList)
         return (True,newDict)
     
@@ -599,7 +599,7 @@ def generateDateRange(startDate:date,endDate:date):
         start=endDate
         end=startDate
     else:
-        raise Exception("date comparison error, no comaprison case hit")
+        raise Exception("date comparison error, no comparison case hit")
     #create a list to store every date in the range, inclusive
     dateRange=[]
     #create our index value, and set index to start
@@ -608,7 +608,7 @@ def generateDateRange(startDate:date,endDate:date):
     while current <= end:
         #compact the current date into a string in our format
         dateRange.append(current)
-        #incriment the day
+        #increment the day
         current = current + timedelta(days=1)
     return dateRange
 
@@ -618,7 +618,7 @@ def generateDateRange(startDate:date,endDate:date):
 def validateCommands(commands:list[dict]):
     easyCLI.fastPrint("validating commands...\n")
     validCommands=set(["specific dates","all data","date range"])
-    validattributes=set(["date","open","high","low","close","adj close","volume"])
+    validAttributes=set(["date","open","high","low","close","adj close","volume"])
     for commandNumber, command in enumerate(commands):
         easyCLI.fastPrint("validating command "+str(commandNumber+1)+" of "+str(len(commands)))
         commandDates=command.get("dates")
@@ -645,7 +645,7 @@ def validateCommands(commands:list[dict]):
         elif(type(attributes)!=list):
             raise Exception("command error: command "+str(commandNumber+1)+" has an invalid attributes value")
         for attributeIndex, attribute in enumerate(attributes):
-            if((type(attribute)!=str) or (not(attribute in validattributes))):
+            if((type(attribute)!=str) or (not(attribute in validAttributes))):
                 raise Exception("command error: attribute "+str(attributeIndex)+" has an invalid value of: "+str(attribute)+" with a type of "+str(type(attribute)))
 
         
@@ -665,12 +665,12 @@ def validateCommands(commands:list[dict]):
 
 
 
-def executeCommand(stock:dict,dates:list[date],attributes:list[str],catagoryLookupDict:dict[str,int],values:list[list]):
+def executeCommand(stock:dict,dates:list[date],attributes:list[str],categoryLookupDict:dict[str,int],values:list[list]):
    
     for date in dates:
         #find the line for this date
         rawLine=findLine(stock,date)
-        #if it doesnt exist, skip it
+        #if it doesn't exist, skip it
         if(rawLine==False):
             easyCLI.fastPrint("\nno data for date: "+date.strftime("%m/%d/%Y"))
             easyCLI.fastPrint("skipping...\n")
@@ -679,7 +679,7 @@ def executeCommand(stock:dict,dates:list[date],attributes:list[str],catagoryLook
             #otherwise, loop through all the attributes the command wants
             for attribute in attributes:
                 #and grab their values for the line, then write them to the buffer for this stock
-                insertValue(date,line.get(attribute),attribute,catagoryLookupDict,values)#type: ignore
+                insertValue(date,line.get(attribute),attribute,categoryLookupDict,values)#type: ignore
 
 
 
@@ -694,15 +694,15 @@ def processStocks(commands:list[dict],stocks:list[dict]):
         
         #loop through our stocks
         for stockNumber, stock in enumerate(stocks):
-            #extract name and create a list for the catagories, and a 2d list for the values
+            #extract name and create a list for the categories, and a 2d list for the values
             name=stock.get("name")
             categories=["date"]
-            catagoryLookupDict:dict[str,int]={"date":0}
+            categoryLookupDict:dict[str,int]={"date":0}
             values:list[list]=[[]]
             stockDates:dict=stock["dates"]
             #create a variable for our progress through this stock
             
-            #loop thorugh our commands
+            #loop through our commands
             for commandNumber, command in enumerate(commands):
                 #do tuple and string magic for our cli
                 easyCLI.fastPrint("".join(("\nexecuting command ",str(commandNumber+1)," of ",str(len(commands))," on stock ",str(stockNumber+1)," of ",str(len(stocks)))))
@@ -715,20 +715,20 @@ def processStocks(commands:list[dict],stocks:list[dict]):
                 #make sure the lists have the attributes in the command
                 possibleNewDict=updateCategories(attributes,categories,values)
                 if(possibleNewDict[0]):
-                    catagoryLookupDict=possibleNewDict[1]
+                    categoryLookupDict=possibleNewDict[1]
                 #overwrite the old values with the corrected ones
                     
 
-                #self explanitory conditional, we are just checking command ids
+                #self explanatory conditional, we are just checking command ids
                 if(action=="specific dates"):
-                    executeCommand(stock,commandDates,attributes,catagoryLookupDict,values)
+                    executeCommand(stock,commandDates,attributes,categoryLookupDict,values)
 
                 #check the command id
                 elif(action=="all data"):
                     #grab all the dates for this stock
                     dates:list=list(stockDates.keys())
                     
-                    executeCommand(stock,dates,attributes,catagoryLookupDict,values)
+                    executeCommand(stock,dates,attributes,categoryLookupDict,values)
                     
 
                 #check the command id
@@ -736,14 +736,14 @@ def processStocks(commands:list[dict],stocks:list[dict]):
                     #generate all the dates for this range
                     dates:list=generateDateRange(commandDates[0],commandDates[1])
                     
-                    executeCommand(stock,dates,attributes,catagoryLookupDict,values)
+                    executeCommand(stock,dates,attributes,categoryLookupDict,values)
 
 
                 else:
                     raise Exception("command error, "+str(command)+" is not a valid command")
                 
 
-            #convert the dates back to their origonal format (needs to be replaced)
+            #convert the dates back to their original format (needs to be replaced)
             
             fixedDates=[datetime.strftime(date,"%b %d, %Y") for date in values[0]]
             values[0]=fixedDates
@@ -754,7 +754,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
             renderObj={"name":name,"categories":categories,"values":values}
             #put it in our buffer
             buffer.append(renderObj)
-            #incriment our command count
+            #increment our command count
            
 
     easyCLI.fastPrint("command execution done.\n\n")
@@ -782,17 +782,17 @@ def outputRenderedResults(displayList:list[dict],outputFileName:str):
         categoriesLen=len(categories)
         #loop through the y indexes
         for y in range(len(values[0])):
-            #create a varaible for the row
+            #create a variable for the row
             line=[values[x][y] for x in range(categoriesLen)]
             buffer.append(line)
         #write some gaps 
         
         buffer.extend(gap)
     easyCLI.fastPrint("done.\n\n")
-    #self explanitory, write the buffer to the file
+    #self explanatory, write the buffer to the file
     easyCLI.fastPrint("saving results as \""+outputFileName+"\"...")
-    with open(outputFileName, "w", newline="") as csvfile:
-        writer = csv.writer(csvfile)
+    with open(outputFileName, "w", newline="") as csvFile:
+        writer = csv.writer(csvFile)
         writer.writerows(buffer)
     easyCLI.fastPrint("save successful.\n\n\n")
     
@@ -814,8 +814,8 @@ easyCLI.setUIHeader(YahooFinanceGrabberHeader())
 
 
 
-def licenceScreen():
-    #very simple and self explanitory, not even any logic
+def licenseScreen():
+    #very simple and self explanatory, not even any logic
     easyCLI.clear()
     easyCLI.uiHeader()
     print(easyCLI.multilineStringBuilder(["Copyright and Licensing Information:\n",
@@ -854,12 +854,12 @@ def licenceScreen():
 
 
 def main(fileName):
-    #our main execution funciton, it mostly just stages out our steps
+    #our main execution function, it mostly just stages out our steps
     #clear the screen
     easyCLI.fastClear()
     #write the header
     easyCLI.fastUIHeader()
-    easyCLI.fastPrint("starting data retreival process...\n\n")
+    easyCLI.fastPrint("starting data retrieval process...\n\n")
     #create and start our stopwatch
     timer=easyCLI.Stopwatch()
     timer.start()
@@ -908,7 +908,7 @@ def main(fileName):
     #stop the timer
     timer.stop()
     easyCLI.waitForFastWriterFinish()
-    print("data retreival complete!\n")
+    print("data retrieval complete!\n")
     print("finished in: "+timer.getUnitDeviatedTimeString()+"\n\n\n")
     input("press enter to finish")
     easyCLI.ln(3)
@@ -919,10 +919,10 @@ def main(fileName):
 
 
 def startup():  
-    licenceScreen()
+    licenseScreen()
     #if the user wants to download the data
-    if(easyCLI.booleanQuestionScreen("would you like to download the preconfigured market data?",None)):
-        #have the menter the file name they want
+    if(easyCLI.booleanQuestionScreen("would you like to download the pre-configured market data?",None)):
+        #have the user the file name they want
         fileName=easyCLI.enterFileNameScreen("please enter the name of the output file.\nwarning, if the file already exists, it will be overwritten.","(do not include the file extention)")+".csv"
         #then start the main program
         main(fileName)
