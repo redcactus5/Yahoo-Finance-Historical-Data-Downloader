@@ -861,7 +861,7 @@ def main(fileName):
     
     rawLinks=loadLinks()
     links:tuple=tuple()
-    if((type(rawLinks)==False)and(rawLinks==False)):
+    if((type(rawLinks)==bool)and(rawLinks==False)):
         return False
     elif(type(rawLinks)==tuple):
         links:tuple=rawLinks
@@ -872,7 +872,7 @@ def main(fileName):
 
     rawCommands=loadCommands()
     commands:list=list()
-    if((type(rawLinks)==bool)and(rawLinks==False)):
+    if((type(commands)==bool)and(commands==False)):
         return False
     elif(type(rawCommands)==list):
         commands=rawCommands
