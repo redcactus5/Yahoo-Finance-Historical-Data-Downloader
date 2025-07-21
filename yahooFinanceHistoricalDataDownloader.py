@@ -805,7 +805,7 @@ class YahooFinanceGrabberHeader(easyCLI.UIHeaderClass):
 
     def drawUIHeader(self):
         easyCLI.clear()
-        print("Yahoo Finance Historical Data Downloader v0.6 by redcacus5\n\n")
+        print("Yahoo Finance Historical Data Downloader v1 by redcacus5\n\n")
         
 
 
