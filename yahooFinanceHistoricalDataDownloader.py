@@ -273,7 +273,6 @@ def loadLinks() -> tuple[list[str],bool] | bool:
     #if we cant find the list, save our template in its place, then exit
     if(not os.path.exists(URLLISTFILE)):
         easyCLI.waitForFastWriterFinish()
-        easyCLI.clear()
         easyCLI.uiHeader()
         print("no yahoo finance historical data page link file found!")
         print("now generating template file...")
@@ -300,7 +299,6 @@ def loadLinks() -> tuple[list[str],bool] | bool:
             if(links[0]=="put historical data links here"):
                 easyCLI.waitForFastWriterFinish()
                 #if so, print a message then exit
-                easyCLI.clear()
                 easyCLI.uiHeader()
                 print("found link file is the template file!")
                 print("please enter your historical data links into the \""+URLLISTFILE+"\" then restart the program to download data.\n\n")
@@ -364,7 +362,6 @@ def loadCommands():
     if(not os.path.exists(COMMANDFILE)):
         #save our template in its place then exit
         easyCLI.waitForFastWriterFinish()
-        easyCLI.clear()
         easyCLI.uiHeader()
         print("no command file found!")
         print("now generating template file...")
@@ -393,7 +390,6 @@ def loadCommands():
                             if(commandList[0].get("dates")[0]=="put dates here"):#type: ignore
                                 #if it is, print a message then exit
                                 easyCLI.waitForFastWriterFinish()
-                                easyCLI.clear()
                                 easyCLI.uiHeader()
                                 print("found command file is the template file!")
                                 print("please enter your commands into the \""+COMMANDFILE+"\" then restart the program to download data.\n\n")
@@ -816,7 +812,6 @@ easyCLI.setUIHeader(YahooFinanceGrabberHeader())
 
 def licenseScreen():
     #very simple and self explanatory, not even any logic
-    easyCLI.clear()
     easyCLI.uiHeader()
     print(easyCLI.multilineStringBuilder(["Copyright and Licensing Information:\n",
     "Yahoo Finance Historical Data Downloader © 2025 redcactus5\n",
@@ -845,7 +840,7 @@ def licenseScreen():
     
     print("press enter to agree to the terms of the licenses and continue")
     input()
-    easyCLI.clear()
+
     
 
 
@@ -855,8 +850,6 @@ def licenseScreen():
 
 def main(fileName):
     #our main execution function, it mostly just stages out our steps
-    #clear the screen
-    easyCLI.fastClear()
     #write the header
     easyCLI.fastUIHeader()
     easyCLI.fastPrint("starting data retrieval process...\n\n")
@@ -942,7 +935,6 @@ if(__name__=="__main__"):
 
     #devious check to make sure no one is doing an illegal thing and distributing without the open source licenses
     if((not os.path.exists("LICENSES/BeautifulSoup-MIT-LICENSE.txt"))or(not os.path.exists("LICENSES/easyCLI-GPL3-LICENSE.txt"))or(not os.path.exists("LICENSES/Nuitka-Apache-2.0-LICENSE.txt"))or(not os.path.exists("LICENSES/Playwright-Apache-2.0-LICENSE.txt"))or(not os.path.exists("LICENSES/Python-PSFL-2-LICENSE.txt"))or(not os.path.exists("LICENSES/WebKit-LGPL-2.0-BSD-License.txt"))or(not os.path.exists("LICENSE.txt"))):
-        easyCLI.clear()
         easyCLI.uiHeader()
         print("ERROR: License file(s) not found.")
         print("This program is open source and must be distributed with its licenses.")

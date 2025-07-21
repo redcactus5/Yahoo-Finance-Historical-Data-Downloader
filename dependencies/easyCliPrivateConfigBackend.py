@@ -20,7 +20,7 @@ class _InternalPrivateLibReferenceKeeper:
         import time
         self.sysLibReference=sys
         self.osLibReference=os
-        self.ctypeLibreference=ctypes
+        self.ctypeLibReference=ctypes
         self.threadingLibReference=threading
         self.queueLibReference=queue
         self.atexitLibReference=atexit
@@ -33,7 +33,7 @@ class _InternalPrivateLibReferenceKeeper:
         return self.osLibReference
     
     def getCTypes(self):
-        return self.ctypeLibreference
+        return self.ctypeLibReference
     
     def getThreading(self):
         return self.threadingLibReference

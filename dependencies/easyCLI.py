@@ -7,28 +7,28 @@ You should have received a copy of the GNU General Public License along with thi
 '''
 
 
-import dependancies.easyCliPrivateConfigBackend as easyCliPrivateConfigBackend
-from dependancies.easyCliPrivateConfigBackend import UIHeaderClass
+import dependencies.easyCliPrivateConfigBackend as easyCliPrivateConfigBackend
+from dependencies.easyCliPrivateConfigBackend import UIHeaderClass
 #handy newline function. not necessary just nice to have
-from dependancies.easyCliPrivateConfigBackend import ln
+from dependencies.easyCliPrivateConfigBackend import ln
 
 #this is easy cli, a simple and easy to use cli framework!
 
 #warning, this library is not thread or multiprocessing safe, though can be used safely if you use best practices
 
-from dependancies.easyCLIStopwatch import Stopwatch
-from dependancies.easyCLIStopwatch import EasyCLIStopwatchError
-from dependancies.easyCliPrivateConfigBackend import EasyCLIFastPrintThreadError
+from dependencies.easyCLIStopwatch import Stopwatch
+from dependencies.easyCLIStopwatch import EasyCLIStopwatchError
+from dependencies.easyCliPrivateConfigBackend import EasyCLIFastPrintThreadError
 
-from dependancies.easyCliPrivateConfigBackend import fastPrint
-from dependancies.easyCliPrivateConfigBackend import fastPrintList
-from dependancies.easyCliPrivateConfigBackend import fastln
-from dependancies.easyCliPrivateConfigBackend import uiHeader
-from dependancies.easyCliPrivateConfigBackend import fastClear
-from dependancies.easyCliPrivateConfigBackend import fastUIHeader
-from dependancies.easyCliPrivateConfigBackend import overwriteStringAtPos
-from dependancies.easyCliPrivateConfigBackend import isFastWriterDone
-from dependancies.easyCliPrivateConfigBackend import waitForFastWriterFinish
+from dependencies.easyCliPrivateConfigBackend import fastPrint
+from dependencies.easyCliPrivateConfigBackend import fastPrintList
+from dependencies.easyCliPrivateConfigBackend import fastln
+from dependencies.easyCliPrivateConfigBackend import uiHeader
+from dependencies.easyCliPrivateConfigBackend import fastClear
+from dependencies.easyCliPrivateConfigBackend import fastUIHeader
+from dependencies.easyCliPrivateConfigBackend import overwriteStringAtPos
+from dependencies.easyCliPrivateConfigBackend import isFastWriterDone
+from dependencies.easyCliPrivateConfigBackend import waitForFastWriterFinish
 #note: clears the screen as part of the process
 def recheckTerminalType():
     easyCliPrivateConfigBackend._PrivateAnsiCapableHandlerObject.recheckAnsiCapable()
@@ -66,7 +66,7 @@ def getAnsiCapable()->bool:
 
 
 
-#self explanitory, it clears the terminal
+#self explanatory, it clears the terminal
 def clear():
     easyCliPrivateConfigBackend._PrivateClearHandlerObject.clear()
 
