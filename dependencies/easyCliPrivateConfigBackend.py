@@ -222,15 +222,15 @@ class _ClearHandler:
                 else:
                 
                 
-                    isterminternal=False
+                    isTerminal=False
                     try:
                         kernel32 = self.localCT.windll.kernel32
                         h = kernel32.GetStdHandle(-11)  # STD_OUTPUT_HANDLE
                         mode = self.localCT.c_ulong()
-                        isterminternal= bool(kernel32.GetConsoleMode(h, self.localCT.byref(mode)))
+                        isTerminal= bool(kernel32.GetConsoleMode(h, self.localCT.byref(mode)))
                     except Exception:
-                        isterminternal=False
-                    if(isterminternal):
+                        isTerminal=False
+                    if(isTerminal):
                         self.clearMode=4
                         self.localOS.system('cls')
                         self.clearMode=1
@@ -368,7 +368,7 @@ class _PrivateInternalAsyncWriterThread(_privateInternalReferenceKeeperObjDoNotE
             4: self._executeAsyncStop,
         }
         self.timeRef=_privateInternalGetTimeRef()
-
+        
         self._cycleDuration=0.008
         self.start()  
         _privateInternalGetAtExitRef().register(self.stop)
