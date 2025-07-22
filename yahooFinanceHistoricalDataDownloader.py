@@ -915,7 +915,7 @@ def startup():
     #if the user wants to download the data
     if(easyCLI.booleanQuestionScreen("would you like to download the pre-configured market data?",None)):
         #have the user the file name they want
-        fileName=easyCLI.enterFileNameScreen("please enter the name of the output file.\nwarning, if the file already exists, it will be overwritten.","(do not include the file extention)")+".csv"
+        fileName=easyCLI.enterFileNameScreen("please enter the name of the output file.\nwarning, if the file already exists, it will be overwritten.","(do not include the file extension)")+".csv"
         #then start the main program
         main(fileName)
     #otherwise
