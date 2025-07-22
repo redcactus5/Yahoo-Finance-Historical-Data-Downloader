@@ -69,19 +69,19 @@ def retrieveWebPages(links:list[str]):
                     easyCLI.fastPrint("requesting page from server...")
                     page = browser.new_page()
                     try:
-                        page.goto(url,wait_until="domcontentloaded",timeout=30000)
+                        page.goto(url,wait_until="domcontentloaded",timeout=150000)
 
 
                         easyCLI.fastPrint("starting page load...")
 
                         #wait for the table to load
-                        page.wait_for_selector("table.table.yf-1jecxey")
+                        page.wait_for_selector("table.table.yf-1jecxey",timeout=150000)
                         #wait for the title to load
-                        page.wait_for_selector("h1.yf-4vbjci")
+                        page.wait_for_selector("h1.yf-4vbjci",timeout=150000)
                         #wait for the table to load its data
-                        page.wait_for_selector("td.yf-1jecxey loading", state="detached")
-                        page.wait_for_selector("td.yf-1jecxey .loading", state="detached")
-                        page.wait_for_selector("td.yf-1jecxey")
+                        page.wait_for_selector("td.yf-1jecxey loading",timeout=150000, state="detached")
+                        page.wait_for_selector("td.yf-1jecxey .loading",timeout=150000, state="detached")
+                        page.wait_for_selector("td.yf-1jecxey",timeout=150000)
                         
                         
                         #wait extra time just to be safe
