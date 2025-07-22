@@ -40,7 +40,7 @@ def shuffle(inputList:list):
     return (scrambledList,randomPosList)
 
 
-def retrieveWebPages(links:list[str]):
+def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompletionTimeout:float):
     #grab our constants
     global BROWSERPATH
     global DOWNLOADRETRYLIMIT
@@ -69,19 +69,19 @@ def retrieveWebPages(links:list[str]):
                     easyCLI.fastPrint("requesting page from server...")
                     page = browser.new_page()
                     try:
-                        page.goto(url,wait_until="domcontentloaded",timeout=150000)
+                        page.goto(url,wait_until="domcontentloaded",timeout=downloadStartTimeout)
 
 
                         easyCLI.fastPrint("starting page load...")
 
                         #wait for the table to load
-                        page.wait_for_selector("table.table.yf-1jecxey",timeout=150000)
+                        page.wait_for_selector("table.table.yf-1jecxey",timeout=downloadCompletionTimeout)
                         #wait for the title to load
-                        page.wait_for_selector("h1.yf-4vbjci",timeout=150000)
+                        page.wait_for_selector("h1.yf-4vbjci",timeout=downloadCompletionTimeout)
                         #wait for the table to load its data
-                        page.wait_for_selector("td.yf-1jecxey loading",timeout=150000, state="detached")
-                        page.wait_for_selector("td.yf-1jecxey .loading",timeout=150000, state="detached")
-                        page.wait_for_selector("td.yf-1jecxey",timeout=150000)
+                        page.wait_for_selector("td.yf-1jecxey loading",timeout=downloadCompletionTimeout, state="detached")
+                        page.wait_for_selector("td.yf-1jecxey .loading",timeout=downloadCompletionTimeout, state="detached")
+                        page.wait_for_selector("td.yf-1jecxey",timeout=downloadCompletionTimeout)
                         
                         
                         #wait extra time just to be safe
@@ -268,7 +268,10 @@ def loadLinks() -> tuple[list[str],bool] | bool:
     jsonDict:dict=dict()
     #create our template
     template={
-        "links":["put historical data links here"],"sort alphabetical":"set to true if you want your stocks sorted aphibetically"
+        "links":["put historical data links here"],
+        "sort alphabetical":"set to true if you want your stocks sorted alphabetically",
+        "page load begin timeout":"put the time in seconds you want to give the page to start loading here",
+        "page load completion timeout":"put the time in seconds you want the retrieval to have before it times out(used for all 6 completion checks)"
     }
     #if we cant find the list, save our template in its place, then exit
     if(not os.path.exists(URLLISTFILE)):
