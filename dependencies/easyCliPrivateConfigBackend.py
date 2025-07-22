@@ -356,7 +356,7 @@ class _PrivateInternalAsyncWriterThread(_privateInternalReferenceKeeperObjDoNotE
         super().__init__(daemon=True)
         self._alive=True
         self._printQueue=_privateInternalReferenceKeeperObjDoNotEdit.getQueue().Queue()
-        #false means stopping, true means not stopping, i know its confusing, but this is an optomisation
+        #false means stopping, true means not stopping, i know its confusing, but this is an optimization
         self._stopping=True
         self._stopped=False
         self._working=False
@@ -369,7 +369,7 @@ class _PrivateInternalAsyncWriterThread(_privateInternalReferenceKeeperObjDoNotE
         }
         self.timeRef=_privateInternalGetTimeRef()
 
-        self._cycleDuration=0.005
+        self._cycleDuration=0.008
         self.start()  
         _privateInternalGetAtExitRef().register(self.stop)
 
@@ -556,7 +556,7 @@ def isFastWriterDone():#BE EXTREMELY CAREFUL WITH THIS IT CAN CAUSE A LOCKUP EAS
     #is the writer not busy
     return (not _PrivateInternalAsyncWriterThreadOBJDoNotEdit.isBusy())
 
-#use this for syncronisation, but be extremely careful with it
+#use this for synchronization, but be extremely careful with it
 def waitForFastWriterFinish(timeoutMS=None,shouldRaiseException:bool=True):#BE EXTREMELY CAREFUL WITH THIS IT CAN CAUSE A LOCKUP EASILY
     #variable we use to keep looping
     waitTime=_PrivateInternalAsyncWriterThreadOBJDoNotEdit._getWaitTime()
@@ -564,7 +564,7 @@ def waitForFastWriterFinish(timeoutMS=None,shouldRaiseException:bool=True):#BE E
     waiting=True
     
     if((timeoutMS is None)or((not((type(timeoutMS)==float)or(type(timeoutMS)==int)))and(timeoutMS<=0))):
-        #self explanitory
+        #self explanatory
         while waiting:
             
             #just a wad of safety checks
@@ -588,7 +588,7 @@ def waitForFastWriterFinish(timeoutMS=None,shouldRaiseException:bool=True):#BE E
         #grab the current time
         start=timeref.perf_counter()
         
-        #self explanitory
+        #self explanatory
         while waiting:
             
             #just a wad of safety checks
