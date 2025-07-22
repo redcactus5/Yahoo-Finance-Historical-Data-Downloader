@@ -579,7 +579,7 @@ def waitForFastWriterFinish(timeoutMS=None,shouldRaiseException:bool=True):#BE E
             timeref.sleep(waitTime)
             #check if the writer is done yet
             waiting=_PrivateInternalAsyncWriterThreadOBJDoNotEdit.isBusy()
-            _PrivateInternalAsyncWriterThreadOBJDoNotEdit._getWaitTime()
+            waitTime=_PrivateInternalAsyncWriterThreadOBJDoNotEdit._getWaitTime()
 
 
     elif((not(timeoutMS is None))and((type(timeoutMS)==float)or(type(timeoutMS)==int))and(timeoutMS>0)):
@@ -609,7 +609,7 @@ def waitForFastWriterFinish(timeoutMS=None,shouldRaiseException:bool=True):#BE E
                 else:
                     waiting=False
                     break
-            _PrivateInternalAsyncWriterThreadOBJDoNotEdit._getWaitTime()
+            waitTime=_PrivateInternalAsyncWriterThreadOBJDoNotEdit._getWaitTime()
             
     else:
         raise TypeError("error: timeout is not of supported type of int float or None. type of timeout: "+str(type(timeoutMS)))
