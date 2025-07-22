@@ -394,7 +394,7 @@ class _PrivateInternalAsyncWriterThread(_privateInternalReferenceKeeperObjDoNotE
 
     def run(self):
         dispatcher=self._dispatcher
-        #because the pain of multithreaded error propigation
+        #because the pain of multithreaded error propagation
         try:
             #init our vars here for speed
             item=None
