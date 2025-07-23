@@ -539,62 +539,6 @@ def equalizeListLens(listSet:list[list]):
             #and extend it with an empty list of that length
             subList.extend([None]*neededSpace)
     
-#back up of old version  
-'''
-#make sure all categories exist
-def updateCategories(newCategories:list, oldCategories:list, values:list[list])->tuple[bool,dict]:
-    #lookup table of the categories and their orders
-    categoryList={"date":0,"open":1,"high":2,"low":3,"close":4,"adj close":5,"volume":6}
-    
-    
-    categoriesUpdated=False
-    #loop through the categories we are adding
-    oldCategoriesSet=set(oldCategories)
-    for cat in newCategories:
-        #if this is valid
-        if((not(cat in categoryList)) or cat=="date"):
-            raise Exception("command error, provided category: "+str(cat)+" is not a valid category\n valid categories "+", ".join(categoryList))
-        
-            #if we dont need to ignore this one
-        elif(not(cat in oldCategoriesSet)):
-            categoriesUpdated=True
-            #find where in the category list it is supposed to go
-            newPos:int=categoryList[cat]
-            oldCategoriesSet.add(cat)
-            #go through all currently existing categories
-            for existing in range(len(oldCategories)):
-                #find where in the master category list the old one is
-                existingPos:int=categoryList[oldCategories[existing]]
-                #if the new category must go behind the one at index zero
-                if((existing==0)and(newPos<existingPos)):
-                    #insert it there and give it an empty list
-                    oldCategories.insert(existing,cat)
-                    values.insert(existing,[])
-                    break
-                    #if the new category must after the end of the one at index zero
-                elif((existing==len(oldCategories)-1)and(newPos>existingPos)):
-                    #append it there and give it an empty list
-                    oldCategories.append(cat)
-                    values.append([])
-                    break
-                #if we are between before and after and not at the start or end
-                elif((newPos<existingPos)and(newPos>categoryList[oldCategories[existing-1]])):
-                    #insert it here, and give it a list
-                    oldCategories.insert(existing,cat)
-                    values.insert(existing,[])
-                    break
-                
-    
-    
-    if(categoriesUpdated):
-        newDict={}
-        builderList=[(category,index) for index, category in enumerate(oldCategories)]
-        newDict.update(builderList)
-        return (True,newDict)
-    
-    return (False,None)#type: ignore
-'''
-
 
 
 #make sure all categories exist
