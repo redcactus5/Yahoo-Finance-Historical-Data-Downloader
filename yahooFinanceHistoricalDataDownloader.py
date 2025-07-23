@@ -536,6 +536,7 @@ def updateCategories(newCategories:list, oldCategories:list, values:list[list])-
     #lookup table of the categories and their orders
     categoryList={"date":0,"open":1,"high":2,"low":3,"close":4,"adj close":5,"volume":6}
     
+    
     categoriesUpdated=False
     #loop through the categories we are adding
     oldCategoriesSet=set(oldCategories)
