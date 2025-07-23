@@ -218,7 +218,7 @@ def parseDataSet(retrievedData):
             
             if(len(rowData)==ValidatorRowStringsLen):#type: ignore
 
-                lineData:Any=[None]*len(rowData)
+                lineData={}
                 #go through its columns
                 for pointIndex, point in enumerate(rowData):
                     #if this is the date index
@@ -472,20 +472,19 @@ def loadCommands():
 
 
         
-def findLine(dataset:dict,date:date)->dict|bool:
+def findLine(dataset:list,datasetDates:dict,date:date)->dict|bool:
     #use our date and dataset values smartly to find the exact line we want then return it
-    #grab our dates dict
-    lookup:dict=dataset["dates"]
+    
+    
     #grab the dataList index for this date
-    rawIndex=lookup.get(date)
+    rawIndex=datasetDates.get(date)
     #if that date doesn't exist, send back that information
     if(rawIndex is None):
         return False
     index:int=rawIndex
-    #otherwise grab the dataset
-    dataList:list=dataset["data"]
+    
     #and extract the index of that line from it
-    line=dataList[index]
+    line=dataset[index]
 
     return line
 
@@ -678,7 +677,7 @@ def generateDateRange(startDate:date,endDate:date):
 
 
 def compileCommands(rawCommands:list[dict])->list[tuple[int,list[int],list[date]]]:
-    easyCLI.fastPrint("compiling commands...")
+    easyCLI.fastPrint("compiling commands...\n")
     #cache this for later
     rawCommandLen=len(rawCommands)
 
@@ -708,7 +707,7 @@ def compileCommands(rawCommands:list[dict])->list[tuple[int,list[int],list[date]
 
 
     
-    easyCLI.fastPrint("compilation successful.\n\n")
+    easyCLI.fastPrint("compilation successful.\n")
     
     
     return compiledCommands
@@ -769,11 +768,11 @@ def validateCommands(commands:list[dict]):
 
 
 
-def executeCommand(stock:dict,dates:list[date],attributes:list[int],categoryLookupDict:dict[int,int],values:list[list]):
+def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:list[int],categoryLookupDict:dict[int,int],values:list[list]):
    
     for date in dates:
         #find the line for this date
-        rawLine=findLine(stock,date)
+        rawLine=findLine(stockData,stockDates,date)
         #if it doesn't exist, skip it
         if(rawLine is False):
             easyCLI.fastPrint("\nno data for date: "+date.strftime("%m/%d/%Y"))
@@ -818,6 +817,7 @@ def processStocks(commands:list[tuple],stocks:list[dict]):
             categoryLookupDict:dict[int,int]={0:0}
             values:list[list]=[[]]
             stockDates:dict=stock["dates"]
+            stockData:list=stock["data"]
             #create a variable for our progress through this stock
             
             #loop through our commands
@@ -842,7 +842,7 @@ def processStocks(commands:list[tuple],stocks:list[dict]):
                 #use our dispatcher to generate our dates list
                 dates = dateDispatcher[action](stockDates, commandDates)
                 #then execute the command
-                executeCommand(stock,dates,attributes,categoryLookupDict,values)
+                executeCommand(stockData,stockDates,dates,attributes,categoryLookupDict,values)
                
 
             #convert the dates back to their original format
@@ -959,14 +959,14 @@ def main(fileName):
     #our main execution function, it mostly just stages out our steps
     #write the header
     easyCLI.fastUIHeader()
-    easyCLI.fastPrint("starting data retrieval process...\n\n")
+    
+    easyCLI.fastPrint("setting up...\n")
+    #startup checks and loading of config files
+    easyCLI.fastPrint("loading urls...")
+    
     #create and start our stopwatch
     timer=easyCLI.Stopwatch()
     timer.start()
-    #startup checks and loading of config files
-    easyCLI.fastPrint("loading urls and raw commands...")
-    
-    
     rawLinks=loadLinks()
     links:tuple=tuple()
     if((type(rawLinks)==bool)and(rawLinks==False)):
@@ -978,7 +978,8 @@ def main(fileName):
         easyCLI.waitForFastWriterFinish()
         raise Exception("error: url loading failed")
     
-
+    easyCLI.fastPrint("done.\n")
+    easyCLI.fastPrint("loading commands...")
     rawCommands=loadCommands()
     commands:list=list()
     if((type(rawCommands)==bool)and(rawCommands==False)):
@@ -995,6 +996,8 @@ def main(fileName):
     validateCommands(commands)
 
     commands=compileCommands(commands)
+    easyCLI.fastPrint("setup complete.\n\n\n")
+    easyCLI.fastPrint("starting data retrieval process...\n\n")
     easyCLI.fastln(3)
     #grab the webpages
     webPages=retrieveWebPages(links[0],links[2],links[3])
