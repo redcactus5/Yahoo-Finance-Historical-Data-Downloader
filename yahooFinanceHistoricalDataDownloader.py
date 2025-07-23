@@ -305,6 +305,7 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
 
     
     except Exception:
+        easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config \"links\" list corrupted or not found")
 
     #make a variable for the sorting variable 
@@ -314,6 +315,7 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
         #save our should sort value
         shouldSort=jsonDict.get("sort alphabetical")
     except:
+        easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config links \"should sort\" value corrupted or not found")
     
     #make a variable for the start timeout
@@ -323,6 +325,7 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
         #save our start timeout value
         startTimeout=jsonDict.get("page load begin timeout")
     except:
+        easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config links \"page load begin timeout\" corrupted or not found")
 
     endTimeout=0
@@ -330,6 +333,7 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
     try:
         endTimeout=jsonDict.get("page load completion timeout")
     except:
+        easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config links page load begin timeout corrupted or not found")
 
     #check if the template is found
@@ -348,18 +352,25 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
 
     #more error detection
     if(not isinstance(links,list)):
+        easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config \"links\" list corrupted or not found")
     elif(len(links)==0):
+        easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config \"links\" list is empty!")
     elif(not isinstance(shouldSort,bool)):
+        easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config \"should sort\" value corrupted or not found")
     elif(not isinstance(startTimeout,(float,int))):
+        easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config \"page load begin timeout\" value corrupted or not found")
     elif(isinstance(startTimeout,(float,int))and(startTimeout<0)):
+        easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config \"page load begin timeout\" value must be 0 or greater!")
     elif(not isinstance(endTimeout,(float,int))):
+        easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config \"page load completion timeout\" value corrupted or not found")
     elif(isinstance(endTimeout,(float,int))and(endTimeout<0)):
+        easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config \"page load completion timeout\" value must be 0 or greater!")
     else:
         startTimeout=float(startTimeout)
@@ -439,11 +450,13 @@ def loadCommands():
                                 return False
 
     except Exception:
+        easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config command list corrupted or not found")
 
 
     #safety check
     if(type(commandList)!=list):
+        easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config command list corrupted or not found")
     
     
@@ -782,13 +795,7 @@ def validateCommands(commands:list[dict]):
 
         
         
-        #convert the dates to date objects
-        dateList:list[str]=command["dates"]
-        if(len(dateList)>0): 
-            newDateList=[datetime.strptime(date, "%m/%d/%Y").date() for date in dateList]
-            command["dates"]=newDateList
 
- 
 
 
 
@@ -824,7 +831,7 @@ def executeCommand(stock:dict,dates:list[date],attributes:list[int],categoryLook
         #find the line for this date
         rawLine=findLine(stock,date)
         #if it doesn't exist, skip it
-        if(rawLine==False):
+        if(rawLine is False):
             easyCLI.fastPrint("\nno data for date: "+date.strftime("%m/%d/%Y"))
             easyCLI.fastPrint("skipping...\n")
         elif(type(rawLine)==dict):
