@@ -13,6 +13,7 @@ DOWNLOADRETRYLIMIT=5
 
 
 from bs4 import BeautifulSoup
+from bs4 import element
 from bs4 import Tag
 import json
 from playwright.sync_api import sync_playwright
@@ -132,7 +133,7 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
 
 
 
-def retrieveTableAndName(htmlText):
+def retrieveTableAndName(htmlText)->tuple[str,Tag]:
     
     #create a beautiful soup object for this raw page so we can parse it
     scraper=BeautifulSoup(htmlText, "html.parser")
@@ -142,22 +143,25 @@ def retrieveTableAndName(htmlText):
     name=scraper.find("h1",class_="yf-4vbjci")
     
     if(name is None):
-        raise Exception("error, no stock name found in page.")
+        raise Exception("error: no stock name found in page.")
     
     name=name.get_text()#type: ignore
 
     #find the table in the page
     table=scraper.find("table")
-
+    
 
     if(table is None):
-        raise Exception("error, no tables found in page.")
-  
+        raise Exception("error: no tables found in page.")
     
-    return (name,table)
+    if(isinstance(table,Tag)):
+        return (name,table)
+    else:
+        raise Exception("error: table in page is corrupted.")
 
 
 def retrieveHtmlListTablesAndName(htmlDataList):
+ 
     rawDataList=[]
     easyCLI.fastPrint("extracting tables...\n")
     
@@ -261,7 +265,7 @@ def parseDataSets(rawDataList,sortAlphabetical):
 
 
 
-def loadLinks() -> tuple[list[str],bool] | bool:
+def loadLinks() -> tuple[list[str],bool,float,float] | bool:
 
     #create a dictionary for our link config and load its location string
     global URLLISTFILE
@@ -270,8 +274,8 @@ def loadLinks() -> tuple[list[str],bool] | bool:
     template={
         "links":["put historical data links here"],
         "sort alphabetical":"set to true if you want your stocks sorted alphabetically",
-        "page load begin timeout":"put the time in seconds you want to give the page to start loading here",
-        "page load completion timeout":"put the time in seconds you want the retrieval to have before it times out(used for all 6 completion checks)"
+        "page load begin timeout":"put the time in seconds you want to give the page to start loading here (a value of zero means no timeout)",
+        "page load completion timeout":"put the time in seconds you want to give the retrieval to complete here (used for all 6 completion checks) (a value of zero means no timeout)"
     }
     #if we cant find the list, save our template in its place, then exit
     if(not os.path.exists(URLLISTFILE)):
@@ -297,20 +301,11 @@ def loadLinks() -> tuple[list[str],bool] | bool:
     #validation step
     try:
         links=jsonDict.get("links")#type:ignore
-        #check if the template is found
-        if(len(links)==1):
-            if(links[0]=="put historical data links here"):
-                easyCLI.waitForFastWriterFinish()
-                #if so, print a message then exit
-                easyCLI.uiHeader()
-                print("found link file is the template file!")
-                print("please enter your historical data links into the \""+URLLISTFILE+"\" then restart the program to download data.\n\n")
-                input("press enter to finish")
-                return False
+        
 
     
     except Exception:
-        raise Exception("config error: config links list corrupted or not found")
+        raise Exception("config error: config \"links\" list corrupted or not found")
 
     #make a variable for the sorting variable 
     shouldSort=False
@@ -319,12 +314,56 @@ def loadLinks() -> tuple[list[str],bool] | bool:
         #save our should sort value
         shouldSort=jsonDict.get("sort alphabetical")
     except:
-        raise Exception("config error: config links sort value corrupted or not found")
+        raise Exception("config error: config links \"should sort\" value corrupted or not found")
+    
+    #make a variable for the start timeout
+    startTimeout=0
+
+    try:
+        #save our start timeout value
+        startTimeout=jsonDict.get("page load begin timeout")
+    except:
+        raise Exception("config error: config links \"page load begin timeout\" corrupted or not found")
+
+    endTimeout=0
+
+    try:
+        endTimeout=jsonDict.get("page load completion timeout")
+    except:
+        raise Exception("config error: config links page load begin timeout corrupted or not found")
+
+    #check if the template is found
+    if(len(links)==1):
+        if(links[0]=="put historical data links here"):
+            if(shouldSort=="set to true if you want your stocks sorted alphabetically"):
+                if(startTimeout=="put the time in seconds you want to give the page to start loading here (a value of zero means no timeout)"):
+                    if(endTimeout=="put the time in seconds you want to give the retrieval to complete here (used for all 6 completion checks) (a value of zero means no timeout)"):
+                        easyCLI.waitForFastWriterFinish()
+                        #if so, print a message then exit
+                        easyCLI.uiHeader()
+                        print("found link file is the template file!")
+                        print("please enter your historical data links into the \""+URLLISTFILE+"\" then restart the program to download data.\n\n")
+                        input("press enter to finish")
+                        return False
+
     #more error detection
-    if(type(links)!=list):
-        raise Exception("config error: config links list corrupted or not found")
-    if(type(shouldSort)!=bool):
-        raise Exception("config error: config sort value corrupted or not found")
+    if(not isinstance(links,list)):
+        raise Exception("config error: config \"links\" list corrupted or not found")
+    elif(len(links)==0):
+        raise Exception("config error: config \"links\" list is empty!")
+    elif(not isinstance(shouldSort,bool)):
+        raise Exception("config error: config \"should sort\" value corrupted or not found")
+    elif(not isinstance(startTimeout,(float,int))):
+        raise Exception("config error: config \"page load begin timeout\" value corrupted or not found")
+    elif(isinstance(startTimeout,(float,int))and(startTimeout<0)):
+        raise Exception("config error: config \"page load begin timeout\" value must be 0 or greater!")
+    elif(not isinstance(endTimeout,(float,int))):
+        raise Exception("config error: config \"page load completion timeout\" value corrupted or not found")
+    elif(isinstance(endTimeout,(float,int))and(endTimeout<0)):
+        raise Exception("config error: config \"page load completion timeout\" value must be 0 or greater!")
+    else:
+        startTimeout=float(startTimeout)
+        endTimeout=float(endTimeout)
 
     #some link shenanigans to grab the data for the current date
     endID="period2="
@@ -339,7 +378,7 @@ def loadLinks() -> tuple[list[str],bool] | bool:
             links[link]=links[link][0:idPos+len(endID)]+str(int(time.time()))
     
 
-    return (links,shouldSort)
+    return (links,shouldSort,startTimeout,endTimeout)
 
 
 
@@ -496,7 +535,7 @@ def equalizeListLens(listSet:list[list]):
 def updateCategories(newCategories:list, oldCategories:list, values:list[list])->tuple[bool,dict]:
     #lookup table of the categories and their orders
     categoryList={"date":0,"open":1,"high":2,"low":3,"close":4,"adj close":5,"volume":6}
-    (categoriesUpdated)=False
+    categoriesUpdated=False
     #loop through the categories we are adding
     oldCategoriesSet=set(oldCategories)
     for cat in newCategories:
@@ -579,6 +618,10 @@ def insertValue(date:date, value:str, category:str, categoryLookupDict:dict, val
         values[0][len(values[0])-1]=date
         #then write its value
         values[categoryIndex][len(values[0])-1]=value
+    else:
+        #paranoid doomsday clause. it should never happen, but if it does, we catch it
+        raise Exception("insert value error: no insertion point found")
+
 
     
 
@@ -588,7 +631,8 @@ def insertValue(date:date, value:str, category:str, categoryLookupDict:dict, val
         
 def generateDateRange(startDate:date,endDate:date):
     #make sure we are generating in ascending order, and if currently not, correct it so that we are
-
+    start:date|None=None
+    end:date|None=None
     if(startDate == endDate):
         return [startDate]
     elif(startDate < endDate):
@@ -598,11 +642,16 @@ def generateDateRange(startDate:date,endDate:date):
         start=endDate
         end=startDate
     else:
-        raise Exception("date comparison error, no comparison case hit")
+        #paranoid doomsday clause
+        raise Exception("date comparison error: no comparison case hit")
+    #paranoid safety check
+    if((start is None)or(end is None)):
+        raise Exception("date range generation error: internal start and end corrupted")
+    
     #create a list to store every date in the range, inclusive
     dateRange=[]
     #create our index value, and set index to start
-    current=start.replace()
+    current=start
     #loop through every date in between, including the start and end, and add that date to the list
     while current <= end:
         #compact the current date into a string in our format
@@ -611,9 +660,28 @@ def generateDateRange(startDate:date,endDate:date):
         current = current + timedelta(days=1)
     return dateRange
 
-    
 
-    
+def compileCommands(rawCommands:list[dict]):
+    easyCLI.fastPrint("compiling commands...")
+    rawCommandLen=len(rawCommands)
+    compiledCommands=[None]*rawCommandLen
+    commandIDTable={"specific dates":0,"all data":1,"date range":2}
+    for commandNumber, command in enumerate(rawCommands):
+        easyCLI.fastPrint("compiling command "+str(commandNumber+1)+" of "+str(rawCommandLen))
+        #convert the dates to date objects
+        dateList:list[str]=command["dates"]
+        if(len(dateList)>0): 
+            newDateList=[datetime.strptime(date, "%m/%d/%Y").date() for date in dateList]
+            command["dates"]=newDateList
+
+        command["command"]=commandIDTable[command["command"]]
+
+        
+        
+
+        
+
+   
 def validateCommands(commands:list[dict]):
     easyCLI.fastPrint("validating commands...\n")
     validCommands=set(["specific dates","all data","date range"])
@@ -630,11 +698,14 @@ def validateCommands(commands:list[dict]):
                 raise Exception("command error: date "+str(dateIndex)+" has an invalid value of: "+str(date)+" with a type of "+str(type(date)))
 
         
+        
         #convert the dates to date objects
         dateList:list[str]=command["dates"]
         if(len(dateList)>0): 
             newDateList=[datetime.strptime(date, "%m/%d/%Y").date() for date in dateList]
             command["dates"]=newDateList
+
+ 
 
 
 
@@ -685,12 +756,25 @@ def executeCommand(stock:dict,dates:list[date],attributes:list[str],categoryLook
 
 def processStocks(commands:list[dict],stocks:list[dict]):
     easyCLI.fastPrint("executing commands...\n")
-    #need to update the month reformat logic
+
     buffer=[]
+    
     #if we have something to do
     if(len(commands)>0):
         
         
+        #preallocate for optimization reasons
+        commandDates:list[date]=[]
+        stockDates:dict=dict()
+        dates=[]
+        
+        #minor optimization
+        dateDispatcher = {
+            0: lambda stockDates, commandDates: commandDates,  # specific dates
+            1: lambda stockDates, commandDates: list(stockDates.keys()),  # all available dates
+            2: lambda stockDates, commandDates: generateDateRange(commandDates[0], commandDates[1]),  # date range
+        }
+
         #loop through our stocks
         for stockNumber, stock in enumerate(stocks):
             #extract name and create a list for the categories, and a 2d list for the values
@@ -708,7 +792,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
 
                 #grab and validate the values we need from the command
                 
-                action:str=command["command"]
+                action:int=command["command"]
                 commandDates:list[date]=command["dates"]
                 attributes:list[str]=command["attributes"]
                 #make sure the lists have the attributes in the command
@@ -719,28 +803,15 @@ def processStocks(commands:list[dict],stocks:list[dict]):
                     
 
                 #self explanatory conditional, we are just checking command ids
-                if(action=="specific dates"):
-                    executeCommand(stock,commandDates,attributes,categoryLookupDict,values)
 
-                #check the command id
-                elif(action=="all data"):
-                    #grab all the dates for this stock
-                    dates:list=list(stockDates.keys())
-                    
-                    executeCommand(stock,dates,attributes,categoryLookupDict,values)
-                    
-
-                #check the command id
-                elif(action=="date range"):
-                    #generate all the dates for this range
-                    dates:list=generateDateRange(commandDates[0],commandDates[1])
-                    
-                    executeCommand(stock,dates,attributes,categoryLookupDict,values)
-
-
-                else:
-                    raise Exception("command error, "+str(command)+" is not a valid command")
-                
+                #0:specific dates
+                #1:all data
+                #2:date range
+                #use our dispatcher to generate our dates list
+                dates = dateDispatcher[action](stockDates, commandDates)
+                #then execute the command
+                executeCommand(stock,dates,attributes,categoryLookupDict,values)
+               
 
             #convert the dates back to their original format
             fixedDates=[datetime.strftime(date,"%b %d, %Y") for date in values[0]]
@@ -859,7 +930,7 @@ def main(fileName):
     timer=easyCLI.Stopwatch()
     timer.start()
     #startup checks and loading of config files
-    easyCLI.fastPrint("loading urls and commands...")
+    easyCLI.fastPrint("loading urls and raw commands...")
     
     
     rawLinks=loadLinks()
@@ -884,6 +955,7 @@ def main(fileName):
         raise Exception("error: command loading failed")
  
     easyCLI.fastPrint("done.\n\n")
+    
     validateCommands(commands)
     #grab the webpages
     webPages=retrieveWebPages(links[0])
