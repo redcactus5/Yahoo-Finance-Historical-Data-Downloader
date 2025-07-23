@@ -996,7 +996,7 @@ def main(fileName):
 
     commands=compileCommands(commands)
     #grab the webpages
-    webPages=retrieveWebPages(links[0],links[1],links[2])
+    webPages=retrieveWebPages(links[0],links[2],links[3])
     #extract their raw data
     rawData=retrieveHtmlListTablesAndName(webPages)
     #save ram, free no longer needed values
