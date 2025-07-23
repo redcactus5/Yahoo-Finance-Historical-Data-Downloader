@@ -535,6 +535,7 @@ def equalizeListLens(listSet:list[list]):
 def updateCategories(newCategories:list, oldCategories:list, values:list[list])->tuple[bool,dict]:
     #lookup table of the categories and their orders
     categoryList={"date":0,"open":1,"high":2,"low":3,"close":4,"adj close":5,"volume":6}
+    
     categoriesUpdated=False
     #loop through the categories we are adding
     oldCategoriesSet=set(oldCategories)
@@ -675,6 +676,7 @@ def compileCommands(rawCommands:list[dict]):
             command["dates"]=newDateList
 
         command["command"]=commandIDTable[command["command"]]
+    easyCLI.fastPrint("done.\n\n")
 
         
         
@@ -780,7 +782,7 @@ def processStocks(commands:list[dict],stocks:list[dict]):
             #extract name and create a list for the categories, and a 2d list for the values
             name=stock.get("name")
             categories=["date"]
-            categoryLookupDict:dict[str,int]={"date":0}
+            categoryLookupDict:dict[str,int]={"date":0}#can be sped up
             values:list[list]=[[]]
             stockDates:dict=stock["dates"]
             #create a variable for our progress through this stock
@@ -800,9 +802,6 @@ def processStocks(commands:list[dict],stocks:list[dict]):
                 if(possibleNewDict[0]):
                     categoryLookupDict=possibleNewDict[1]
                 #overwrite the old values with the corrected ones
-                    
-
-                #self explanatory conditional, we are just checking command ids
 
                 #0:specific dates
                 #1:all data
@@ -957,8 +956,10 @@ def main(fileName):
     easyCLI.fastPrint("done.\n\n")
     
     validateCommands(commands)
+
+    compileCommands(commands)
     #grab the webpages
-    webPages=retrieveWebPages(links[0])
+    webPages=retrieveWebPages(links[0],links[1],links[2])
     #extract their raw data
     rawData=retrieveHtmlListTablesAndName(webPages)
     #save ram, free no longer needed values
