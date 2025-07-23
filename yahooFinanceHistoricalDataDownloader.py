@@ -996,9 +996,10 @@ def main(fileName):
     validateCommands(commands)
 
     commands=compileCommands(commands)
-    easyCLI.fastPrint("setup complete.\n\n\n")
+    easyCLI.fastPrint("setup complete.")
+    easyCLI.fastln(6)
     easyCLI.fastPrint("starting data retrieval process...\n\n")
-    easyCLI.fastln(3)
+    
     #grab the webpages
     webPages=retrieveWebPages(links[0],links[2],links[3])
     #extract their raw data
