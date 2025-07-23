@@ -196,7 +196,7 @@ def parseDataSet(retrievedData):
     #validate to make sure the table is actually the one we want. if it fails, yahoo changed their website, or the link was wrong
     ValidatorRowStrings=["Date","Open","High","Low","Close","Adj Close","Volume"]
     #a nice set of lookup tables we need
-    datapointOptionList=["date","open","high","low","close","adj close","volume"]
+    
     
     
     headerRow=rows[0].find_all("th")#type: ignore
@@ -211,14 +211,14 @@ def parseDataSet(retrievedData):
         rowCount=0
         #go through every row
         for row in rows:
-            lineData={}
+            
             #extract the cells
             rowData:list[Tag]=row.find_all("td")#type: ignore
             #if this is a row we aren't supposed to ignore
             
             if(len(rowData)==ValidatorRowStringsLen):#type: ignore
 
-
+                lineData:Any=[None]*len(rowData)
                 #go through its columns
                 for pointIndex, point in enumerate(rowData):
                     #if this is the date index
@@ -227,7 +227,7 @@ def parseDataSet(retrievedData):
 
                         dates[parsedDate]=rowCount
                     else:#otherwise save it like normal
-                        lineData[datapointOptionList[pointIndex]]=str(point.get_text(strip=True))#type: ignore
+                        lineData[pointIndex]=str(point.get_text(strip=True))#type: ignore
 
                 #save what we extracted
                 dataList.append(lineData)
@@ -995,6 +995,7 @@ def main(fileName):
     validateCommands(commands)
 
     commands=compileCommands(commands)
+    easyCLI.fastln(3)
     #grab the webpages
     webPages=retrieveWebPages(links[0],links[2],links[3])
     #extract their raw data
