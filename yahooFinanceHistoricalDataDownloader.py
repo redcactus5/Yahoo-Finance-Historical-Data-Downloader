@@ -27,7 +27,7 @@ from datetime import date
 from datetime import timedelta
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 import bisect
-
+from typing import Any
 
 def shuffle(inputList:list):
     #make a copy of our input
@@ -526,11 +526,8 @@ def equalizeListLens(listSet:list[list]):
             #and extend it with an empty list of that length
             subList.extend([None]*neededSpace)
     
-    
-
-
-
-
+#back up of old version  
+'''
 #make sure all categories exist
 def updateCategories(newCategories:list, oldCategories:list, values:list[list])->tuple[bool,dict]:
     #lookup table of the categories and their orders
@@ -569,6 +566,66 @@ def updateCategories(newCategories:list, oldCategories:list, values:list[list])-
                     break
                 #if we are between before and after and not at the start or end
                 elif((newPos<existingPos)and(newPos>categoryList[oldCategories[existing-1]])):
+                    #insert it here, and give it a list
+                    oldCategories.insert(existing,cat)
+                    values.insert(existing,[])
+                    break
+                
+    
+    
+    if(categoriesUpdated):
+        newDict={}
+        builderList=[(category,index) for index, category in enumerate(oldCategories)]
+        newDict.update(builderList)
+        return (True,newDict)
+    
+    return (False,None)#type: ignore
+'''
+
+
+
+#make sure all categories exist
+def updateCategories(newCategories:list, oldCategories:list, values:list[list])->tuple[bool,dict]:
+    #lookup table of the categories and their orders
+    
+    #categoryLookupList={0:"date",1:"open",2:"high",3:"low",4:"close",5:"adj close",6:"volume"}
+    categoryListSet=set(range(7))
+    
+    categoriesUpdated=False
+    #loop through the categories we are adding
+    oldCategoriesSet=set(oldCategories)
+
+
+    for cat in newCategories:
+        #if this is valid
+        if((not(cat in categoryListSet)) or cat==0):
+            categoryList={"date":0,"open":1,"high":2,"low":3,"close":4,"adj close":5,"volume":6}
+            raise Exception("command error, provided category: "+str(cat)+" is not a valid category\n valid categories "+", ".join(categoryList))
+        
+            #if we dont need to ignore this one
+        elif(not(cat in oldCategoriesSet)):
+            categoriesUpdated=True
+            #find where in the category list it is supposed to go
+            newPos:int=cat
+            oldCategoriesSet.add(cat)
+            #go through all currently existing categories
+            for existing in range(len(oldCategories)):
+                #find where in the master category list the old one is
+                existingPos:int=oldCategories[existing]
+                #if the new category must go behind the one at index zero
+                if((existing==0)and(newPos<existingPos)):
+                    #insert it there and give it an empty list
+                    oldCategories.insert(existing,cat)
+                    values.insert(existing,[])
+                    break
+                    #if the new category must after the end of the one at index zero
+                elif((existing==len(oldCategories)-1)and(newPos>existingPos)):
+                    #append it there and give it an empty list
+                    oldCategories.append(cat)
+                    values.append([])
+                    break
+                #if we are between before and after and not at the start or end
+                elif((newPos<existingPos)and(newPos>oldCategories[existing-1])):
                     #insert it here, and give it a list
                     oldCategories.insert(existing,cat)
                     values.insert(existing,[])
@@ -663,21 +720,41 @@ def generateDateRange(startDate:date,endDate:date):
     return dateRange
 
 
-def compileCommands(rawCommands:list[dict]):
+def compileCommands(rawCommands:list[dict])->list[tuple[int,list[int],list[date]]]:
     easyCLI.fastPrint("compiling commands...")
+    #cache this for later
     rawCommandLen=len(rawCommands)
-    compiledCommands=[None]*rawCommandLen
+
+    #preallocate while shutting up linter
+    compiledCommands:Any=[None]*rawCommandLen
+
+    #lookup tables
+    masterCategoryList={"date":0,"open":1,"high":2,"low":3,"close":4,"adj close":5,"volume":6}
     commandIDTable={"specific dates":0,"all data":1,"date range":2}
+
+
     for commandNumber, command in enumerate(rawCommands):
-        easyCLI.fastPrint("compiling command "+str(commandNumber+1)+" of "+str(rawCommandLen))
+        easyCLI.fastPrint("compiling command "+str(commandNumber+1)+" of "+str(rawCommandLen)+"...")
         #convert the dates to date objects
         dateList:list[str]=command["dates"]
+        newDateList=[]
         if(len(dateList)>0): 
             newDateList=[datetime.strptime(date, "%m/%d/%Y").date() for date in dateList]
-            command["dates"]=newDateList
+            
 
-        command["command"]=commandIDTable[command["command"]]
-    easyCLI.fastPrint("done.\n\n")
+        commandID=commandIDTable[command["command"]]
+
+        categoryList=command["attributes"]
+        newCategoryList=[masterCategoryList[category] for category in categoryList]
+        compiledCommands[commandNumber]=(commandID,newCategoryList,newDateList)
+        print("done\n")
+
+
+    
+    easyCLI.fastPrint("compilation successful.\n\n")
+    
+    
+    return compiledCommands
 
         
         
@@ -687,8 +764,11 @@ def compileCommands(rawCommands:list[dict]):
    
 def validateCommands(commands:list[dict]):
     easyCLI.fastPrint("validating commands...\n")
+
     validCommands=set(["specific dates","all data","date range"])
     validAttributes=set(["date","open","high","low","close","adj close","volume"])
+
+
     for commandNumber, command in enumerate(commands):
         easyCLI.fastPrint("validating command "+str(commandNumber+1)+" of "+str(len(commands)))
         commandDates=command.get("dates")
@@ -738,7 +818,7 @@ def validateCommands(commands:list[dict]):
 
 
 
-def executeCommand(stock:dict,dates:list[date],attributes:list[str],categoryLookupDict:dict[str,int],values:list[list]):
+def executeCommand(stock:dict,dates:list[date],attributes:list[int],categoryLookupDict:dict[int,int],values:list[list]):
    
     for date in dates:
         #find the line for this date
@@ -757,7 +837,7 @@ def executeCommand(stock:dict,dates:list[date],attributes:list[str],categoryLook
 
 
 
-def processStocks(commands:list[dict],stocks:list[dict]):
+def processStocks(commands:list[tuple],stocks:list[dict]):
     easyCLI.fastPrint("executing commands...\n")
 
     buffer=[]
@@ -782,8 +862,8 @@ def processStocks(commands:list[dict],stocks:list[dict]):
         for stockNumber, stock in enumerate(stocks):
             #extract name and create a list for the categories, and a 2d list for the values
             name=stock.get("name")
-            categories=["date"]
-            categoryLookupDict:dict[str,int]={"date":0}#can be sped up
+            categories=[0]
+            categoryLookupDict:dict[int,int]={0:0}
             values:list[list]=[[]]
             stockDates:dict=stock["dates"]
             #create a variable for our progress through this stock
@@ -795,9 +875,9 @@ def processStocks(commands:list[dict],stocks:list[dict]):
 
                 #grab and validate the values we need from the command
                 
-                action:int=command["command"]
-                commandDates:list[date]=command["dates"]
-                attributes:list[str]=command["attributes"]
+                action:int=command[0]
+                commandDates:list[date]=command[2]
+                attributes:list[int]=command[1]
                 #make sure the lists have the attributes in the command
                 possibleNewDict=updateCategories(attributes,categories,values)
                 if(possibleNewDict[0]):
@@ -837,6 +917,7 @@ def outputRenderedResults(displayList:list[dict],outputFileName:str):
     easyCLI.fastPrint("rendering results...")
     #create a buffer
     buffer=[]
+    categoryLookupList={0:"date",1:"open",2:"high",3:"low",4:"close",5:"adj close",6:"volume"}
 
     gap=[[None]]*3
 
@@ -844,7 +925,8 @@ def outputRenderedResults(displayList:list[dict],outputFileName:str):
     for item in displayList:
         #render the header data
         buffer.append([item["name"],])
-        categories=item["categories"]
+        #convert the compiled categories back to human readable ones
+        categories=[categoryLookupList[datapoint] for datapoint in item["categories"]]
         buffer.append(categories)
         #grab the data
         values=item["values"]
@@ -958,7 +1040,7 @@ def main(fileName):
     
     validateCommands(commands)
 
-    compileCommands(commands)
+    commands=compileCommands(commands)
     #grab the webpages
     webPages=retrieveWebPages(links[0],links[1],links[2])
     #extract their raw data
