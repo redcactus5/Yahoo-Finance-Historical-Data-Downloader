@@ -791,7 +791,7 @@ def executeCommand(stock:dict,dates:list[date],attributes:list[int],categoryLook
 def processStocks(commands:list[tuple],stocks:list[dict]):
     easyCLI.fastPrint("executing commands...\n")
 
-    buffer=[]
+    buffer=[dict()]*len(stocks)
     
     #if we have something to do
     if(len(commands)>0):
@@ -853,7 +853,7 @@ def processStocks(commands:list[tuple],stocks:list[dict]):
             #save this stock's data as a render object
             renderObj={"name":name,"categories":categories,"values":values}
             #put it in our buffer
-            buffer.append(renderObj)
+            buffer[stockNumber]=renderObj
             #increment our command count
            
 
