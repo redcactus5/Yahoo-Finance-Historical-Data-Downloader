@@ -789,7 +789,7 @@ def executeCommand(stock:dict,dates:list[date],attributes:list[int],categoryLook
 
 
 def processStocks(commands:list[tuple],stocks:list[dict]):
-    easyCLI.fastPrint("executing commands...\n")
+    easyCLI.fastPrint("executing commands...\n\n")
 
     buffer=[dict()]*len(stocks)
     
@@ -812,6 +812,7 @@ def processStocks(commands:list[tuple],stocks:list[dict]):
         #loop through our stocks
         for stockNumber, stock in enumerate(stocks):
             #extract name and create a list for the categories, and a 2d list for the values
+            
             name=stock.get("name")
             categories=[0]
             categoryLookupDict:dict[int,int]={0:0}
