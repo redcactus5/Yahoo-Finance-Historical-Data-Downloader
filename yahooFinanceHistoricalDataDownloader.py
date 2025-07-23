@@ -6,7 +6,7 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>. 
 '''
 
-URLLISTFILE="config/stockLinkConfig.json"
+URLLISTFILE="config/downloadConfig.json"
 COMMANDFILE="config/commands.json"
 BROWSERPATH="webproxy/Playwright.exe"
 DOWNLOADRETRYLIMIT=5
@@ -272,7 +272,7 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
     jsonDict:dict=dict()
     #create our template
     template={
-        "links":["put historical data links here"],
+        "URLs":["put historical data links here"],
         "sort alphabetical":"set to true if you want your stocks sorted alphabetically",
         "page load begin timeout":"put the time in seconds you want to give the page to start loading here (a value of zero means no timeout)",
         "page load completion timeout":"put the time in seconds you want to give the retrieval to complete here (used for all 6 completion checks) (a value of zero means no timeout)"
@@ -300,13 +300,13 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
 
     #validation step
     try:
-        links=jsonDict.get("links")#type:ignore
+        links=jsonDict.get("URLs")#type:ignore
         
 
     
     except Exception:
         easyCLI.waitForFastWriterFinish()
-        raise Exception("config error: config \"links\" list corrupted or not found")
+        raise Exception("config error: downloadConfig \"URLs\" list corrupted or not found")
 
     #make a variable for the sorting variable 
     shouldSort=False
@@ -316,7 +316,7 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
         shouldSort=jsonDict.get("sort alphabetical")
     except:
         easyCLI.waitForFastWriterFinish()
-        raise Exception("config error: config links \"should sort\" value corrupted or not found")
+        raise Exception("config error: downloadConfig \"should sort\" value corrupted or not found")
     
     #make a variable for the start timeout
     startTimeout=0
@@ -326,7 +326,7 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
         startTimeout=jsonDict.get("page load begin timeout")
     except:
         easyCLI.waitForFastWriterFinish()
-        raise Exception("config error: config links \"page load begin timeout\" corrupted or not found")
+        raise Exception("config error: downloadConfig \"page load begin timeout\" value corrupted or not found")
 
     endTimeout=0
 
@@ -334,7 +334,7 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
         endTimeout=jsonDict.get("page load completion timeout")
     except:
         easyCLI.waitForFastWriterFinish()
-        raise Exception("config error: config links page load begin timeout corrupted or not found")
+        raise Exception("config error: downloadConfig \"page load completion timeout\" value corrupted or not found")
 
     #check if the template is found
     if(len(links)==1):
@@ -353,10 +353,10 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
     #more error detection
     if(not isinstance(links,list)):
         easyCLI.waitForFastWriterFinish()
-        raise Exception("config error: config \"links\" list corrupted or not found")
+        raise Exception("config error: config \"URLs\" list corrupted or not found")
     elif(len(links)==0):
         easyCLI.waitForFastWriterFinish()
-        raise Exception("config error: config \"links\" list is empty!")
+        raise Exception("config error: config \"URLs\" list is empty!")
     elif(not isinstance(shouldSort,bool)):
         easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config \"should sort\" value corrupted or not found")
@@ -381,7 +381,7 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
     #loop through the links
     for link in range(len(links)):
         if(type(links[link])!=str):#check if the link actually exists
-            raise Exception("link error: non string link found")
+            raise Exception("URL error: non string URL found")
         #look for the part we are interested in
         idPos=links[link].find(endID)
         #if we find it, overwrite the old unix time value with the current one
@@ -975,6 +975,7 @@ def main(fileName):
         links:tuple=rawLinks
         rawLinks=None
     else:
+        easyCLI.waitForFastWriterFinish()
         raise Exception("error: url loading failed")
     
 
@@ -986,6 +987,7 @@ def main(fileName):
         commands=rawCommands
         rawCommands=None
     else:
+        easyCLI.waitForFastWriterFinish()
         raise Exception("error: command loading failed")
  
     easyCLI.fastPrint("done.\n\n")
@@ -1024,7 +1026,7 @@ def main(fileName):
 def startup():  
     licenseScreen()
     #if the user wants to download the data
-    if(easyCLI.booleanQuestionScreen("would you like to download the pre-configured market data?",None)):
+    if(easyCLI.booleanQuestionScreen("would you like to download the configured market data?",None)):
         #have the user the file name they want
         fileName=easyCLI.enterFileNameScreen("please enter the name of the output file.\nwarning, if the file already exists, it will be overwritten.","(do not include the file extension)")+".csv"
         #then start the main program
@@ -1050,6 +1052,9 @@ if(__name__=="__main__"):
         print("This program is open source and must be distributed with its licenses.")
         print("Please ensure the LICENSE.txt is present, and the LICENSES directory is \npresent and contains easyCLI-GPL3-LICENSE.txt, BeautifulSoup-MIT-LICENSE.txt, \nNuitka-Apache-2.0-LICENSE.txt, WebKit-LGPL-2.0-BSD-License.txt, and Playwright-Apache-2.0-LICENSE.txt.")
         input("press enter to finish")
+        easyCLI.ln(1)
+        print("now exiting...")
+        easyCLI.ln(1)
     else:
         startup()
         print("now exiting...")
