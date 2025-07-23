@@ -734,7 +734,7 @@ def compileCommands(rawCommands:list[dict])->list[tuple[int,list[int],list[date]
 
 
     for commandNumber, command in enumerate(rawCommands):
-        easyCLI.fastPrint("compiling command "+str(commandNumber+1)+" of "+str(rawCommandLen)+"...")
+        easyCLI.fastPrint("".join(("compiling command ",str(commandNumber+1)," of ",str(rawCommandLen),"...")))
         #convert the dates to date objects
         dateList:list[str]=command["dates"]
         newDateList=[]
