@@ -373,8 +373,8 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
         easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config \"page load completion timeout\" value must be 0 or greater!")
     else:
-        startTimeout=float(startTimeout)
-        endTimeout=float(endTimeout)
+        startTimeout=float(startTimeout*1000)
+        endTimeout=float(endTimeout*1000)
 
     #some link shenanigans to grab the data for the current date
     endID="period2="

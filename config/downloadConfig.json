@@ -10,5 +10,7 @@
         "https://finance.yahoo.com/quote/%5EDJI/history/?period1=1720823189&period2=1752192000"
         
         ],
-    "sort alphabetical":false
+    "sort alphabetical":false,
+    "page load begin timeout":60,
+    "page load completion timeout":120
 }
