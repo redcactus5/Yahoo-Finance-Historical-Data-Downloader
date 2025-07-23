@@ -586,21 +586,21 @@ def updateCategories(newCategories:list, oldCategories:list, values:list[list])-
 
 #make sure all categories exist
 def updateCategories(newCategories:list, oldCategories:list, values:list[list])->tuple[bool,dict]:
-    #lookup table of the categories and their orders
     
     #categoryLookupList={0:"date",1:"open",2:"high",3:"low",4:"close",5:"adj close",6:"volume"}
+    #master category list 
     categoryListSet=set(range(7))
     
     categoriesUpdated=False
-    #loop through the categories we are adding
+    
     oldCategoriesSet=set(oldCategories)
 
-
+    #loop through the categories we are adding
     for cat in newCategories:
         #if this is valid
         if((not(cat in categoryListSet)) or cat==0):
-            categoryList={"date":0,"open":1,"high":2,"low":3,"close":4,"adj close":5,"volume":6}
-            raise Exception("command error, provided category: "+str(cat)+" is not a valid category\n valid categories "+", ".join(categoryList))
+            categoryStringList=["date","open","high","low","close","adj close","volume"]
+            raise Exception("command error, provided category: "+str(cat)+" is not a valid category\n valid categories "+", ".join(categoryStringList))
         
             #if we dont need to ignore this one
         elif(not(cat in oldCategoriesSet)):
