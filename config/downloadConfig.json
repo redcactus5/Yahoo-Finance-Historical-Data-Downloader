@@ -12,5 +12,6 @@
         ],
     "sort alphabetical":false,
     "page load begin timeout":60,
-    "page load completion timeout":120
+    "page load completion timeout":120,
+    "download retry limit":5
 }
