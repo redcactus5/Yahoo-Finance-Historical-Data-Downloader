@@ -738,7 +738,7 @@ def compileCommands(rawCommands:list[dict])->list[tuple[int,list[int],list[date]
 
 
     
-    easyCLI.fastPrint("\ncompilation successful.\n")
+    easyCLI.fastPrint("compilation successful.\n")
     
     
     return compiledCommands
@@ -987,7 +987,7 @@ def main(fileName):
     #write the header
     easyCLI.fastUIHeader()
     
-    easyCLI.fastPrint("starting setup.\n")
+    easyCLI.fastPrint("beginning setup...\n")
     #startup checks and loading of config files
     easyCLI.fastPrint("loading urls...")
     
