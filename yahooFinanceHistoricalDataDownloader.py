@@ -1023,7 +1023,7 @@ def main(fileName):
     validateCommands(commands)
 
     commands=compileCommands(commands)
-    easyCLI.fastPrint("setup complete.")
+    easyCLI.fastPrint("\nsetup complete.")
     easyCLI.fastln(4)
     easyCLI.fastPrint("starting data retrieval process...\n\n")
     
