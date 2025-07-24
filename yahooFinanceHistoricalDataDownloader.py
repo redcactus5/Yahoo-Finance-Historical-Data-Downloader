@@ -734,7 +734,7 @@ def compileCommands(rawCommands:list[dict])->list[tuple[int,list[int],list[date]
         categoryList=command["attributes"]
         newCategoryList=[masterCategoryList[category] for category in categoryList]
         compiledCommands[commandNumber]=(commandID,newCategoryList,newDateList)
-        print("done.\n")
+        easyCLI.fastPrint("done.\n")
 
 
     
@@ -987,7 +987,7 @@ def main(fileName):
     #write the header
     easyCLI.fastUIHeader()
     
-    easyCLI.fastPrint("setting up...\n")
+    easyCLI.fastPrint("starting setup.\n")
     #startup checks and loading of config files
     easyCLI.fastPrint("loading urls...")
     
@@ -1024,7 +1024,7 @@ def main(fileName):
 
     commands=compileCommands(commands)
     easyCLI.fastPrint("setup complete.")
-    easyCLI.fastln(6)
+    easyCLI.fastln(4)
     easyCLI.fastPrint("starting data retrieval process...\n\n")
     
     #grab the webpages
