@@ -145,7 +145,15 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
         #if there is an error first close the browser then crash, so we dont leave resources running
         except Exception as E:
             browser.close()
+            easyCLI.waitForFastWriterFinish()
             raise(E)
+        
+        except KeyboardInterrupt as E:
+            browser.close()
+            easyCLI.waitForFastWriterFinish()
+            raise(E)
+
+
     
   
     easyCLI.fastPrint("all page retrievals complete.\n\n")

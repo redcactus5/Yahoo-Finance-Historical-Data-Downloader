@@ -418,12 +418,13 @@ class _PrivateInternalAsyncWriterThread(_privateInternalReferenceKeeperObjDoNotE
     
             self._stopped=True
         
-        except Exception:
+        except Exception as e:
             import traceback
-            import os
-            print("Exception in fast cli Worker thread:")
+            import sys
+            print("Exception in fast writer worker thread:")
             traceback.print_exc()
-            os._exit(1)
+            print(e)
+            sys.exit(1)
         
 
     def addItemToQueue(self,*args, **kwargs):
