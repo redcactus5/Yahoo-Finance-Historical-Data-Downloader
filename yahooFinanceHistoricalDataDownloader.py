@@ -788,7 +788,7 @@ def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:li
 
 
 def processStocks(commands:list[tuple],stocks:list[dict]):
-    easyCLI.fastPrint("executing commands...\n")
+    easyCLI.fastPrint("executing commands...\n\n")
 
     buffer=[dict()]*len(stocks)
     
@@ -811,7 +811,7 @@ def processStocks(commands:list[tuple],stocks:list[dict]):
         #loop through our stocks
         for stockNumber, stock in enumerate(stocks):
             #extract name and create a list for the categories, and a 2d list for the values
-            easyCLI.fastPrint("".join(("processing of stock: \"",str(stock.get("name")),"\" (stock ",str(stockNumber+1)," of ",stockListLen,")...")))
+            easyCLI.fastPrint("".join(("processing stock: \"",str(stock.get("name")),"\" (stock ",str(stockNumber+1)," of ",stockListLen,")...")))
             name=stock.get("name")
             categories=[0]
             categoryLookupDict:dict[int,int]={0:0}
@@ -855,10 +855,10 @@ def processStocks(commands:list[tuple],stocks:list[dict]):
             renderObj={"name":name,"categories":categories,"values":values}
             #put it in our buffer
             buffer[stockNumber]=renderObj
-            #increment our command count
+            easyCLI.fastPrint("processing done.")
            
 
-    easyCLI.fastPrint("command execution done.\n\n")
+    easyCLI.fastPrint("command execution complete.\n\n")
     return buffer
 
 
