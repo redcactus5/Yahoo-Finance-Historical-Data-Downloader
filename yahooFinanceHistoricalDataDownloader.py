@@ -760,7 +760,7 @@ def validateCommands(commands:list[dict]):
         elif(not (parseCommand in validCommands)):
             raise Exception("command error: command has an invalid value of: "+str(parseCommand)+" with a type of "+str(type(parseCommand)))
         easyCLI.fastPrint("done\n")
-    easyCLI.fastPrint("validation successful.\n\n")
+    easyCLI.fastPrint("validation complete.\n\n")
 
 
     return True
