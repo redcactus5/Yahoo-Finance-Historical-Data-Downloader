@@ -9,7 +9,7 @@ You should have received a copy of the GNU General Public License along with thi
 URLLISTFILE="config/downloadConfig.json"
 COMMANDFILE="config/commands.json"
 BROWSERPATH="webproxy/Playwright.exe"
-DOWNLOADRETRYLIMIT=5
+
 
 
 from bs4 import BeautifulSoup
@@ -35,7 +35,7 @@ proxyVar:playwright.sync_api.Browser|None=None
 proxyExists=False
 
 
-def possibleRaceConditionHandler():
+def onQuitRaceConditionHandler():
     global proxyExists
     global proxyVar
     if(proxyExists and isinstance(proxyVar,playwright.sync_api.Browser)):
@@ -58,10 +58,9 @@ def shuffle(inputList:list):
     return (scrambledList,randomPosList)
 
 
-def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompletionTimeout:float):
+def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompletionTimeout:float,downloadRetryLimit:int):
     #grab our constants
     global BROWSERPATH
-    global DOWNLOADRETRYLIMIT
     global proxyVar
     global proxyExists
     easyCLI.fastPrint("starting webpage retrieval...\n")
@@ -129,7 +128,8 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                         #cleanup the fail
                         page.close()
                         tryCount+=1
-                        if(tryCount>DOWNLOADRETRYLIMIT):#if we go past our retry limit, give up
+                        if(tryCount>downloadRetryLimit):#if we go past our retry limit, give up
+                            easyCLI.waitForFastWriterFinish()
                             raise Exception("download error: retry limit exceeded for url: "+str(links[urlIndex]))
                         easyCLI.fastPrint("\ndownload timed out.")
                         easyCLI.fastPrint("retrying...\n")
@@ -174,6 +174,7 @@ def retrieveTableAndName(htmlText)->tuple[str,Tag]:
     name=scraper.find("h1",class_="yf-4vbjci")
     
     if(name is None):
+        easyCLI.waitForFastWriterFinish()
         raise Exception("error: no stock name found in page.")
     
     name=name.get_text()#type: ignore
@@ -183,11 +184,13 @@ def retrieveTableAndName(htmlText)->tuple[str,Tag]:
     
 
     if(table is None):
+        easyCLI.waitForFastWriterFinish()
         raise Exception("error: no tables found in page.")
     
     if(isinstance(table,Tag)):
         return (name,table)
     else:
+        easyCLI.waitForFastWriterFinish()
         raise Exception("error: table in page is corrupted.")
 
 
@@ -221,7 +224,8 @@ def parseDataSet(retrievedData):
 
     #safety check to make sure the table is populated
     if(len(rows)<1):
-        raise Exception("error, table is empty.")
+        easyCLI.waitForFastWriterFinish()
+        raise Exception("error: data table is empty.")
     
 
     #validate to make sure the table is actually the one we want. if it fails, yahoo changed their website, or the link was wrong
@@ -265,6 +269,7 @@ def parseDataSet(retrievedData):
                 #increment rowcount since we found a row
                 rowCount+=1
     else:
+        easyCLI.waitForFastWriterFinish()
         raise Exception("error: invalid data table.")
     
 
@@ -296,17 +301,18 @@ def parseDataSets(rawDataList,sortAlphabetical):
 
 
 
-def loadLinks() -> tuple[list[str],bool,float,float] | bool:
+def loadLinks() -> tuple[list[str],bool,float,float,int] | bool:
 
     #create a dictionary for our link config and load its location string
     global URLLISTFILE
     jsonDict:dict=dict()
     #create our template
     template={
-        "URLs":["put historical data links here"],
-        "sort alphabetical":"set to true if you want your stocks sorted alphabetically",
-        "page load begin timeout":"put the time in seconds you want to give the page to start loading here (a value of zero means no timeout)",
-        "page load completion timeout":"put the time in seconds you want to give the retrieval to complete here (used for all 6 completion checks) (a value of zero means no timeout)"
+        "URLs":["put historical data links here."],
+        "sort alphabetical":"set to true if you want your stocks sorted alphabetically.",
+        "page load begin timeout":"put the time in seconds you want to give the page to start loading here (a value of zero means no timeout).",
+        "page load completion timeout":"put the time in seconds you want to give the retrieval to complete here (used for all 6 completion checks) (a value of zero means no timeout).",
+        "download retry limit":"put the number of download retry attempts you want to allow here."
     }
     #if we cant find the list, save our template in its place, then exit
     if(not os.path.exists(URLLISTFILE)):
@@ -329,12 +335,9 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
     #create a list for our links
     links:list[str]=[]
 
-    #validation step
+    #validation steps and loading
     try:
         links=jsonDict.get("URLs")#type:ignore
-        
-
-    
     except Exception:
         easyCLI.waitForFastWriterFinish()
         raise Exception("config error: downloadConfig \"URLs\" list corrupted or not found.")
@@ -350,7 +353,7 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
         raise Exception("config error: downloadConfig \"should sort\" value corrupted or not found.")
     
     #make a variable for the start timeout
-    startTimeout=0
+    startTimeout=-1
 
     try:
         #save our start timeout value
@@ -359,7 +362,7 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
         easyCLI.waitForFastWriterFinish()
         raise Exception("config error: downloadConfig \"page load begin timeout\" value corrupted or not found.")
 
-    endTimeout=0
+    endTimeout=-1
 
     try:
         endTimeout=jsonDict.get("page load completion timeout")
@@ -367,19 +370,16 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
         easyCLI.waitForFastWriterFinish()
         raise Exception("config error: downloadConfig \"page load completion timeout\" value corrupted or not found.")
 
-    #check if the template is found
-    if(len(links)==1):
-        if(links[0]=="put historical data links here"):
-            if(shouldSort=="set to true if you want your stocks sorted alphabetically"):
-                if(startTimeout=="put the time in seconds you want to give the page to start loading here (a value of zero means no timeout)"):
-                    if(endTimeout=="put the time in seconds you want to give the retrieval to complete here (used for all 6 completion checks) (a value of zero means no timeout)"):
-                        easyCLI.waitForFastWriterFinish()
-                        #if so, print a message then exit
-                        easyCLI.uiHeader()
-                        print("found link file is the template file!")
-                        print("please enter your historical data links into the \""+URLLISTFILE+"\" then restart the program to download data.\n\n")
-                        input("press enter to finish.")
-                        return False
+
+    retryLimit=-1
+
+    try:
+        retryLimit=jsonDict.get("download retry limit")
+    except:
+        easyCLI.waitForFastWriterFinish()
+        raise Exception("config error: downloadConfig \"download retry limit\" value corrupted or not found.")
+
+    
 
     #more error detection
     if(not isinstance(links,list)):
@@ -388,7 +388,26 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
     elif(len(links)==0):
         easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config \"URLs\" list is empty!")
-    elif(not isinstance(shouldSort,bool)):
+    
+
+    #check if the template is found
+    if(len(links)==1):
+        if(links[0]=="put historical data links here."):
+            if(shouldSort=="set to true if you want your stocks sorted alphabetically."):
+                if(startTimeout=="put the time in seconds you want to give the page to start loading here (a value of zero means no timeout)."):
+                    if(endTimeout=="put the time in seconds you want to give the retrieval to complete here (used for all 6 completion checks) (a value of zero means no timeout)."):
+                        if(retryLimit=="put the number of download retry attempts you want to allow here."):
+                            easyCLI.waitForFastWriterFinish()
+                            #if so, print a message then exit
+                            easyCLI.uiHeader()
+                            print("found link file is the template file!")
+                            print("please enter your historical data links into the \""+URLLISTFILE+"\" then restart the program to download data.\n\n")
+                            input("press enter to finish.")
+                            return False
+
+
+    #finish our error detection:
+    if(not isinstance(shouldSort,bool)):
         easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config \"should sort\" value corrupted or not found.")
     elif(not isinstance(startTimeout,(float,int))):
@@ -403,15 +422,28 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
     elif(isinstance(endTimeout,(float,int))and(endTimeout<0)):
         easyCLI.waitForFastWriterFinish()
         raise Exception("config error: config \"page load completion timeout\" value must be 0 or greater!")
+    elif((not isinstance(retryLimit,int))):
+        easyCLI.waitForFastWriterFinish()
+        raise Exception("config error: config \"download retry limit\" value corrupted or not found.")
+    elif(isinstance(retryLimit,float)):
+        easyCLI.waitForFastWriterFinish()
+        raise Exception("config error: \"download retry limit\" value must be an integer!")
+    elif(isinstance(retryLimit,int)and(retryLimit<0)):
+        easyCLI.waitForFastWriterFinish()
+        raise Exception("config error: \"download retry limit\" value must be 0 or greater!")
     else:
+        #all safety checks passed
         startTimeout=float(startTimeout*1000)
         endTimeout=float(endTimeout*1000)
+
+
 
     #some link shenanigans to grab the data for the current date
     endID="period2="
     #loop through the links
     for link in range(len(links)):
         if(type(links[link])!=str):#check if the link actually exists
+            easyCLI.waitForFastWriterFinish()
             raise Exception("URL error: non string URL found.")
         #look for the part we are interested in
         idPos=links[link].find(endID)
@@ -420,7 +452,7 @@ def loadLinks() -> tuple[list[str],bool,float,float] | bool:
             links[link]=links[link][0:idPos+len(endID)]+str(int(time.time()))
     
 
-    return (links,shouldSort,startTimeout,endTimeout)
+    return (links,shouldSort,startTimeout,endTimeout,retryLimit)
 
 
 
@@ -548,7 +580,7 @@ def findDateInsertionPoint(date:date,dates:list[date]):
         return (2, False)
 
         
-
+    easyCLI.waitForFastWriterFinish()
     raise Exception("error: insertion point search failure, no insertion point found.")
 
 
@@ -587,6 +619,7 @@ def updateCategories(newCategories:list, oldCategories:list, values:list[list])-
         #if this is valid
         if((not(cat in categoryListSet)) or cat==0):
             categoryStringList=["date","open","high","low","close","adj close","volume"]
+            easyCLI.waitForFastWriterFinish()
             raise Exception("command error, provided category: "+str(cat)+" is not a valid category\n valid categories "+", ".join(categoryStringList),".")
         
             #if we dont need to ignore this one
@@ -666,6 +699,7 @@ def insertValue(date:date, value:str, category:str, categoryLookupDict:dict, val
         values[categoryIndex][len(values[0])-1]=value
     else:
         #paranoid doomsday clause. it should never happen, but if it does, we catch it
+        easyCLI.waitForFastWriterFinish()
         raise Exception("error: value insertion failed, no insertion point found.")
 
 
@@ -689,9 +723,11 @@ def generateDateRange(startDate:date,endDate:date):
         end=startDate
     else:
         #paranoid doomsday clause
+        easyCLI.waitForFastWriterFinish()
         raise Exception("error: date comparison failure, no comparison case hit.")
     #paranoid safety check
     if((start is None)or(end is None)):
+        easyCLI.waitForFastWriterFinish()
         raise Exception("error: date range generation failure, internal start and end values corrupted.")
     
     #create a list to store every date in the range, inclusive
@@ -760,30 +796,39 @@ def validateCommands(commands:list[dict]):
         easyCLI.fastPrint("validating command "+str(commandNumber+1)+" of "+str(len(commands))+"...")
         commandDates=command.get("dates")
         if(commandDates is None):
+            easyCLI.waitForFastWriterFinish()
             raise Exception("error: invalid command, command "+str(commandNumber+1)+" has no dates value or key value.")
         elif(type(commandDates)!=list):
+            easyCLI.waitForFastWriterFinish()
             raise Exception("error: invalid command, command "+str(commandNumber+1)+" has an invalid dates value.")
         for dateIndex, date in enumerate(commandDates):
             if(type(date)!=str):
+                easyCLI.waitForFastWriterFinish()
                 raise Exception("error: invalid command, date "+str(dateIndex)+" has an invalid value of: "+str(date)+" with a type of "+str(type(date))+".")
 
 
         attributes=command.get("attributes")
         if(attributes is None):
+            easyCLI.waitForFastWriterFinish()
             raise Exception("error: invalid command, command "+str(commandNumber+1)+" has no attributes value or no key value.")
         elif(type(attributes)!=list):
+            easyCLI.waitForFastWriterFinish()
             raise Exception("error: invalid command, command "+str(commandNumber+1)+" has an invalid attributes value.")
         for attributeIndex, attribute in enumerate(attributes):
             if((type(attribute)!=str) or (not(attribute in validAttributes))):
+                easyCLI.waitForFastWriterFinish()
                 raise Exception("error: invalid command, attribute "+str(attributeIndex)+" has an invalid value of: "+str(attribute)+" with a type of "+str(type(attribute))+".")
 
         
         parseCommand=command.get("command")
         if(parseCommand is None):
+            easyCLI.waitForFastWriterFinish()
             raise Exception("error: invalid command, command "+str(commandNumber+1)+" has no command value or no key value.")
         elif(type(parseCommand)!=str):
+            easyCLI.waitForFastWriterFinish()
             raise Exception("error: invalid command, "+str(commandNumber+1)+" has an invalid command value.")
         elif(not (parseCommand in validCommands)):
+            easyCLI.waitForFastWriterFinish()
             raise Exception("error: invalid command, has an invalid value of: "+str(parseCommand)+" with a type of "+str(type(parseCommand))+".")
         easyCLI.fastPrint("done.\n")
     easyCLI.fastPrint("validation complete.\n\n")
@@ -1028,7 +1073,7 @@ def main(fileName):
     easyCLI.fastPrint("starting data retrieval process...\n\n")
     
     #grab the webpages
-    webPages=retrieveWebPages(links[0],links[2],links[3])
+    webPages=retrieveWebPages(links[0],links[2],links[3],links[4])
     #extract their raw data
     rawData=retrieveHtmlListTablesAndName(webPages)
     #save ram, free no longer needed values
@@ -1088,7 +1133,7 @@ if(__name__=="__main__"):
         print("now exiting...")
         easyCLI.ln(1)
     else:
-        atexit.register(possibleRaceConditionHandler)
+        atexit.register(onQuitRaceConditionHandler)
         startup()
         print("now exiting...")
         easyCLI.ln(1)
