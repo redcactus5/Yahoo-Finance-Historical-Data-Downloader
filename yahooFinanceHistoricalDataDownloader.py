@@ -859,7 +859,7 @@ def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:li
 
 
 def processStocks(commands:list[tuple],stocks:list[dict]):
-    easyCLI.fastPrint("executing commands...\n")
+    easyCLI.fastPrint("executing commands...")
 
     buffer=[dict()]*len(stocks)
     
