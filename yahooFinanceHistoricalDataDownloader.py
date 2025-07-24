@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 from bs4 import element
 from bs4 import Tag
 import json
-from playwright.sync_api import sync_playwright
+import playwright.sync_api
 import time
 import random
 import dependencies.easyCLI as easyCLI
@@ -28,6 +28,23 @@ from datetime import timedelta
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 import bisect
 from typing import Any
+import atexit
+
+
+proxyVar:playwright.sync_api.Browser|None=None
+proxyExists=False
+
+
+def possibleRaceConditionHandler():
+    global proxyExists
+    global proxyVar
+    if(proxyExists and isinstance(proxyVar,playwright.sync_api.Browser)):
+        proxyVar.close()
+        proxyVar=None
+        proxyExists=False
+
+
+
 
 def shuffle(inputList:list):
     #make a copy of our input
@@ -45,6 +62,8 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
     #grab our constants
     global BROWSERPATH
     global DOWNLOADRETRYLIMIT
+    global proxyVar
+    global proxyExists
     easyCLI.fastPrint("starting webpage retrieval...\n")
     #make a list for what we download
     pages=[None]*len(links)
@@ -54,9 +73,11 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
     ogPos=scrambled[1]
 
     #the print statements explain most of it
-    with sync_playwright() as p:
+    with playwright.sync_api.sync_playwright() as p:
         easyCLI.fastPrint("launching retriever proxy...")
+        proxyExists=True
         browser = p.webkit.launch(executable_path=BROWSERPATH,headless=True)
+        proxyVar=browser
         try:
             
             easyCLI.fastPrint("done.\n")
@@ -118,6 +139,8 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
             
             easyCLI.fastPrint("cleaning up retriever proxy...")
             browser.close()
+            proxyVar=None
+            proxyExists=False
             easyCLI.fastPrint("done.\n")
         #if there is an error first close the browser then crash, so we dont leave resources running
         except Exception as E:
@@ -803,6 +826,7 @@ def processStocks(commands:list[tuple],stocks:list[dict]):
             2: lambda stockDates, commandDates: generateDateRange(commandDates[0], commandDates[1]),  # date range
         }
         stockListLen=str(len(stocks))
+        commandsListLen=str(len(commands))
         #loop through our stocks
         for stockNumber, stock in enumerate(stocks):
             #extract name and create a list for the categories, and a 2d list for the values
@@ -818,7 +842,7 @@ def processStocks(commands:list[tuple],stocks:list[dict]):
             #loop through our commands
             for commandNumber, command in enumerate(commands):
                 #do tuple and string magic for our cli
-                easyCLI.fastPrint("".join(("\nexecuting command ",str(commandNumber+1)," of ",str(len(commands)))))
+                easyCLI.fastPrint("".join(("\nexecuting command ",str(commandNumber+1)," of ",commandsListLen,"...")))
 
                 #grab and validate the values we need from the command
                 
@@ -940,7 +964,7 @@ def licenseScreen():
     
     time.sleep(5)
     
-    print("press enter to agree to the terms of the licenses and continue")
+    print("press enter to agree to the terms of the licenses and continue.")
     input()
 
     
@@ -971,7 +995,7 @@ def main(fileName):
         rawLinks=None
     else:
         easyCLI.waitForFastWriterFinish()
-        raise Exception("error: url loading failed")
+        raise Exception("error: url loading failed.")
     
     easyCLI.fastPrint("done.\n")
     easyCLI.fastPrint("loading commands...")
@@ -984,7 +1008,7 @@ def main(fileName):
         rawCommands=None
     else:
         easyCLI.waitForFastWriterFinish()
-        raise Exception("error: command loading failed")
+        raise Exception("error: command loading failed.")
  
     easyCLI.fastPrint("done.\n\n")
     
@@ -1015,7 +1039,7 @@ def main(fileName):
     easyCLI.waitForFastWriterFinish()
     print("data retrieval complete!\n")
     print("finished in: "+timer.getUnitDeviatedTimeString()+"\n\n\n")
-    input("press enter to finish")
+    input("press enter to finish.")
     easyCLI.ln(3)
     
 
@@ -1051,11 +1075,12 @@ if(__name__=="__main__"):
         print("ERROR: License file(s) not found.")
         print("This program is open source and must be distributed with its licenses.")
         print("Please ensure the LICENSE.txt is present, and the LICENSES directory is \npresent and contains easyCLI-GPL3-LICENSE.txt, BeautifulSoup-MIT-LICENSE.txt, \nNuitka-Apache-2.0-LICENSE.txt, WebKit-LGPL-2.0-BSD-License.txt, and Playwright-Apache-2.0-LICENSE.txt.")
-        input("press enter to finish")
+        input("press enter to finish.")
         easyCLI.ln(1)
         print("now exiting...")
         easyCLI.ln(1)
     else:
+        atexit.register(possibleRaceConditionHandler)
         startup()
         print("now exiting...")
         easyCLI.ln(1)
