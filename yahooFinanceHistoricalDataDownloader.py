@@ -788,7 +788,7 @@ def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:li
 
 
 def processStocks(commands:list[tuple],stocks:list[dict]):
-    easyCLI.fastPrint("executing commands...\n\n")
+    easyCLI.fastPrint("executing commands...\n")
 
     buffer=[dict()]*len(stocks)
     
@@ -807,11 +807,11 @@ def processStocks(commands:list[tuple],stocks:list[dict]):
             1: lambda stockDates, commandDates: list(stockDates.keys()),  # all available dates
             2: lambda stockDates, commandDates: generateDateRange(commandDates[0], commandDates[1]),  # date range
         }
-
+        stockListLen=str(len(stocks))
         #loop through our stocks
         for stockNumber, stock in enumerate(stocks):
             #extract name and create a list for the categories, and a 2d list for the values
-            
+            easyCLI.fastPrint("".join(("processing of stock: \"",str(stock.get("name")),"\" (stock ",str(stockNumber+1)," of ",stockListLen,")...")))
             name=stock.get("name")
             categories=[0]
             categoryLookupDict:dict[int,int]={0:0}
@@ -823,7 +823,7 @@ def processStocks(commands:list[tuple],stocks:list[dict]):
             #loop through our commands
             for commandNumber, command in enumerate(commands):
                 #do tuple and string magic for our cli
-                easyCLI.fastPrint("".join(("\nexecuting command ",str(commandNumber+1)," of ",str(len(commands))," on stock ",str(stockNumber+1)," of ",str(len(stocks)))))
+                easyCLI.fastPrint("".join(("\nexecuting command ",str(commandNumber+1)," of ",str(len(commands)))))
 
                 #grab and validate the values we need from the command
                 
