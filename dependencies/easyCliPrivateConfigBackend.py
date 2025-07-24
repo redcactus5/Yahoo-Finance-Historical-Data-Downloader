@@ -425,6 +425,8 @@ class _PrivateInternalAsyncWriterThread(_privateInternalReferenceKeeperObjDoNotE
             traceback.print_exc()
             print(e)
             sys.exit(1)
+
+
         
 
     def addItemToQueue(self,*args, **kwargs):
