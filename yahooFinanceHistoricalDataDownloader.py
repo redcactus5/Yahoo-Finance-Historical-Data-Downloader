@@ -38,7 +38,7 @@ proxyExists=False
 def onQuitRaceConditionHandler():
     global proxyExists
     global proxyVar
-    if(proxyExists and isinstance(proxyVar,playwright.sync_api.Browser)):
+    if(proxyExists and isinstance(proxyVar,playwright.sync_api.Browser) and proxyVar.is_connected()):
         proxyVar.close()
         proxyVar=None
         proxyExists=False
@@ -77,6 +77,7 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
         proxyExists=True
         browser = p.webkit.launch(executable_path=BROWSERPATH,headless=True)
         proxyVar=browser
+        
         try:
             
             easyCLI.fastPrint("done.\n")
@@ -90,8 +91,20 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                     easyCLI.fastPrint("requesting page from server...")
                     page = browser.new_page()
                     try:
-                        page.goto(url,wait_until="domcontentloaded",timeout=downloadStartTimeout)
+                        response=page.goto(url,wait_until="domcontentloaded",timeout=downloadStartTimeout)
 
+                        if(isinstance(response,playwright.sync_api.Response)):
+                            if(response.url=="https://finance.yahoo.com/?err=404"):
+                                raise Exception("error: stock ticker \""+str(url)+"\" was unable to be found by the answering server.")
+                            elif(response.status==404):
+                                raise Exception("error: network error 404, webpage \""+str(url)+"\" not found, check your connection.")
+                            elif(response.status==500):
+                                raise Exception("error: requesting \""+str(url)+"\" returned network error 500, internal server error.")
+                            #if we get here the request was successful
+                        elif(response is None):
+                            raise Exception("error: network request for page \""+str(url)+"\" returned no response.")
+                        else:
+                            raise Exception("error: catastrophic internal program error during download process.")
 
                         easyCLI.fastPrint("downloading page...")
 
