@@ -85,7 +85,7 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                         wait=1+random.randint(0,3)+random.random()
                         easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
                         time.sleep(wait)
-                        easyCLI.fastPrint("done.\n")
+                        easyCLI.fastPrint("done.")
                         
                         easyCLI.fastPrint("requesting dataset from server...")
                         response=page.goto(url,wait_until="domcontentloaded",timeout=downloadStartTimeout)
