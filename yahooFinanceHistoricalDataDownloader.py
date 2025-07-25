@@ -28,20 +28,7 @@ from datetime import timedelta
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 import bisect
 from typing import Any
-import atexit
 
-
-proxyVar:playwright.sync_api.Browser|None=None
-proxyExists=False
-
-
-def onQuitRaceConditionHandler():
-    global proxyExists
-    global proxyVar
-    if(proxyExists and isinstance(proxyVar,playwright.sync_api.Browser) and proxyVar.is_connected()):
-        proxyVar.close()
-        proxyVar=None
-        proxyExists=False
 
 
 
@@ -61,8 +48,7 @@ def shuffle(inputList:list):
 def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompletionTimeout:float,downloadRetryLimit:int):
     #grab our constants
     global BROWSERPATH
-    global proxyVar
-    global proxyExists
+
     easyCLI.fastPrint("starting webpage retrieval...\n")
     #make a list for what we download
     pages=[None]*len(links)
@@ -74,11 +60,9 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
     #the print statements explain most of it
     with playwright.sync_api.sync_playwright() as p:
         easyCLI.fastPrint("launching retriever proxy...")
-        proxyExists=True
+      
         browser = p.webkit.launch(executable_path=BROWSERPATH,headless=True)
-        proxyVar=browser
-        context=browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36")
-        
+        context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36")
         
         try:
             
@@ -94,6 +78,11 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                     page = context.new_page()
                     
                     try:
+                        page.goto("https://finance.yahoo.com/",wait_until="domcontentloaded",timeout=downloadStartTimeout)
+                        wait=1+random.randint(0,3)+random.random()
+                        easyCLI.fastPrint("waiting "+f"{wait:.1f}"+"  second anti-antibot delay...")
+                        time.sleep(wait)
+                        
                         response=page.goto(url,wait_until="domcontentloaded",timeout=downloadStartTimeout)
 
                         if(isinstance(response,playwright.sync_api.Response)):
@@ -107,7 +96,7 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                         elif(response is None):
                             raise Exception("error: network request for page \""+str(url)+"\" returned no response.")
                         else:
-                            raise Exception("error: catastrophic internal program error during download process.")
+                            raise Exception("error: catastrophic internal program error for \""+str(url)+"\" during download process.")
 
                         easyCLI.fastPrint("downloading page...")
 
@@ -155,8 +144,7 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
             
             easyCLI.fastPrint("cleaning up retriever proxy...")
             browser.close()
-            proxyVar=None
-            proxyExists=False
+
             easyCLI.fastPrint("done.\n")
         #if there is an error first close the browser then crash, so we dont leave resources running
         except Exception as E:
@@ -1149,7 +1137,7 @@ if(__name__=="__main__"):
         print("now exiting...")
         easyCLI.ln(1)
     else:
-        atexit.register(onQuitRaceConditionHandler)
+        
         startup()
         print("now exiting...")
         easyCLI.ln(1)

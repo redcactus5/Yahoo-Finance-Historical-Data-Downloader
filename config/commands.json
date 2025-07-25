@@ -1,9 +1,9 @@
 {
     "commands":[
         {
-            "command":"date range",
+            "command":"all data",
             "attributes":["open","close"],
-            "dates":["6/16/2025","7/11/2025"]
+            "dates":[]
         }
 
 
