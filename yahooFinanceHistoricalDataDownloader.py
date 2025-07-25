@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 URLLISTFILE="config/downloadConfig.json"
 COMMANDFILE="config/commands.json"
-BROWSERPATH="webproxy/Playwright.exe"
+BROWSERPATH="webproxy/firefox.exe"
 
 
 
@@ -61,8 +61,8 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
     with playwright.sync_api.sync_playwright() as p:
         easyCLI.fastPrint("launching retriever proxy...")
       
-        browser = p.webkit.launch(executable_path=BROWSERPATH,headless=True)
-        context = browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36")
+        browser = p.webkit.launch(executable_path=BROWSERPATH,headless=False)
+        
         
         try:
             
@@ -75,7 +75,7 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                 while(True):
                     easyCLI.fastPrint("page "+str(urlIndex+1)+" of "+lenString)
                     
-                    page = context.new_page()
+                    page = browser.new_page()
                     
                     try:
                         easyCLI.fastPrint("requesting landing page...")
@@ -89,7 +89,7 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                         
                         easyCLI.fastPrint("requesting dataset from server...")
                         response=page.goto(url,wait_until="domcontentloaded",timeout=downloadStartTimeout)
-
+                        '''
                         if(isinstance(response,playwright.sync_api.Response)):
                             if(response.url=="https://finance.yahoo.com/?err=404"):
                                 raise Exception("error: stock ticker \""+str(url)+"\" was unable to be found by the answering server.")
@@ -102,7 +102,7 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                             raise Exception("error: network request for page \""+str(url)+"\" returned no response.")
                         else:
                             raise Exception("error: catastrophic internal program error for \""+str(url)+"\" during download process.")
-
+                        '''
                         easyCLI.fastPrint("downloading dataset...")
 
                         #wait for the table to load
@@ -127,7 +127,7 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                         easyCLI.fastPrint("cleaning up...")
                         page.close()
                         easyCLI.fastPrint("page download complete.")
-                        wait=1+random.randint(0,3)+random.random()
+                        wait=2+random.randint(0,4)+random.random()
                         easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
                         time.sleep(wait)
                         easyCLI.fastPrint("done.\n")
