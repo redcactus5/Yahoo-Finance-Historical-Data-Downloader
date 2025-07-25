@@ -74,10 +74,20 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                 tryCount=1
                 while(True):
                     easyCLI.fastPrint("page "+str(urlIndex+1)+" of "+lenString)
-                    easyCLI.fastPrint("requesting page from server...")
+                    
                     page = context.new_page()
                     
                     try:
+                        easyCLI.fastPrint("requesting landing page...")
+
+                        page.goto("https://finance.yahoo.com",wait_until="domcontentloaded",timeout=downloadStartTimeout)
+                        
+                        wait=1+random.randint(0,3)+random.random()
+                        easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
+                        time.sleep(wait)
+                        easyCLI.fastPrint("done.\n")
+                        
+                        easyCLI.fastPrint("requesting dataset from server...")
                         response=page.goto(url,wait_until="domcontentloaded",timeout=downloadStartTimeout)
 
                         if(isinstance(response,playwright.sync_api.Response)):
@@ -93,7 +103,7 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                         else:
                             raise Exception("error: catastrophic internal program error for \""+str(url)+"\" during download process.")
 
-                        easyCLI.fastPrint("downloading page...")
+                        easyCLI.fastPrint("downloading dataset...")
 
                         #wait for the table to load
                         page.wait_for_selector("table.table.yf-1jecxey",timeout=downloadCompletionTimeout)
@@ -118,7 +128,7 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                         page.close()
                         easyCLI.fastPrint("page download complete.")
                         wait=1+random.randint(0,3)+random.random()
-                        easyCLI.fastPrint("waiting "+f"{wait:.1f}"+"  second anti-antibot delay...")
+                        easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
                         time.sleep(wait)
                         easyCLI.fastPrint("done.\n")
                         break
