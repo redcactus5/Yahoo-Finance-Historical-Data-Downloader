@@ -77,6 +77,8 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
         proxyExists=True
         browser = p.webkit.launch(executable_path=BROWSERPATH,headless=True)
         proxyVar=browser
+        context=browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36")
+        
         
         try:
             
@@ -89,7 +91,8 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                 while(True):
                     easyCLI.fastPrint("page "+str(urlIndex+1)+" of "+lenString)
                     easyCLI.fastPrint("requesting page from server...")
-                    page = browser.new_page()
+                    page = context.new_page()
+                    
                     try:
                         response=page.goto(url,wait_until="domcontentloaded",timeout=downloadStartTimeout)
 
