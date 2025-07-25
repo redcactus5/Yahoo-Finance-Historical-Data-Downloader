@@ -46,7 +46,7 @@ def shuffle(inputList:list):
 
 
 
-def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, endDate:date):
+def configurePageForLoading(page:playwright.sync_api.Page, startDate:date):
     
     
     wait=random.randint(1,2)+random.random()
@@ -83,16 +83,21 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, endDa
         year=zeros+year
 
     page.keyboard.type(month)
+
     wait=random.random()
     if(wait<0.5):
         wait+=0.5
     time.sleep(wait)
+
     page.keyboard.type(day)
+
     wait=random.random()
     if(wait<0.5):
         wait+=0.5
     time.sleep(wait)
+
     page.keyboard.type(year)
+
     wait=1+random.randint(0,2)+random.random()
     if(wait<0.5):
         wait+=0.5
@@ -110,9 +115,16 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, endDa
                 errorText=datetime.strptime(line.split("\"")[1],"%b %d, %Y").date().strftime("%m/%d/%Y")
                 break
             
-        raise Exception("start date error, start date for url: "+page.url+" is invalid. \nprovided date: "+startDate.strftime("%m/%d/%Y")+" minimum date: "+errorText)
+        raise Exception("start date error, start date for url: "+page.url+" is invalid.\nprovided date: "+startDate.strftime("%m/%d/%Y")+" minimum date: "+errorText)
     
     doneButton.click()
+    easyCLI.fastPrint("configuration complete.")
+    page.wait_for_selector('section[slot="content"].container.yf-1th5n0r', state='hidden')
+    wait=random.randint(1,2)+random.random()
+    easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
+    time.sleep(wait)
+    easyCLI.fastPrint("done.")
+
 
     
 
@@ -126,7 +138,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, endDa
 
 
 
-def retrieveWebPages(links:list[tuple[str,date,date]],downloadStartTimeout:float,downloadCompletionTimeout:float,downloadRetryLimit:int):
+def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,downloadCompletionTimeout:float,downloadRetryLimit:int):
     #grab our constants
     global BROWSERPATH
 
@@ -161,9 +173,7 @@ def retrieveWebPages(links:list[tuple[str,date,date]],downloadStartTimeout:float
                     try:
                         easyCLI.fastPrint("requesting landing page...")
                         response=page.goto(url[0],wait_until="domcontentloaded",timeout=downloadStartTimeout)
-                        wait=1+random.randint(0,3)+random.random()
-
-
+                        configurePageForLoading(page,url[1])
 
 
 
