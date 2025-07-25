@@ -89,7 +89,7 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                         
                         easyCLI.fastPrint("requesting dataset from server...")
                         response=page.goto(url,wait_until="domcontentloaded",timeout=downloadStartTimeout)
-                        '''
+                        
                         if(isinstance(response,playwright.sync_api.Response)):
                             if(response.url=="https://finance.yahoo.com/?err=404"):
                                 raise Exception("error: stock ticker \""+str(url)+"\" was unable to be found by the answering server.")
@@ -102,7 +102,7 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                             raise Exception("error: network request for page \""+str(url)+"\" returned no response.")
                         else:
                             raise Exception("error: catastrophic internal program error for \""+str(url)+"\" during download process.")
-                        '''
+                        
                         easyCLI.fastPrint("downloading dataset...")
 
                         #wait for the table to load
