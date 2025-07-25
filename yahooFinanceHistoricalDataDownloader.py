@@ -45,7 +45,88 @@ def shuffle(inputList:list):
     return (scrambledList,randomPosList)
 
 
-def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompletionTimeout:float,downloadRetryLimit:int):
+
+def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, endDate:date):
+    
+    
+    wait=random.randint(1,2)+random.random()
+    easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
+    time.sleep(wait)
+    easyCLI.fastPrint("done.")
+    easyCLI.fastPrint("configuring page to retrieve data...")
+    #open the input dialog
+    page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-1epmntv")
+    page.wait_for_selector(selector="input[name='startDate']",state='visible')
+    
+    wait=random.randint(0,1)+random.random()
+    if(wait<0.5):
+        wait+=0.5
+    time.sleep(wait)
+    page.click("input[name='startDate']")
+
+    wait=random.randint(0,1)+random.random()
+    if(wait<0.5):
+        wait+=0.5
+    time.sleep(wait)
+
+    month=str(startDate.month)
+    if(len(month)==1):
+        month="0"+month
+    
+    day=str(startDate.day)
+    if(len(day)==1):
+        day="0"+day
+
+    year=str(startDate.year)
+    if(len(year)<4):
+        zeros="0"*(4-len(year))
+        year=zeros+year
+
+    page.keyboard.type(month)
+    wait=random.random()
+    if(wait<0.5):
+        wait+=0.5
+    time.sleep(wait)
+    page.keyboard.type(day)
+    wait=random.random()
+    if(wait<0.5):
+        wait+=0.5
+    time.sleep(wait)
+    page.keyboard.type(year)
+    wait=1+random.randint(0,2)+random.random()
+    if(wait<0.5):
+        wait+=0.5
+    time.sleep(wait)
+
+    doneButton=page.locator("button.primary-btn.rounded", has_text="Done")
+
+    if(doneButton.is_disabled()):
+        errorText=""
+        section = page.locator("section.container")
+
+        text = section.inner_text()
+        for line in text.splitlines():
+            if("Date shouldn't be prior to" in line):
+                errorText=datetime.strptime(line.split("\"")[1],"%b %d, %Y").date().strftime("%m/%d/%Y")
+                break
+            
+        raise Exception("start date error, start date for url: "+page.url+" is invalid. \nprovided date: "+startDate.strftime("%m/%d/%Y")+" minimum date: "+errorText)
+    
+    doneButton.click()
+
+    
+
+
+
+        
+
+
+
+
+
+
+
+def retrieveWebPages(links:list[tuple[str,date,date]],downloadStartTimeout:float,downloadCompletionTimeout:float,downloadRetryLimit:int):
     #grab our constants
     global BROWSERPATH
 
@@ -79,16 +160,15 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                     
                     try:
                         easyCLI.fastPrint("requesting landing page...")
-
-                        page.goto("https://finance.yahoo.com",wait_until="domcontentloaded",timeout=downloadStartTimeout)
-                        
+                        response=page.goto(url[0],wait_until="domcontentloaded",timeout=downloadStartTimeout)
                         wait=1+random.randint(0,3)+random.random()
-                        easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
-                        time.sleep(wait)
-                        easyCLI.fastPrint("done.")
-                        
+
+
+
+
+
                         easyCLI.fastPrint("requesting dataset from server...")
-                        response=page.goto(url,wait_until="domcontentloaded",timeout=downloadStartTimeout)
+                        
                         
                         if(isinstance(response,playwright.sync_api.Response)):
                             if(response.url=="https://finance.yahoo.com/?err=404"):
@@ -124,13 +204,20 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                         content = page.content()  # get rendered HTML
                         #reverse the scrambling to put the data in the correct order
                         pages[ogPos[urlIndex]]=content#type: ignore
+
+
                         easyCLI.fastPrint("cleaning up...")
                         page.close()
+
+
                         easyCLI.fastPrint("page download complete.")
-                        wait=2+random.randint(0,4)+random.random()
+
+                        wait=2+random.randint(0,3)+random.random()
                         easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
                         time.sleep(wait)
                         easyCLI.fastPrint("done.\n")
+
+
                         break
 
                     #detect the page randomly not loading, clean up, and try again
