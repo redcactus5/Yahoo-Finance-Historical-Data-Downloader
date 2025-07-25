@@ -78,11 +78,6 @@ def retrieveWebPages(links:list[str],downloadStartTimeout:float,downloadCompleti
                     page = context.new_page()
                     
                     try:
-                        page.goto("https://finance.yahoo.com/",wait_until="domcontentloaded",timeout=downloadStartTimeout)
-                        wait=1+random.randint(0,3)+random.random()
-                        easyCLI.fastPrint("waiting "+f"{wait:.1f}"+"  second anti-antibot delay...")
-                        time.sleep(wait)
-                        
                         response=page.goto(url,wait_until="domcontentloaded",timeout=downloadStartTimeout)
 
                         if(isinstance(response,playwright.sync_api.Response)):
