@@ -11,6 +11,8 @@ COMMANDFILE="config/commands.json"
 BROWSERPATH="webproxy/firefox.exe"
 
 
+#warning, this program is held together by duct tape and prayers
+
 
 from bs4 import BeautifulSoup
 from bs4 import element
@@ -62,6 +64,7 @@ def shuffle(inputList:list):
 
 
 def typeDelay():
+    #delay specifically optimized for typing mimicry
     delay=(1/float(random.randint(6,10)+random.random()))
     time.sleep(delay)
 
@@ -71,21 +74,21 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     #avoid bot sniffers
     antiSnifferRandomDelay(1,2,True)
 
-    easyCLI.fastPrint("configuring page to retrieve data...")
+    easyCLI.fastPrint("configuring page...")
 
     #open the menu we want to use, and wait for it open
     page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-1epmntv")
-
+    #these are just to add human like random delay
     antiSnifferRandomDelay(1,1)
     
 
     #click the box we want
-    
     page.click("input[name='startDate']")
 
     #more waiting to trip up bot sniffers
     antiSnifferRandomDelay(0,1)
 
+    #build our month string in an inefficient and paranoid way
     month=str(startDate.month) 
     if(len(month)==1):
         month="0"+month
@@ -99,25 +102,25 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
         zeros="0"*(4-len(year))
         year=zeros+year
     
+    #make voltron, i mean the full date string
     stringedDate=month+day+year
 
+    #go through every character and type it with a delay
     for char in stringedDate:
         page.keyboard.type(char)
         typeDelay()
         
 
-    #simulate waiting to click delay
-    antiSnifferRandomDelay(1,2)
-    #click the button
+    
     
 
 
     doneButton = page.locator("button.primary-btn.fin-size-small.rounded.yf-1epmntv", has_text="Done")
     doneButton.wait_for(state="attached")
 
-    
-    #give it a second
+    #simulate waiting to click delay
     antiSnifferRandomDelay(1,2)
+  
     #error handling and special casing
     errorText="Date shouldn't be prior to"
     section = page.locator("section[slot=\"content\"].container.yf-1th5n0r")
@@ -128,13 +131,13 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
         if(type(text)==str):
             errorText=datetime.strptime(text.split("\"")[1],"%b %d, %Y").date().strftime("%m/%d/%Y")
         else:
-            raise Exception("something has gone horribly wrong")
+            raise Exception("error: fatal error, section has no text.")
         
         
-        #handle edge case 
-        
+        #handle edge case where the date we want is the first avalable date, and the website has an off by one error here, but we can work around it
         if(datetime.strptime(errorText,"%m/%d/%Y").date()==startDate):
-            antiSnifferRandomDelay(0,1)
+            #if we have this very specific edge case, we basically do the same thing, but click a different button
+            #grab said button
             maxButtonLocator=page.locator("button.tertiary-btn", has_text="Max")
             maxButtonLocator.wait_for(state="attached")
             easyCLI.fastPrint("configuration complete.")
@@ -145,6 +148,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
             easyCLI.waitForFastWriterFinish()
             raise Exception("error: start date error, start date for url: "+page.url+" is invalid.\nprovided date: "+startDate.strftime("%m/%d/%Y")+" minimum date: "+errorText)
     else:
+        #click the done button if the date is valid
         easyCLI.fastPrint("configuration complete.")
         easyCLI.fastPrint("requesting dataset from server...")
         doneButton.click()
