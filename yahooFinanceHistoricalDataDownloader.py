@@ -109,8 +109,10 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     page.keyboard.type(year)
 
     antiSnifferRandomDelay(0,2)
-
+    
     doneButton=page.locator("button.primary-btn.rounded", has_text="Done")
+
+    doneButton.wait_for(state="attached")
 
     if(doneButton.is_disabled()):
         errorText=""
