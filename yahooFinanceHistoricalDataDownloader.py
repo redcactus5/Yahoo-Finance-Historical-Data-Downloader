@@ -263,7 +263,7 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
                         easyCLI.fastPrint("page download complete.")
 
                         antiSnifferRandomDelay(0,3,True)
-
+                        easyCLI.fastln()
 
                         break
 
