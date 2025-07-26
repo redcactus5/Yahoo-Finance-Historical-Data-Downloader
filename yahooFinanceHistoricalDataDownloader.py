@@ -222,10 +222,7 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
 
                         easyCLI.fastPrint("page download complete.")
 
-                        wait=2+random.randint(0,3)+random.random()
-                        easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
-                        time.sleep(wait)
-                        easyCLI.fastPrint("done.\n")
+                        antiSnifferRandomDelay(0,3,True)
 
 
                         break
