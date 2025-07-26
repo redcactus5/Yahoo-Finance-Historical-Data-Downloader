@@ -72,78 +72,94 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     antiSnifferRandomDelay(1,2,True)
 
     easyCLI.fastPrint("configuring page to retrieve data...")
-
+    easyCLI.fastPrint("1")
     #open the menu we want to use, and wait for it open
     page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-1epmntv")
+    easyCLI.fastPrint("2")
     antiSnifferRandomDelay(1,1)
     if(not(page.is_visible(selector="input[name='startDate']"))):
+        easyCLI.fastPrint("2.5")
         page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-1epmntv")
     page.wait_for_selector(selector="input[name='startDate']",state='visible')
-    
+    easyCLI.fastPrint("3")
     #wait extra to avoid bot sniffers
     
 
     #click the box we want
-
+    
     page.click("input[name='startDate']")
 
     #more waiting to trip up bot sniffers
     antiSnifferRandomDelay(0,1)
 
     # Clear existing value
+    easyCLI.fastPrint("4")
     for backspace in range(random.randint(11,14)):  #random to emulate human 
         page.keyboard.press("Backspace")
-        typeDelay()
+        if(backspace==0):
+            time.sleep(1)
+        time.sleep((1/12))
     
     #more waiting
     antiSnifferRandomDelay(0,1)
 
     isoDate = startDate.strftime("%Y-%m-%d")
+    easyCLI.fastPrint("5")
     for char in isoDate:
         page.keyboard.type(char)
         typeDelay()
 
     #simulate waiting to click delay
     antiSnifferRandomDelay(1,2)
-    
+    easyCLI.fastPrint("6")
     doneButton=page.locator("button.primary-btn.rounded", has_text="Done")
-
+    easyCLI.fastPrint("7")
     doneButton.wait_for(state="attached")
 
   
     
 
     
-
+    easyCLI.fastPrint("7")
     doneButton.click()
     antiSnifferRandomDelay(0,1)
+    easyCLI.fastPrint("8")
     if(doneButton.is_disabled()):
         
         errorText=""
+        easyCLI.fastPrint("9")
         section = page.locator('section[slot="content"].container.yf-1th5n0r', has_text="Date shouldn't be prior to")
-
+        easyCLI.fastPrint("10")
         text = section.text_content()
+        easyCLI.fastPrint("11")
         if(type(text)==str):
+            easyCLI.fastPrint("12")
             errorText=datetime.strptime(text.split("\"")[1],"%b %d, %Y").date().strftime("%m/%d/%Y")
         else:
             raise Exception("something has gone horribly wrong")
         
         
         #handle edge case 
+        easyCLI.fastPrint("13")
         if(datetime.strptime(errorText,"%m/%d/%Y").date()==startDate):
+            easyCLI.fastPrint("14")
             antiSnifferRandomDelay(0,1)
+            easyCLI.fastPrint("15")
             maxButtonLocator=page.locator("button.tertiary-btn", has_text="Max")
+            easyCLI.fastPrint("16")
             maxButtonLocator.wait_for(state="attached")
+            easyCLI.fastPrint("17")
             maxButtonLocator.click()
     
         else:
             easyCLI.waitForFastWriterFinish()
             raise Exception("error: start date error, start date for url: "+page.url+" is invalid.\nprovided date: "+startDate.strftime("%m/%d/%Y")+" minimum date: "+errorText)
-    page.wait_for_selector("td.yf-1jecxey .loading",timeout=downloadStartTimeout, state="attached")  
-        
+    easyCLI.fastPrint("18")
+    page.wait_for_selector("td.yf-1jecxey .loading", state="attached")  
+    easyCLI.fastPrint("19")
     easyCLI.fastPrint("configuration complete.")
     easyCLI.fastPrint("requesting dataset from server...")
-
+    easyCLI.fastPrint("20")
     page.wait_for_selector('section[slot="content"].container.yf-1th5n0r', state='hidden',timeout=downloadStartTimeout)
 
     antiSnifferRandomDelay(0,2,True)
@@ -171,9 +187,9 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
     #the print statements explain most of it
     with playwright.sync_api.sync_playwright() as p:
         easyCLI.fastPrint("launching retriever proxy...")
-      
-        browser = p.webkit.launch(executable_path=BROWSERPATH,headless=True)
-        
+        desktopUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"
+        browser = p.webkit.launch(executable_path=BROWSERPATH,headless=False)
+        context=browser.new_context(user_agent=desktopUserAgent,viewport={'width': 1920, 'height': 1080},device_scale_factor=1,is_mobile=False)
         
         try:
             
@@ -186,7 +202,7 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
                 while(True):
                     easyCLI.fastPrint("page "+str(urlIndex+1)+" of "+lenString)
                     
-                    page = browser.new_page()
+                    page = context.new_page()
                     
                     try:
                         easyCLI.fastPrint("requesting base page from server...")
