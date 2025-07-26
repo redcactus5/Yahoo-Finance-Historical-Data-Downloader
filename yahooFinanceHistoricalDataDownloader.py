@@ -1290,7 +1290,7 @@ def main(fileName):
     print("finished in: "+timer.getUnitDeviatedTimeString()+"\n\n\n")
     input("press enter to finish.")
     easyCLI.ln(3)
-    
+
 
 
 
