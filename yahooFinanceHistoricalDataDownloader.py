@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 URLLISTFILE="config/downloadConfig.json"
 COMMANDFILE="config/commands.json"
-BROWSERPATH="webproxy/firefox.exe"
+BROWSERPATH="webproxy/Playwright.exe"
 
 
 
