@@ -72,17 +72,11 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     antiSnifferRandomDelay(1,2,True)
 
     easyCLI.fastPrint("configuring page to retrieve data...")
-    easyCLI.fastPrint("1")
+
     #open the menu we want to use, and wait for it open
     page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-1epmntv")
-    easyCLI.fastPrint("2")
+
     antiSnifferRandomDelay(1,1)
-    if(not(page.is_visible(selector="input[name='startDate']"))):
-        easyCLI.fastPrint("2.5")
-        page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-1epmntv")
-    page.wait_for_selector(selector="input[name='startDate']",state='visible')
-    easyCLI.fastPrint("3")
-    #wait extra to avoid bot sniffers
     
 
     #click the box we want
@@ -92,84 +86,63 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     #more waiting to trip up bot sniffers
     antiSnifferRandomDelay(0,1)
 
-    # Clear existing value
-    easyCLI.fastPrint("4")
-    '''
-    for backspace in range(random.randint(11,14)):  #random to emulate human 
-        page.keyboard.press("Backspace")
-        if(backspace==0):
-            time.sleep(1)
-        time.sleep((1/12))
-    '''
-    
-    
-    #more waiting
-    antiSnifferRandomDelay(0,1)
+    month=str(startDate.month) 
+    if(len(month)==1):
+        month="0"+month
 
-     
+    day=str(startDate.day)
+    if(len(day)==1):
+        day="0"+day
+
     year=str(startDate.year)
     if(len(year)<4):
         zeros="0"*(4-len(year))
         year=zeros+year
-
     
-    easyCLI.fastPrint("5")
+    stringedDate=month+day+year
+
     for char in stringedDate:
         page.keyboard.type(char)
         typeDelay()
-        time.sleep(2)
+        
 
     #simulate waiting to click delay
     antiSnifferRandomDelay(1,2)
-    easyCLI.fastPrint("6")
-    doneButton=page.locator("button.primary-btn.rounded", has_text="Done")
-    easyCLI.fastPrint("7")
+    #click the button
+    easyCLI.fastPrint("configuration complete.")
+    easyCLI.fastPrint("requesting dataset from server...")
+    doneButton = page.locator("button.primary-btn.fin-size-small.rounded.yf-1epmntv", has_text="Done")
     doneButton.wait_for(state="attached")
-
-  
-    
-
-    
-    easyCLI.fastPrint("7")
     doneButton.click()
-    antiSnifferRandomDelay(0,1)
-    easyCLI.fastPrint("8")
-    if(doneButton.is_disabled()):
+    #give it a second
+    antiSnifferRandomDelay(1,2)
+    #error handling and special casing
+    if(not(doneButton.get_attribute("disabled") is None)):
         
         errorText=""
-        easyCLI.fastPrint("9")
+        
         section = page.locator('section[slot="content"].container.yf-1th5n0r', has_text="Date shouldn't be prior to")
-        easyCLI.fastPrint("10")
         text = section.text_content()
-        easyCLI.fastPrint("11")
+        
         if(type(text)==str):
-            easyCLI.fastPrint("12")
             errorText=datetime.strptime(text.split("\"")[1],"%b %d, %Y").date().strftime("%m/%d/%Y")
         else:
             raise Exception("something has gone horribly wrong")
         
         
         #handle edge case 
-        easyCLI.fastPrint("13")
+        
         if(datetime.strptime(errorText,"%m/%d/%Y").date()==startDate):
-            easyCLI.fastPrint("14")
             antiSnifferRandomDelay(0,1)
-            easyCLI.fastPrint("15")
             maxButtonLocator=page.locator("button.tertiary-btn", has_text="Max")
-            easyCLI.fastPrint("16")
             maxButtonLocator.wait_for(state="attached")
-            easyCLI.fastPrint("17")
             maxButtonLocator.click()
     
         else:
             easyCLI.waitForFastWriterFinish()
             raise Exception("error: start date error, start date for url: "+page.url+" is invalid.\nprovided date: "+startDate.strftime("%m/%d/%Y")+" minimum date: "+errorText)
-    easyCLI.fastPrint("18")
-    page.wait_for_selector("td.yf-1jecxey .loading", state="attached")  
-    easyCLI.fastPrint("19")
-    easyCLI.fastPrint("configuration complete.")
-    easyCLI.fastPrint("requesting dataset from server...")
-    easyCLI.fastPrint("20")
+
+    
     page.wait_for_selector('section[slot="content"].container.yf-1th5n0r', state='hidden',timeout=downloadStartTimeout)
 
     antiSnifferRandomDelay(0,2,True)
@@ -1174,7 +1147,7 @@ class YahooFinanceGrabberHeader(easyCLI.UIHeaderClass):
 
     def drawUIHeader(self):
         easyCLI.clear()
-        print("Yahoo Finance Historical Data Downloader v1.0.1 by redcacus5\n\n")
+        print("Yahoo Finance Historical Data Downloader v1.1 by redcacus5\n\n")
         
 
 
