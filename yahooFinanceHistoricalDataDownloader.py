@@ -8,7 +8,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 URLLISTFILE="config/downloadConfig.json"
 COMMANDFILE="config/commands.json"
-BROWSERPATH="webproxy/Playwright.exe"
+BROWSERPATH="webproxy/firefox.exe"
 
 
 
@@ -188,7 +188,7 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
     with playwright.sync_api.sync_playwright() as p:
         easyCLI.fastPrint("launching retriever proxy...")
         desktopUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"
-        browser = p.webkit.launch(executable_path=BROWSERPATH,headless=False)
+        browser = p.firefox.launch(executable_path=BROWSERPATH,headless=False)
         context=browser.new_context(user_agent=desktopUserAgent,viewport={'width': 1920, 'height': 1080},device_scale_factor=1,is_mobile=False)
         
         try:
