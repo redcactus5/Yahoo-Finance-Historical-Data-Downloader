@@ -62,14 +62,14 @@ def shuffle(inputList:list):
 
 
 def typeDelay():
-    delay=(1/float(random.randint(3,5)))+random.random()
+    delay=(1/float(random.randint(6,9)))-random.random()
     time.sleep(delay)
 
 
 def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downloadStartTimeout:float):
     
     #avoid bot sniffers
-    antiSnifferRandomDelay(1,2,True)
+    antiSnifferRandomDelay(2,3,True)
 
     easyCLI.fastPrint("configuring page to retrieve data...")
 
@@ -113,7 +113,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     
 
     doneButton.click()
-
+    antiSnifferRandomDelay(0,1)
     if(doneButton.is_disabled()):
         
         errorText=""
@@ -131,10 +131,11 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
             maxButtonLocator=page.locator("button.tertiary-btn", has_text="Max")
             maxButtonLocator.wait_for(state="attached")
             maxButtonLocator.click()
-        easyCLI.waitForFastWriterFinish()
-        raise Exception("error: start date error, start date for url: "+page.url+" is invalid.\nprovided date: "+startDate.strftime("%m/%d/%Y")+" minimum date: "+errorText)
-    
-    
+        else:
+            easyCLI.waitForFastWriterFinish()
+            raise Exception("error: start date error, start date for url: "+page.url+" is invalid.\nprovided date: "+startDate.strftime("%m/%d/%Y")+" minimum date: "+errorText)
+        
+        
     easyCLI.fastPrint("configuration complete.")
     easyCLI.fastPrint("requesting dataset from server...")
 
