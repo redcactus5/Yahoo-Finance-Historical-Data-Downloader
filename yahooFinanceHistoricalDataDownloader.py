@@ -62,7 +62,7 @@ def shuffle(inputList:list):
 
 
 def typeDelay():
-    delay=(1/float(random.randint(6,9)))-random.random()
+    delay=(1/float(random.randint(5,8)+random.random()))
     time.sleep(delay)
 
 
