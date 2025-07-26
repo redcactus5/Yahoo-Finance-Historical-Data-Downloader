@@ -109,15 +109,18 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     #simulate waiting to click delay
     antiSnifferRandomDelay(1,2)
     #click the button
-    easyCLI.fastPrint("configuration complete.")
-    easyCLI.fastPrint("requesting dataset from server...")
+    
+
+
     doneButton = page.locator("button.primary-btn.fin-size-small.rounded.yf-1epmntv", has_text="Done")
     doneButton.wait_for(state="attached")
-    doneButton.click()
+    easyCLI.fastPrint("configuration complete.")
+    easyCLI.fastPrint("requesting dataset from server...")
+    
     #give it a second
-    antiSnifferRandomDelay(1,2)
+    antiSnifferRandomDelay(1,2,True)
     #error handling and special casing
-    if(not(doneButton.get_attribute("disabled") is None)):
+    if(doneButton.get_attribute("disabled") is None):
         
         errorText=""
         
@@ -136,12 +139,17 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
             antiSnifferRandomDelay(0,1)
             maxButtonLocator=page.locator("button.tertiary-btn", has_text="Max")
             maxButtonLocator.wait_for(state="attached")
+            easyCLI.fastPrint("configuration complete.")
+            easyCLI.fastPrint("requesting dataset from server...")
             maxButtonLocator.click()
     
         else:
             easyCLI.waitForFastWriterFinish()
             raise Exception("error: start date error, start date for url: "+page.url+" is invalid.\nprovided date: "+startDate.strftime("%m/%d/%Y")+" minimum date: "+errorText)
-
+    else:
+        easyCLI.fastPrint("configuration complete.")
+        easyCLI.fastPrint("requesting dataset from server...")
+        doneButton.click()
     
     page.wait_for_selector('section[slot="content"].container.yf-1th5n0r', state='hidden',timeout=downloadStartTimeout)
 
