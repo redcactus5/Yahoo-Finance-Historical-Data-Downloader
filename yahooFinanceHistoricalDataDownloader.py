@@ -1357,6 +1357,7 @@ def integrityCheck():
 if(__name__=="__main__"):
 
     #devious check to make sure no one is doing an illegal thing and distributing without the open source licenses
+    print("starting up...")
     if(integrityCheck()):
         startup()
         print("now exiting...")
