@@ -40,17 +40,19 @@ def antiSnifferRandomDelay(start,end,message=False):
     #if start and end are the same, dont try to randomize the integer and add the floating point to it
     if(start==end):
         wait=start+random.random()
+    #otherwise do the random range with the random float
     else:
         wait=random.randint(int(start),int(end))+random.random()
 
+    #if its too small add half a second
     if(wait<0.5):
         wait+=0.5
-
+    #if we are supposed to print a waiting message, run the version where we do that
     if(message):
         easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
         time.sleep(wait)
         easyCLI.fastPrint("done.")
-    else:
+    else:#otherwise only sleep
         time.sleep(wait)
         
 
@@ -243,6 +245,7 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
                         
                         
                         #wait extra time just to be safe, the only reason we aren't using the dedicated function is because 
+                        #of the custom message
                         wait=1+random.randint(0,1)+random.random()
                         easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" seconds for download completion...")
                         time.sleep(wait)
