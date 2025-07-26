@@ -61,6 +61,10 @@ def shuffle(inputList:list):
     return (scrambledList,randomPosList)
 
 
+def typeDelay():
+    delay=1/float(random.randint(3,6))
+    time.sleep(delay)
+
 
 def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downloadStartTimeout:float):
     
@@ -77,38 +81,27 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     antiSnifferRandomDelay(0,1)
 
     #click the box we want
+
     page.click("input[name='startDate']")
 
     #more waiting to trip up bot sniffers
     antiSnifferRandomDelay(0,1)
 
-    #make our date strings
-    month=str(startDate.month)
-    if(len(month)==1):
-        month="0"+month
+    # Clear existing value
+    for backspace in range(random.randint(11,14)):  #random to emulate human 
+        page.keyboard.press("Backspace")
+        typeDelay()
     
-    day=str(startDate.day)
-    if(len(day)==1):
-        day="0"+day
-
-    year=str(startDate.year)
-    if(len(year)<4):
-        zeros="0"*(4-len(year))
-        year=zeros+year
-
-    #type in the date strings, separated by delays to once again sneak by bot sniffers. 
-    #no automation here officer
-    page.keyboard.type(month)
-
+    #more waiting
     antiSnifferRandomDelay(0,1)
 
-    page.keyboard.type(day)
+    isoDate = startDate.strftime("%Y-%m-%d")
+    for char in isoDate:
+        page.keyboard.type(char)
+        typeDelay()
 
-    antiSnifferRandomDelay(0,1)
-
-    page.keyboard.type(year)
-
-    antiSnifferRandomDelay(0,1)
+    #simulate waiting to click delay
+    antiSnifferRandomDelay(1,2)
     
     doneButton=page.locator("button.primary-btn.rounded", has_text="Done")
 
