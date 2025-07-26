@@ -12,7 +12,7 @@ BROWSERPATH="webproxy/firefox.exe"
 
 
 #warning, this program is held together by duct tape and prayers
-
+#also, the moment yahoo changes their website, this script will no longer work
 
 from bs4 import BeautifulSoup
 from bs4 import element
@@ -34,7 +34,10 @@ from datetime import timezone
 
 
 def antiSnifferRandomDelay(start,end,message=False):
+    #this function looks more complicated than it is
+    
     wait=0
+    #if start and end are the same, dont try to randomize the integer and add the floating point to it
     if(start==end):
         wait=start+random.random()
     else:
@@ -134,7 +137,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
             raise Exception("error: fatal error, section has no text.")
         
         
-        #handle edge case where the date we want is the first available date, and the website has an off by one error here, but we can work around it
+        #handle edge case, because the website has an off by one error
         if(datetime.strptime(errorText,"%m/%d/%Y").date()==startDate):
             #if we have this very specific edge case, we basically do the same thing, but click a different button
             #grab said button
@@ -173,33 +176,41 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
     pages=[None]*len(links)
     #shuffle our links to throw bot detectors off our scent
     scrambled=shuffle(links)
+    #one is the shuffled links, the other is lookup table we use to put them back in order
     links=scrambled[0]#type: ignore
     ogPos=scrambled[1]
 
     #the print statements explain most of it
     with playwright.sync_api.sync_playwright() as p:
-        easyCLI.fastPrint("launching retriever proxy...")
         desktopUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"
+        easyCLI.fastPrint("launching retriever proxy...")
+        #launch firefox, so we can client side render scrape. fucking web 2.0. also do it headless so we dont have windows pooping up scaring people
         browser = p.firefox.launch(executable_path=BROWSERPATH,headless=True)
-        context=browser.new_context(user_agent=desktopUserAgent,viewport={'width': 1920, 'height': 1080},device_scale_factor=1,is_mobile=False)
-        
         try:
             
+            #the user agent we are spoofing
+            context=browser.new_context(user_agent=desktopUserAgent,viewport={'width': 1920, 'height': 1080},device_scale_factor=1,is_mobile=False)
             easyCLI.fastPrint("done.\n")
-            #loop through links
+            
+            #precalculate how long the url list is for speed
             lenString=str(len(links))
+            #loop through all our links
             for urlIndex, url in enumerate(links):
                 #keep track of retries
                 tryCount=1
+                #retry loop
                 while(True):
                     easyCLI.fastPrint("page "+str(urlIndex+1)+" of "+lenString)
-                    
+                    #make a new tab
                     page = context.new_page()
                     
+                    #catch errors
                     try:
                         easyCLI.fastPrint("requesting base page from server...")
+                        #request the page from the server
                         response=page.goto(url[0],wait_until="domcontentloaded",timeout=downloadStartTimeout)
 
+                        #handle common errors
                         if(isinstance(response,playwright.sync_api.Response)):
                             if(response.url=="https://finance.yahoo.com/?err=404"):
                                 raise Exception("error: the requested page \""+str(url)+"\" was unable to be retrieved from the answering server.")
@@ -213,11 +224,14 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
                         else:
                             raise Exception("error: catastrophic internal program error for \""+str(url)+"\" during download process.")
                         
-
+                        #run the configure script
                         configurePageForLoading(page,url[1],downloadStartTimeout)
+
 
                         easyCLI.fastPrint("downloading dataset...")
 
+                        
+                        #basically a bunch of checks to make sure we are fully loaded before saving our data
                         #wait for the table to load
                         page.wait_for_selector("table.table.yf-1jecxey",timeout=downloadCompletionTimeout)
                         #wait for the title to load
@@ -228,12 +242,12 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
                         page.wait_for_selector("td.yf-1jecxey",timeout=downloadCompletionTimeout)
                         
                         
-                        #wait extra time just to be safe
+                        #wait extra time just to be safe, the only reason we aren't using the dedicated function is because 
                         wait=1+random.randint(0,1)+random.random()
                         easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" seconds for download completion...")
                         time.sleep(wait)
-
                         easyCLI.fastPrint("saving data...")
+
                         content = page.content()  # get rendered HTML
                         #reverse the scrambling to put the data in the correct order
                         pages[ogPos[urlIndex]]=content#type: ignore
