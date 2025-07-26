@@ -1193,8 +1193,8 @@ def licenseScreen():
     " - Python Software Foundation License Version 2",
     " - Apache License 2.0",
     " - GNU General Public License Version 3 (GPLv3)",
-    " - GNU Library General Public License Version 2 (LGPLv2)",
-    " - BSD 2 clause license",
+    " - Mozilla Public License Version 2.0",
+    
     " - MIT License\n",
     "See the LICENSES/ directory for full license texts and details.\n\n"]))
     
@@ -1307,7 +1307,7 @@ def startup():
 if(__name__=="__main__"):
 
     #devious check to make sure no one is doing an illegal thing and distributing without the open source licenses
-    if((not os.path.exists("LICENSES/BeautifulSoup-MIT-LICENSE.txt"))or(not os.path.exists("LICENSES/easyCLI-GPL3-LICENSE.txt"))or(not os.path.exists("LICENSES/Nuitka-Apache-2.0-LICENSE.txt"))or(not os.path.exists("LICENSES/Playwright-Apache-2.0-LICENSE.txt"))or(not os.path.exists("LICENSES/Python-PSFL-2-LICENSE.txt"))or(not os.path.exists("LICENSES/WebKit-LGPL-2.0-BSD-License.txt"))or(not os.path.exists("LICENSE.txt"))):
+    if((not os.path.exists("LICENSES/BeautifulSoup-MIT-LICENSE.txt"))or(not os.path.exists("LICENSES/easyCLI-GPL3-LICENSE.txt"))or(not os.path.exists("LICENSES/Nuitka-Apache-2.0-LICENSE.txt"))or(not os.path.exists("LICENSES/Playwright-Apache-2.0-LICENSE.txt"))or(not os.path.exists("LICENSES/Python-PSFL-2-LICENSE.txt"))or(not os.path.exists("LICENSES/Mozilla-Public-License-2.0-LICENSE.txt"))or(not os.path.exists("LICENSE.txt"))):
         easyCLI.uiHeader()
         print("ERROR: License file(s) not found.")
         print("This program is open source and must be distributed with its licenses.")
