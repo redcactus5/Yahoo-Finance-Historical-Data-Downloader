@@ -31,7 +31,23 @@ from typing import Any
 
 
 
+def antiSnifferRandomDelay(start,end,message=False):
+    wait=0
+    if(start==end):
+        wait=start+random.random()
+    else:
+        wait=random.randint(start,end)+random.random()
 
+    if(wait<0.5):
+        wait+=0.5
+
+    if(message):
+        easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
+        time.sleep(wait)
+        easyCLI.fastPrint("done.")
+    else:
+        time.sleep(wait)
+        
 
 def shuffle(inputList:list):
     #make a copy of our input
@@ -46,29 +62,27 @@ def shuffle(inputList:list):
 
 
 
-def configurePageForLoading(page:playwright.sync_api.Page, startDate:date):
+def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downloadStartTimeout:float):
     
-    
-    wait=random.randint(1,2)+random.random()
-    easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
-    time.sleep(wait)
-    easyCLI.fastPrint("done.")
+    #avoid bot sniffers
+    antiSnifferRandomDelay(1,2,True)
+
     easyCLI.fastPrint("configuring page to retrieve data...")
-    #open the input dialog
+
+    #open the menu we want to use, and wait for it open
     page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-1epmntv")
     page.wait_for_selector(selector="input[name='startDate']",state='visible')
     
-    wait=random.randint(0,1)+random.random()
-    if(wait<0.5):
-        wait+=0.5
-    time.sleep(wait)
+    #wait extra to avoid bot sniffers
+    antiSnifferRandomDelay(0,1)
+
+    #click the box we want
     page.click("input[name='startDate']")
 
-    wait=random.randint(0,1)+random.random()
-    if(wait<0.5):
-        wait+=0.5
-    time.sleep(wait)
+    #more waiting to trip up bot sniffers
+    antiSnifferRandomDelay(0,1)
 
+    #make our date strings
     month=str(startDate.month)
     if(len(month)==1):
         month="0"+month
@@ -82,26 +96,19 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date):
         zeros="0"*(4-len(year))
         year=zeros+year
 
+    #type in the date strings, separated by delays to once again sneak by bot sniffers. 
+    #no automation here officer
     page.keyboard.type(month)
 
-    wait=random.random()
-    if(wait<0.5):
-        wait+=0.5
-    time.sleep(wait)
+    antiSnifferRandomDelay(0,1)
 
     page.keyboard.type(day)
 
-    wait=random.random()
-    if(wait<0.5):
-        wait+=0.5
-    time.sleep(wait)
+    antiSnifferRandomDelay(0,1)
 
     page.keyboard.type(year)
 
-    wait=1+random.randint(0,2)+random.random()
-    if(wait<0.5):
-        wait+=0.5
-    time.sleep(wait)
+    antiSnifferRandomDelay(0,2)
 
     doneButton=page.locator("button.primary-btn.rounded", has_text="Done")
 
@@ -122,23 +129,14 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date):
     easyCLI.fastPrint("requesting dataset from server...")
     doneButton.click()
     
-    page.wait_for_selector('section[slot="content"].container.yf-1th5n0r', state='hidden')
+    page.wait_for_selector('section[slot="content"].container.yf-1th5n0r', state='hidden',timeout=downloadStartTimeout)
 
-    wait=random.randint(1,2)+random.random()
-    easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
-    time.sleep(wait)
+    antiSnifferRandomDelay(0,2,True)
 
     easyCLI.fastPrint("done.")
 
 
     
-
-
-
-        
-
-
-
 
 
 
@@ -176,19 +174,12 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
                     page = browser.new_page()
                     
                     try:
-                        easyCLI.fastPrint("requesting landing page...")
+                        easyCLI.fastPrint("requesting base page from server...")
                         response=page.goto(url[0],wait_until="domcontentloaded",timeout=downloadStartTimeout)
-                        
-                        
-                        configurePageForLoading(page,url[1])
 
-
-                        easyCLI.fastPrint("requesting dataset from server...")
-                        
-                        
                         if(isinstance(response,playwright.sync_api.Response)):
                             if(response.url=="https://finance.yahoo.com/?err=404"):
-                                raise Exception("error: stock ticker \""+str(url)+"\" was unable to be found by the answering server.")
+                                raise Exception("error: the requested page \""+str(url)+"\" was unable to be retrieved from the answering server.")
                             elif(response.status==404):
                                 raise Exception("error: network error 404, webpage \""+str(url)+"\" not found, check your connection.")
                             elif(response.status==500):
@@ -199,6 +190,9 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
                         else:
                             raise Exception("error: catastrophic internal program error for \""+str(url)+"\" during download process.")
                         
+
+                        configurePageForLoading(page,url[1],downloadStartTimeout)
+
                         easyCLI.fastPrint("downloading dataset...")
 
                         #wait for the table to load
