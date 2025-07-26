@@ -134,7 +134,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
             raise Exception("error: fatal error, section has no text.")
         
         
-        #handle edge case where the date we want is the first avalable date, and the website has an off by one error here, but we can work around it
+        #handle edge case where the date we want is the first available date, and the website has an off by one error here, but we can work around it
         if(datetime.strptime(errorText,"%m/%d/%Y").date()==startDate):
             #if we have this very specific edge case, we basically do the same thing, but click a different button
             #grab said button
