@@ -28,7 +28,7 @@ from datetime import timedelta
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 import bisect
 from typing import Any
-
+from datetime import timezone
 
 
 def antiSnifferRandomDelay(start,end,message=False):
@@ -541,6 +541,7 @@ def loadLinks() -> tuple[list[tuple[str,date]],bool,float,float,int] | bool:
 
     endID="/history/"
     unixStartID="period1="
+    unixEpoch = datetime(1970, 1, 1, tzinfo=timezone.utc)
 
     #ok, here we are just parsing the provided urls to extract the base url, and if there, the start date. 
     # we do this becuase yahoo finance is finicky about direct access, so we have to access a base url we 
@@ -576,13 +577,21 @@ def loadLinks() -> tuple[list[tuple[str,date]],bool,float,float,int] | bool:
                 #if we find dont find the end, panic
                 if(endIndex==-1):
                     raise Exception("config error: invalid or corrupted url found. the url "+link+" is not a yahoo finance historical data page. \nthe url must be for a yahoo finance historical data page.")
+                
+                stringUnixStartTime=importantPart[0:endIndex]
+                unixStartTime=-1
                 #otherwise extract the timecode and integer cast it
-                easyCLI.fastPrint(link,importantPart[0:endIndex])
-                unixStartTime=float(int(importantPart[0:endIndex]))
-                #convert that timecode to a date
-                startDate=datetime.fromtimestamp(unixStartTime).date()
-                #append the stuff we extracted to the newlinks list (not to be confused with a linked list)
-                newLinks.append((trueLink,startDate))
+                try:
+                    unixStartTime=int(stringUnixStartTime)
+                except:
+                    raise Exception("config error: config error: invalid or corrupted url found. the url "+link+" has a non numeric start date value.")
+                try:
+                    #convert that timecode to a date
+                    startDate=(unixEpoch+timedelta(seconds=unixStartTime)).date()
+                    #append the stuff we extracted to the newlinks list (not to be confused with a linked list)
+                    newLinks.append((trueLink,startDate))
+                except:
+                    raise Exception("config error: config error: invalid or corrupted url found. the url "+link+" has a corrupted start date value.")
 
 
 
