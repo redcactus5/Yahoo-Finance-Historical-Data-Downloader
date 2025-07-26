@@ -577,7 +577,8 @@ def loadLinks() -> tuple[list[tuple[str,date]],bool,float,float,int] | bool:
                 if(endIndex==-1):
                     raise Exception("config error: invalid or corrupted url found. the url "+link+" is not a yahoo finance historical data page. \nthe url must be for a yahoo finance historical data page.")
                 #otherwise extract the timecode and integer cast it
-                unixStartTime=float(int(importantPart[:endIndex]))
+                easyCLI.fastPrint(link,importantPart[0:endIndex])
+                unixStartTime=float(int(importantPart[0:endIndex]))
                 #convert that timecode to a date
                 startDate=datetime.fromtimestamp(unixStartTime).date()
                 #append the stuff we extracted to the newlinks list (not to be confused with a linked list)
