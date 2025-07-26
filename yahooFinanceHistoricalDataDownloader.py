@@ -1284,6 +1284,7 @@ def main(fileName):
     outputRenderedResults(displayList,fileName)
     #stop the timer
     timer.stop()
+    displayList=None
     easyCLI.waitForFastWriterFinish()
     print("data retrieval complete!\n")
     print("finished in: "+timer.getUnitDeviatedTimeString()+"\n\n\n")
