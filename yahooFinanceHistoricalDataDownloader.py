@@ -115,7 +115,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date):
                 errorText=datetime.strptime(line.split("\"")[1],"%b %d, %Y").date().strftime("%m/%d/%Y")
                 break
             
-        raise Exception("start date error, start date for url: "+page.url+" is invalid.\nprovided date: "+startDate.strftime("%m/%d/%Y")+" minimum date: "+errorText)
+        raise Exception("error: start date error, start date for url: "+page.url+" is invalid.\nprovided date: "+startDate.strftime("%m/%d/%Y")+" minimum date: "+errorText)
     
     easyCLI.fastPrint("configuration complete.")
 
