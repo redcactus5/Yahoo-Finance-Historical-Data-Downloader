@@ -36,7 +36,7 @@ def antiSnifferRandomDelay(start,end,message=False):
     if(start==end):
         wait=start+random.random()
     else:
-        wait=random.randint(start,end)+random.random()
+        wait=random.randint(int(start),int(end))+random.random()
 
     if(wait<0.5):
         wait+=0.5
@@ -108,7 +108,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
 
     page.keyboard.type(year)
 
-    antiSnifferRandomDelay(0,2)
+    antiSnifferRandomDelay(0,1)
     
     doneButton=page.locator("button.primary-btn.rounded", has_text="Done")
 
