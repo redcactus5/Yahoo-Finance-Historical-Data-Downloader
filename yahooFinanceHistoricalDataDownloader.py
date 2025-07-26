@@ -69,16 +69,19 @@ def typeDelay():
 def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downloadStartTimeout:float):
     
     #avoid bot sniffers
-    antiSnifferRandomDelay(2,3,True)
+    antiSnifferRandomDelay(1,2,True)
 
     easyCLI.fastPrint("configuring page to retrieve data...")
 
     #open the menu we want to use, and wait for it open
     page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-1epmntv")
+    antiSnifferRandomDelay(1,1)
+    if(not(page.is_visible(selector="input[name='startDate']"))):
+        page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-1epmntv")
     page.wait_for_selector(selector="input[name='startDate']",state='visible')
     
     #wait extra to avoid bot sniffers
-    antiSnifferRandomDelay(0,1)
+    
 
     #click the box we want
 
@@ -117,13 +120,14 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     if(doneButton.is_disabled()):
         
         errorText=""
-        section = page.locator("section.container")
+        section = page.locator('section[slot="content"].container.yf-1th5n0r', has_text="Date shouldn't be prior to")
 
-        text = section.inner_text()
-        for line in text.splitlines():
-            if("Date shouldn't be prior to" in line):
-                errorText=datetime.strptime(line.split("\"")[1],"%b %d, %Y").date().strftime("%m/%d/%Y")
-                break
+        text = section.text_content()
+        if(type(text)==str):
+            errorText=datetime.strptime(text.split("\"")[1],"%b %d, %Y").date().strftime("%m/%d/%Y")
+        else:
+            raise Exception("something has gone horribly wrong")
+        
         
         #handle edge case 
         if(datetime.strptime(errorText,"%m/%d/%Y").date()==startDate):
@@ -131,10 +135,11 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
             maxButtonLocator=page.locator("button.tertiary-btn", has_text="Max")
             maxButtonLocator.wait_for(state="attached")
             maxButtonLocator.click()
+    
         else:
             easyCLI.waitForFastWriterFinish()
             raise Exception("error: start date error, start date for url: "+page.url+" is invalid.\nprovided date: "+startDate.strftime("%m/%d/%Y")+" minimum date: "+errorText)
-        
+    page.wait_for_selector("td.yf-1jecxey .loading",timeout=downloadStartTimeout, state="attached")  
         
     easyCLI.fastPrint("configuration complete.")
     easyCLI.fastPrint("requesting dataset from server...")
@@ -142,7 +147,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     page.wait_for_selector('section[slot="content"].container.yf-1th5n0r', state='hidden',timeout=downloadStartTimeout)
 
     antiSnifferRandomDelay(0,2,True)
-
+   
     easyCLI.fastPrint("done.")
 
 
@@ -167,7 +172,7 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
     with playwright.sync_api.sync_playwright() as p:
         easyCLI.fastPrint("launching retriever proxy...")
       
-        browser = p.webkit.launch(executable_path=BROWSERPATH,headless=False)
+        browser = p.webkit.launch(executable_path=BROWSERPATH,headless=True)
         
         
         try:
