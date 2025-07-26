@@ -62,7 +62,7 @@ def shuffle(inputList:list):
 
 
 def typeDelay():
-    delay=(1/float(random.randint(5,8)+random.random()))
+    delay=(1/float(random.randint(6,10)+random.random()))
     time.sleep(delay)
 
 
@@ -114,19 +114,17 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
 
     doneButton = page.locator("button.primary-btn.fin-size-small.rounded.yf-1epmntv", has_text="Done")
     doneButton.wait_for(state="attached")
-    easyCLI.fastPrint("configuration complete.")
-    easyCLI.fastPrint("requesting dataset from server...")
+
     
     #give it a second
-    antiSnifferRandomDelay(1,2,True)
+    antiSnifferRandomDelay(1,2)
     #error handling and special casing
-    if(doneButton.get_attribute("disabled") is None):
-        
-        errorText=""
-        
-        section = page.locator('section[slot="content"].container.yf-1th5n0r', has_text="Date shouldn't be prior to")
-        text = section.text_content()
-        
+    errorText="Date shouldn't be prior to"
+    section = page.locator("section[slot=\"content\"].container.yf-1th5n0r")
+
+    if(errorText in " ".join(section.all_inner_texts())):
+        section=page.locator("section[slot=\"content\"].container.yf-1th5n0r",has_text=errorText)
+        text=section.text_content()
         if(type(text)==str):
             errorText=datetime.strptime(text.split("\"")[1],"%b %d, %Y").date().strftime("%m/%d/%Y")
         else:
@@ -179,7 +177,7 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
     with playwright.sync_api.sync_playwright() as p:
         easyCLI.fastPrint("launching retriever proxy...")
         desktopUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"
-        browser = p.firefox.launch(executable_path=BROWSERPATH,headless=False)
+        browser = p.firefox.launch(executable_path=BROWSERPATH,headless=True)
         context=browser.new_context(user_agent=desktopUserAgent,viewport={'width': 1920, 'height': 1080},device_scale_factor=1,is_mobile=False)
         
         try:

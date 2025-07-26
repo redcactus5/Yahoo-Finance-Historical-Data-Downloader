@@ -1,1 +1,2 @@
+
 python -m nuitka --onefile --windows-icon-from-ico="yahoo finance downloader logov2.ico" yahooFinanceHistoricalDataDownloader.py
