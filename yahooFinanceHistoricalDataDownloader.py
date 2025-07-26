@@ -154,10 +154,9 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
         doneButton.click()
     
     page.wait_for_selector('section[slot="content"].container.yf-1th5n0r', state='hidden',timeout=downloadStartTimeout)
-
-    antiSnifferRandomDelay(0,2,True)
+    antiSnifferRandomDelay(1,1)
    
-    easyCLI.fastPrint("done.")
+
 
 
     
