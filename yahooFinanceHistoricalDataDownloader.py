@@ -94,20 +94,30 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
 
     # Clear existing value
     easyCLI.fastPrint("4")
+    '''
     for backspace in range(random.randint(11,14)):  #random to emulate human 
         page.keyboard.press("Backspace")
         if(backspace==0):
             time.sleep(1)
         time.sleep((1/12))
+    '''
+    
     
     #more waiting
     antiSnifferRandomDelay(0,1)
 
-    isoDate = startDate.strftime("%Y-%m-%d")
+     
+    year=str(startDate.year)
+    if(len(year)<4):
+        zeros="0"*(4-len(year))
+        year=zeros+year
+
+    
     easyCLI.fastPrint("5")
-    for char in isoDate:
+    for char in stringedDate:
         page.keyboard.type(char)
         typeDelay()
+        time.sleep(2)
 
     #simulate waiting to click delay
     antiSnifferRandomDelay(1,2)
