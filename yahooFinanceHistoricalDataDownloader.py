@@ -117,12 +117,17 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date):
             
         raise Exception("start date error, start date for url: "+page.url+" is invalid.\nprovided date: "+startDate.strftime("%m/%d/%Y")+" minimum date: "+errorText)
     
-    doneButton.click()
     easyCLI.fastPrint("configuration complete.")
+
+    easyCLI.fastPrint("requesting dataset from server...")
+    doneButton.click()
+    
     page.wait_for_selector('section[slot="content"].container.yf-1th5n0r', state='hidden')
+
     wait=random.randint(1,2)+random.random()
     easyCLI.fastPrint("waiting "+f"{wait:.1f}"+" second anti-antibot delay...")
     time.sleep(wait)
+
     easyCLI.fastPrint("done.")
 
 
@@ -173,8 +178,9 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
                     try:
                         easyCLI.fastPrint("requesting landing page...")
                         response=page.goto(url[0],wait_until="domcontentloaded",timeout=downloadStartTimeout)
+                        
+                        
                         configurePageForLoading(page,url[1])
-
 
 
                         easyCLI.fastPrint("requesting dataset from server...")
@@ -407,7 +413,7 @@ def parseDataSets(rawDataList,sortAlphabetical):
 
 
 
-def loadLinks() -> tuple[list[str],bool,float,float,int] | bool:
+def loadLinks() -> tuple[list[tuple[str,date]],bool,float,float,int] | bool:
 
     #create a dictionary for our link config and load its location string
     global URLLISTFILE
@@ -438,29 +444,26 @@ def loadLinks() -> tuple[list[str],bool,float,float,int] | bool:
     with open(URLLISTFILE) as config:
         jsonDict=json.load(config)
 
-    #create a list for our links
+    #create the variables we will put what we load into
     links:list[str]=[]
+    shouldSort=False
+    startTimeout=-1
+    endTimeout=-1
+    retryLimit=-1
 
-    #validation steps and loading
+    #validation steps and loading. that literally is everything this massive block of try catches does
     try:
         links=jsonDict.get("URLs")#type:ignore
     except Exception:
         easyCLI.waitForFastWriterFinish()
         raise Exception("config error: downloadConfig \"URLs\" list corrupted or not found.")
 
-    #make a variable for the sorting variable 
-    shouldSort=False
-    #do error detection
     try:
-        #save our should sort value
         shouldSort=jsonDict.get("sort alphabetical")
     except:
         easyCLI.waitForFastWriterFinish()
         raise Exception("config error: downloadConfig \"should sort\" value corrupted or not found.")
     
-    #make a variable for the start timeout
-    startTimeout=-1
-
     try:
         #save our start timeout value
         startTimeout=jsonDict.get("page load begin timeout")
@@ -468,7 +471,6 @@ def loadLinks() -> tuple[list[str],bool,float,float,int] | bool:
         easyCLI.waitForFastWriterFinish()
         raise Exception("config error: downloadConfig \"page load begin timeout\" value corrupted or not found.")
 
-    endTimeout=-1
 
     try:
         endTimeout=jsonDict.get("page load completion timeout")
@@ -476,8 +478,6 @@ def loadLinks() -> tuple[list[str],bool,float,float,int] | bool:
         easyCLI.waitForFastWriterFinish()
         raise Exception("config error: downloadConfig \"page load completion timeout\" value corrupted or not found.")
 
-
-    retryLimit=-1
 
     try:
         retryLimit=jsonDict.get("download retry limit")
@@ -538,27 +538,73 @@ def loadLinks() -> tuple[list[str],bool,float,float,int] | bool:
         easyCLI.waitForFastWriterFinish()
         raise Exception("config error: \"download retry limit\" value must be 0 or greater!")
     else:
-        #all safety checks passed
+        #all safety checks passed, convert the timeouts to millisecond format
         startTimeout=float(startTimeout*1000)
         endTimeout=float(endTimeout*1000)
 
 
+    newLinks=[]
 
-    #some link shenanigans to grab the data for the current date
-    endID="period2="
-    #loop through the links
-    for link in range(len(links)):
-        if(type(links[link])!=str):#check if the link actually exists
+
+    endID="/history/"
+    unixStartID="period1="
+
+    #ok, here we are just parsing the provided urls to extract the base url, and if there, the start date. 
+    # we do this becuase yahoo finance is finicky about direct access, so we have to access a base url we 
+    # know it is ok with direct access to, then navigate to where we want from there. i know, its a pain.
+    for linkIndex, link in enumerate(links):
+
+        if(type(link)!=str):#check if the link actually exists
             easyCLI.waitForFastWriterFinish()
-            raise Exception("URL error: non string URL found.")
-        #look for the part we are interested in
-        idPos=links[link].find(endID)
-        #if we find it, overwrite the old unix time value with the current one
-        if(idPos!=-1):
-            links[link]=links[link][0:idPos+len(endID)]+str(int(time.time()))
+            raise Exception("URL error: non string URL found. provided url: "+str(link))
+        
+        #look for the end of the base url
+        idPos=link.find(endID)
+        #if we dont find it, panic
+        if(idPos==-1):
+            raise Exception("config error: invalid or corrupted url found. the url "+link+" is not a yahoo finance historical data page. \nthe url must be for a yahoo finance historical data page.")
+            
+        else:
+            #calculate the actual end of the base url
+            trueLinkEndIndex=idPos+(len(endID)-1)
+            #extract the base url
+            trueLink=link[0:trueLinkEndIndex]
+            #find the start date unix timecode in the link
+            startUnixIndex=link.find(unixStartID)
+
+            #if it is there
+            if(startUnixIndex!=-1):
+                #calculate the start of it
+                trueStartUnixIndex=startUnixIndex+len(unixStartID)
+                #isolate it from everything before there
+                importantPart=link[trueStartUnixIndex:]
+                #find the character we know delimits the end
+                endIndex=importantPart.find("&")
+                #if we find dont find the end, panic
+                if(endIndex==-1):
+                    raise Exception("config error: invalid or corrupted url found. the url "+link+" is not a yahoo finance historical data page. \nthe url must be for a yahoo finance historical data page.")
+                #otherwise extract the timecode and integer cast it
+                unixStartTime=int(importantPart[:endIndex])
+                #convert that timecode to a date
+                startDate=datetime.fromtimestamp(unixStartTime).date()
+                #append the stuff we extracted to the newlinks list (not to be confused with a linked list)
+                newLinks.append((trueLink,startDate))
+
+
+
+            else:
+                #if there is no unix time code, alert the user
+                easyCLI.fastPrint("no start date found for: "+link+" using default of one year.")
+                #get the current date, subtract a year from it, then convert it to a date object
+                startDate=(datetime.now()-timedelta(days=365)).date()
+                #append the base url and the start date we made to newlinks as a tuple
+                newLinks.append((trueLink,startDate))
+
+
+            
     
 
-    return (links,shouldSort,startTimeout,endTimeout,retryLimit)
+    return (newLinks,shouldSort,startTimeout,endTimeout,retryLimit)
 
 
 
@@ -1156,7 +1202,7 @@ def main(fileName):
         easyCLI.waitForFastWriterFinish()
         raise Exception("error: url loading failed.")
     
-    easyCLI.fastPrint("done.\n")
+    easyCLI.fastPrint("load successful.\n")
     easyCLI.fastPrint("loading commands...")
     rawCommands=loadCommands()
     commands:list=list()
@@ -1169,7 +1215,7 @@ def main(fileName):
         easyCLI.waitForFastWriterFinish()
         raise Exception("error: command loading failed.")
  
-    easyCLI.fastPrint("done.\n\n")
+    easyCLI.fastPrint("load successful.\n\n")
     
     validateCommands(commands)
 
