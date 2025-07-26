@@ -31,6 +31,8 @@ from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 import bisect
 from typing import Any
 from datetime import timezone
+import base64
+import hashlib
 
 
 def antiSnifferRandomDelay(start,end,message=False):
@@ -1192,11 +1194,11 @@ def licenseScreen():
     "Yahoo Finance Historical Data Downloader is free software released under the GNU General Public License,",
     "Version 3 (GPLv3).\n",
     "Powered by:",
-    " - Python ©2001-2025 Python Software Foundation",
+    " - Python © 2001-2025 Python Software Foundation",
     " - easyCLI © 2025 redcactus5",
-    " - BeautifulSoup ©2025 Leonard Richardson",
+    " - BeautifulSoup © 2025 Leonard Richardson",
     " - Playwright © 2025 Microsoft",
-    " - WebKit © 2025 Apple Inc.",
+    " - Firefox © 1998-2025 Mozilla and Firefox Contributors",
     " - Nuitka © Copyright 2025 Kay Hayen and Nuitka Contributors\n",
     "This project includes components licensed under the following licenses:",
     " - Python Software Foundation License Version 2",
@@ -1307,27 +1309,64 @@ def startup():
         print("well, thanks anyway!\n")
 
 
+def makeSillyString():
+    fileNames=["LICENSES/BeautifulSoup-MIT-LICENSE.txt","LICENSES/easyCLI-GPL3-LICENSE.txt","LICENSES/Nuitka-Apache-2.0-LICENSE.txt","LICENSES/Playwright-Apache-2.0-LICENSE.txt","LICENSES/Python-PSFL-2-LICENSE.txt","LICENSES/Mozilla-Public-License-2.0-LICENSE.txt","LICENSE.txt"]
+    new=[]
+    for name in fileNames:
+        new.append(str(base64.b85encode(name.encode())))
+    #remember to remove trailing ' and preceeding b'
+    print(new)
+    easyCLI.ln()
+    hashes=[]
+    
+    for file in fileNames:
+        with open(file, 'r') as current:
+            #i would like to apologize to my ram
+            text=base64.b64encode(current.read().encode())
+            hasher=hashlib.sha256()
+            hasher.update(text)
+            hashes.append(hasher.hexdigest())
+
+    print(hashes)
+
+    input()
 
 
 
+def integrityCheck():
+    integrity1=tuple("Oi4pUPE$owFG6Kub#!TFb!<~_b#N_BNmMONNkc_WQ$;Rxcys☺Oi4pUPE$owFJ)nKc|%M|Ek{sHGc8O>Lq$$gMJ{xBbN☺Oi4pUPE$owFHUu7bZcQPL2zMXXk{%jE-)=jNkc_WQ$;Rxcys☺Oi4pUPE$owFHme@d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcys☺Oi4pUPE$owFHm`OXm4&UP*X-sEix@kNkc_WQ$;Rxcys☺Oi4pUPE$owFHLWHX>4p^El_o0Y-wXHOlf0fZgXWVGA=MJOi4pUPE$oLba-?☺Oi4pUPE$oLba-?".split("☺"))
+    integrity2=tuple('77a0c340ea7f74e257583b5ef3bdd3a632095e4aa7db84c57e4896ff0c5580ab☺c3f0b92e9f659b5ac0751844931a53d76dd2dba4411d5453aa8420acd10aa605☺01cd5191f2c0ccdb7085cc8ec6db495c955eaed85546081304c1f9317699a368☺f7d20fed3ceee20499dbeca58172052d67af49c062c456492cf4f772cf24c42e☺922d5865ac432b893cccd681669eeed44560991ae6dc2c0d0db3741ab0b04c2a☺d00826277035a486a18ac6d488b8bf2e8239966a74dbcca54fb8d4f8403975cb☺c3f0b92e9f659b5ac0751844931a53d76dd2dba4411d5453aa8420acd10aa605'.split("☺"))
+    for tegrity in range(len(integrity1)):
+
+        if(os.path.exists(base64.b85decode(integrity1[tegrity].encode()).decode())):
+            with open(base64.b85decode(integrity1[tegrity].encode()).decode(), 'r') as current:
+                #i would like to apologize to my ram
+                
+                hasher=hashlib.sha256()
+                hasher.update(base64.b64encode(current.read().encode()))
+                if(hasher.hexdigest()!=integrity2[tegrity]):
+                    return False
+
+        else:
+            return False
+    return True
 
 
 
 if(__name__=="__main__"):
 
     #devious check to make sure no one is doing an illegal thing and distributing without the open source licenses
-    if((not os.path.exists("LICENSES/BeautifulSoup-MIT-LICENSE.txt"))or(not os.path.exists("LICENSES/easyCLI-GPL3-LICENSE.txt"))or(not os.path.exists("LICENSES/Nuitka-Apache-2.0-LICENSE.txt"))or(not os.path.exists("LICENSES/Playwright-Apache-2.0-LICENSE.txt"))or(not os.path.exists("LICENSES/Python-PSFL-2-LICENSE.txt"))or(not os.path.exists("LICENSES/Mozilla-Public-License-2.0-LICENSE.txt"))or(not os.path.exists("LICENSE.txt"))):
+    if(integrityCheck()):
+        startup()
+        print("now exiting...")
+        easyCLI.ln(1)
+    else:
         easyCLI.uiHeader()
         print("ERROR: License file(s) not found.")
         print("This program is open source and must be distributed with its licenses.")
         print("Please ensure the LICENSE.txt is present, and the LICENSES directory is \npresent and contains easyCLI-GPL3-LICENSE.txt, BeautifulSoup-MIT-LICENSE.txt, \nNuitka-Apache-2.0-LICENSE.txt, WebKit-LGPL-2.0-BSD-License.txt, and Playwright-Apache-2.0-LICENSE.txt.")
         input("press enter to finish.")
         easyCLI.ln(1)
-        print("now exiting...")
-        easyCLI.ln(1)
-    else:
-        
-        startup()
         print("now exiting...")
         easyCLI.ln(1)
         
