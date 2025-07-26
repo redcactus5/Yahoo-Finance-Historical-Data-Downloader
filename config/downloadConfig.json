@@ -1,0 +1,11 @@
+{
+    "URLs":[
+        "https://finance.yahoo.com/quote/%5EDJI/history/?period1=694362600&period2=1753520385",
+        "https://finance.yahoo.com/quote/%5EGSPC/history/?period1=-1325583000&period2=1753413914",
+        "https://finance.yahoo.com/quote/%5EIXIC/history/?period1=34612200&period2=1753520454"
+        ],
+    "sort alphabetical":true,
+    "page load begin timeout":60,
+    "page load completion timeout":210,
+    "download retry limit":5
+}
