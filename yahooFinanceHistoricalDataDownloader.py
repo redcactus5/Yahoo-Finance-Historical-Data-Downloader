@@ -79,7 +79,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     #avoid bot sniffers
     antiSnifferRandomDelay(1,2,True)
 
-    easyCLI.fastPrint("configuring page...")
+    easyCLI.fastPrint("configuring webpage for dataset download...")
 
     #open the menu we want to use, and wait for it open
     page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-1epmntv")
@@ -202,13 +202,13 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
                 tryCount=1
                 #retry loop
                 while(True):
-                    easyCLI.fastPrint("page "+str(urlIndex+1)+" of "+lenString)
+                    easyCLI.fastPrint("dataset "+str(urlIndex+1)+" of "+lenString)
                     #make a new tab
                     page = context.new_page()
                     
                     #catch errors
                     try:
-                        easyCLI.fastPrint("requesting base page from server...")
+                        easyCLI.fastPrint("requesting source webpage from server...")
                         #request the page from the server
                         response=page.goto(url[0],wait_until="domcontentloaded",timeout=downloadStartTimeout)
 
