@@ -664,8 +664,8 @@ def loadCommands():
             "commands":[
                 {
                     "command":"set this to either specific dates, date range, or all data",
-                    "attributes":["put attributes you want here"],
-                    "dates":["put dates here"]
+                    "attributes":["put attributes you want here(the attributes are the categories at the top of the table on the webpage.)"],
+                    "dates":["put dates here. how they are used depends on the command, all data ignores this, date range uses it for the start and stop dates (only one pair per command supported for that), and specific dates only retrieves the dates listed here."]
                 }
             ]
     }
@@ -696,9 +696,9 @@ def loadCommands():
         if(len(commandList)==1):
             if(commandList[0].get("command")=="set this to either specific dates, date range, or all data"):
                 if(len(commandList[0].get("attributes"))==1):#type: ignore
-                    if(commandList[0].get("attributes")[0]=="put attributes you want here"):#type: ignore
+                    if(commandList[0].get("attributes")[0]=="put attributes you want here(the attributes are the categories at the top of the table on the webpage.)"):#type: ignore
                         if(len(commandList[0].get("dates"))==1):#type: ignore
-                            if(commandList[0].get("dates")[0]=="put dates here"):#type: ignore
+                            if(commandList[0].get("dates")[0]=="put dates here. how they are used depends on the command, all data ignores this, date range uses it for the start and stop dates (only one pair per command supported for that), and specific dates only retrieves the dates listed here."):#type: ignore
                                 #if it is, print a message then exit
                                 easyCLI.waitForFastWriterFinish()
                                 easyCLI.uiHeader()
