@@ -1344,7 +1344,7 @@ def integrityCheck():
         if(os.path.exists(pathCache)):
             with open(pathCache, 'r') as current:
                 pathCache2=None
-                #i would like to apologize to my ram
+                #i would like to apologize to my ram (and cache)
                 
                 hasher=hashlib.sha256()
                 hasher.update(current.read().encode())
