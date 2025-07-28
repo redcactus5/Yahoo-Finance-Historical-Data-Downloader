@@ -1328,7 +1328,7 @@ def makeSillyString():
             hasher=hashlib.sha256()
             text=current.read().encode()
             hasher.update(text)
-            hashes.append(base64.b64encode(hasher.hexdigest().encode()).decode())
+            hashes.append(base64.b85encode(hasher.hexdigest().encode()).decode())
 
     print("☺".join(hashes))
 
@@ -1343,11 +1343,12 @@ def integrityCheck():
         pathCache=base64.b85decode(integrity1[tegrity].encode()).decode()
         if(os.path.exists(pathCache)):
             with open(pathCache, 'r') as current:
+                pathCache2=None
                 #i would like to apologize to my ram
                 
                 hasher=hashlib.sha256()
                 hasher.update(current.read().encode())
-                if(hasher.hexdigest()!=base64.b64decode(integrity2[tegrity].encode()).decode()):
+                if(hasher.hexdigest()!=base64.b85decode(integrity2[tegrity].encode()).decode()):
                     return False
 
         else:
