@@ -453,7 +453,7 @@ def loadLinks() -> tuple[list[tuple[str,date]],bool,float,float,int] | bool:
     jsonDict:dict=dict()
     #create our template
     template={
-        "URLs":["put historical data links here."],
+        "URLs":["put historical data links here. if you want data from a date, make sure it is included in the page you link. this can be done by changing the starting date in yahoo finance before copying the link."],
         "sort alphabetical":"set to true if you want your stocks sorted alphabetically.",
         "page load begin timeout":"put the time in seconds you want to give the page to start loading here (a value of zero means no timeout).",
         "page load completion timeout":"put the time in seconds you want to give the retrieval to complete here (used for all 6 completion checks) (a value of zero means no timeout).",
@@ -531,7 +531,7 @@ def loadLinks() -> tuple[list[tuple[str,date]],bool,float,float,int] | bool:
 
     #check if the template is found
     if(len(links)==1):
-        if(links[0]=="put historical data links here."):
+        if(links[0]=="put historical data links here. if you want data from a date, make sure it is included in the page you link. this can be done by changing the starting date in yahoo finance before copying the link."):
             if(shouldSort=="set to true if you want your stocks sorted alphabetically."):
                 if(startTimeout=="put the time in seconds you want to give the page to start loading here (a value of zero means no timeout)."):
                     if(endTimeout=="put the time in seconds you want to give the retrieval to complete here (used for all 6 completion checks) (a value of zero means no timeout)."):
