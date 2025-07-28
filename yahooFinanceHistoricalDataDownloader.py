@@ -1316,24 +1316,24 @@ def makeSillyString():
     for name in fileNames:
         new.append(str(base64.b85encode(name.encode())))
     #remember to remove trailing ' and preceeding b'
-    print(new)
+    print("☺".join(new))
     easyCLI.ln()
     hashes=[]
     
     for file in fileNames:
         with open(file, 'r') as current:
             #i would like to apologize to my ram
-            text=base64.b64encode(current.read().encode())
             hasher=hashlib.sha256()
+            text=current.read().encode()
             hasher.update(text)
-            hashes.append(hasher.hexdigest())
+            hashes.append(base64.b64encode(hasher.hexdigest().encode()).decode())
 
-    print(hashes)
+    print("☺".join(hashes))
 
     input()
 
 
-
+#need to update to properly do hash hiding
 def integrityCheck():
     integrity1=tuple("Oi4pUPE$owFG6Kub#!TFb!<~_b#N_BNmMONNkc_WQ$;Rxcys☺Oi4pUPE$owFJ)nKc|%M|Ek{sHGc8O>Lq$$gMJ{xBbN☺Oi4pUPE$owFHUu7bZcQPL2zMXXk{%jE-)=jNkc_WQ$;Rxcys☺Oi4pUPE$owFHme@d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcys☺Oi4pUPE$owFHm`OXm4&UP*X-sEix@kNkc_WQ$;Rxcys☺Oi4pUPE$owFHLWHX>4p^El_o0Y-wXHOlf0fZgXWVGA=MJOi4pUPE$oLba-?☺Oi4pUPE$oLba-?".split("☺"))
     integrity2=tuple('77a0c340ea7f74e257583b5ef3bdd3a632095e4aa7db84c57e4896ff0c5580ab☺c3f0b92e9f659b5ac0751844931a53d76dd2dba4411d5453aa8420acd10aa605☺01cd5191f2c0ccdb7085cc8ec6db495c955eaed85546081304c1f9317699a368☺f7d20fed3ceee20499dbeca58172052d67af49c062c456492cf4f772cf24c42e☺922d5865ac432b893cccd681669eeed44560991ae6dc2c0d0db3741ab0b04c2a☺d00826277035a486a18ac6d488b8bf2e8239966a74dbcca54fb8d4f8403975cb☺c3f0b92e9f659b5ac0751844931a53d76dd2dba4411d5453aa8420acd10aa605'.split("☺"))
@@ -1344,8 +1344,8 @@ def integrityCheck():
                 #i would like to apologize to my ram
                 
                 hasher=hashlib.sha256()
-                hasher.update(base64.b64encode(current.read().encode()))
-                if(hasher.hexdigest()!=integrity2[tegrity]):
+                hasher.update(current.read().encode())
+                if(hasher.hexdigest()!=base64.b64decode(integrity2[tegrity].encode()).decode()):
                     return False
 
         else:
