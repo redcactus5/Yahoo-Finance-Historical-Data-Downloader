@@ -1312,43 +1312,23 @@ def startup():
         print("well, thanks anyway!\n")
 
 
-def makeSillyString():
-    fileNames=["LICENSES/BeautifulSoup-MIT-LICENSE.txt","LICENSES/easyCLI-GPL3-LICENSE.txt","LICENSES/Nuitka-Apache-2.0-LICENSE.txt","LICENSES/Playwright-Apache-2.0-LICENSE.txt","LICENSES/Python-PSFL-2-LICENSE.txt","LICENSES/Mozilla-Public-License-2.0-LICENSE.txt","LICENSE.txt"]
-    new=[]
-    for name in fileNames:
-        new.append(str(base64.b85encode(name.encode())))
-    #remember to remove trailing ' and preceeding b'
-    print("☺".join(new))
-    easyCLI.ln()
-    hashes=[]
-    
-    for file in fileNames:
-        with open(file, 'r') as current:
-            #i would like to apologize to my ram
-            hasher=hashlib.sha256()
-            text=current.read().encode()
-            hasher.update(text)
-            hashes.append(base64.b85encode(hasher.hexdigest().encode()).decode())
-
-    print("☺".join(hashes))
-
-    input()
 
 
 #need to update to properly do hash hiding
 def integrityCheck():
     integrity1=tuple("Oi4pUPE$owFG6Kub#!TFb!<~_b#N_BNmMONNkc_WQ$;Rxcys☺Oi4pUPE$owFJ)nKc|%M|Ek{sHGc8O>Lq$$gMJ{xBbN☺Oi4pUPE$owFHUu7bZcQPL2zMXXk{%jE-)=jNkc_WQ$;Rxcys☺Oi4pUPE$owFHme@d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcys☺Oi4pUPE$owFHm`OXm4&UP*X-sEix@kNkc_WQ$;Rxcys☺Oi4pUPE$owFHLWHX>4p^El_o0Y-wXHOlf0fZgXWVGA=MJOi4pUPE$oLba-?☺Oi4pUPE$oLba-?".split("☺"))
-    integrity2=tuple("77a0c340ea7f74e257583b5ef3bdd3a632095e4aa7db84c57e4896ff0c5580ab☺c3f0b92e9f659b5ac0751844931a53d76dd2dba4411d5453aa8420acd10aa605☺01cd5191f2c0ccdb7085cc8ec6db495c955eaed85546081304c1f9317699a368☺f7d20fed3ceee20499dbeca58172052d67af49c062c456492cf4f772cf24c42e☺922d5865ac432b893cccd681669eeed44560991ae6dc2c0d0db3741ab0b04c2a☺d00826277035a486a18ac6d488b8bf2e8239966a74dbcca54fb8d4f8403975cb☺c3f0b92e9f659b5ac0751844931a53d76dd2dba4411d5453aa8420acd10aa605".split("☺"))
+    integrity2=tuple("V_`QlFfn3fVm2^jVlrbjGGjPoHD+aDHZd||VKX>pIAJz7Gi75rVrDQgFl972HezODVKQPcWiVkdVK_55☺HZn3YWi)0uV>dTqWHc~0F*ac~FgIp2I5sk5WiT=_FgZ14WnwU9VKXu?Vq`RCVlic5W;QuAIXE{oH)CXG☺G-P99WHM%AH8nV5F*Rc{GdDFfH#0RcGcz_~Fl9A0VKOyjGc_<{W??okIW}cBVKregVKFc^Vly*iVL4@F☺H#at6Vq!TmIWjq8V>35nI5sjcVq#@CV>dE1FgRl|V>LEqG%z$ZGc;s4GB`M9W;tUqHDNb3HZm||W;J7F☺I5jqAH)1nkVK-$lH#adeVq!IBWiT;gW-&NnVPrWpWMwonW;HW2GC5*4WjHl3WMVU7HaTTvHDWSiGG;k6☺FkxmiHZ?F~Gc#dhHfA<BHDow5WH~lCF<~${I5Rb4Vq{}tGBh}1G&V41H#apiWH2-~H)Jq2W-~J~WHV(s☺HZn3YWi)0uV>dTqWHc~0F*ac~FgIp2I5sk5WiT=_FgZ14WnwU9VKXu?Vq`RCVlic5W;QuAIXE{oH)CXG☺<U)`E#Oex<Hs1h7#DrA(qJ4@fPilc3f5w2Xdir-!lf{DLvHGSe_JWIoJzUxT3QR^rPUG=_iBcpu^o$o7>;=K`y".split("☺"))
     for tegrity in range(len(integrity1)):
         pathCache=base64.b85decode(integrity1[tegrity].encode()).decode()
         if(os.path.exists(pathCache)):
             with open(pathCache, 'r') as current:
-                pathCache2=None
+                pathCache=None
                 #i would like to apologize to my ram (and cache)
                 
                 hasher=hashlib.sha256()
                 hasher.update(current.read().encode())
-                if(hasher.hexdigest()!=base64.b85decode(integrity2[tegrity].encode()).decode()):
+                hasher.update(integrity2[len(integrity2)-1].encode())
+                if(base64.b85encode(hasher.hexdigest().encode()).decode()!=integrity2[tegrity]):
                     return False
 
         else:
