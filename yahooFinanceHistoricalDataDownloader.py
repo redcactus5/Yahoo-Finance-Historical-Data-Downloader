@@ -1327,7 +1327,7 @@ def integrityCheck():
                 
                 hasher=hashlib.sha256()
                 hasher.update(current.read().encode())
-                hasher.update(integrity2[-1].encode())
+                hasher.update(integrity2[len(integrity1)-1].encode())
                 if(base64.b85encode(hasher.hexdigest().encode()).decode()!=integrity2[tegrity]):
                     return False
 
