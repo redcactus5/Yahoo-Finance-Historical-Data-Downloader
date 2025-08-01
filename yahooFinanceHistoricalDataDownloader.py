@@ -188,13 +188,16 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
     with playwright.sync_api.sync_playwright() as p:
         desktopUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"
         easyCLI.fastPrint("launching retriever proxy...")
-        #launch firefox, so we can client side render scrape. fucking web 2.0. also do it headless so we dont have windows pooping up scaring people
-        browser = p.firefox.launch(executable_path=BROWSERPATH,headless=True)
+        browser=None
+        context=None
         try:
-            
+            #launch firefox, so we can client side render scrape. fucking web 2.0. also do it headless so we dont have windows pooping up scaring people
+            browser = p.firefox.launch(executable_path=BROWSERPATH,headless=True)
             #the user agent we are spoofing
             context=browser.new_context(user_agent=desktopUserAgent,viewport={'width': 1920, 'height': 1080},device_scale_factor=1,is_mobile=False)
             easyCLI.fastPrint("done.\n")
+
+            
             
             #precalculate how long the url list is for speed
             lenString=str(len(links))
@@ -284,17 +287,24 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
 
             
             easyCLI.fastPrint("cleaning up retriever proxy...")
+            context.close()
             browser.close()
 
             easyCLI.fastPrint("done.\n")
         #if there is an error first close the browser then crash, so we dont leave resources running
         except Exception as E:
-            browser.close()
+            if(not(context is None)):
+                context.close()
+            if(not(browser is None)):
+                browser.close()
             easyCLI.waitForFastWriterFinish()
             raise(E)
         
         except KeyboardInterrupt as E:
-            browser.close()
+            if(not(context is None)):
+                context.close()
+            if(not(browser is None)):
+                browser.close()
             easyCLI.waitForFastWriterFinish()
             raise(E)
 
@@ -322,7 +332,7 @@ def retrieveTableAndName(htmlText)->tuple[str,Tag]:
         easyCLI.waitForFastWriterFinish()
         raise Exception("error: no stock name found in page.")
     
-    name=name.get_text()#type: ignore
+    name=str(name.get_text())
 
     #find the table in the page
     table=scraper.find("table")
@@ -1078,7 +1088,7 @@ def processStocks(commands:list[tuple],stocks:list[dict])->list[dict]:
         for stockNumber, stock in enumerate(stocks):
             #extract name and create a list for the categories, and a 2d list for the values
             easyCLI.fastPrint("".join(("\nprocessing stock: \"",str(stock.get("name")),"\" (stock ",str(stockNumber+1)," of ",stockListLen,")...")))
-            name=stock.get("name")
+            name=str(stock.get("name"))
             categories=[0]
             categoryLookupDict:dict[int,int]={0:0}
             values:list[list]=[[]]
@@ -1180,8 +1190,6 @@ class YahooFinanceGrabberHeader(easyCLI.UIHeaderClass):
         
 
 
-#set the library ui header to the one we just made
-easyCLI.setUIHeader(YahooFinanceGrabberHeader())
 
 
 
@@ -1344,10 +1352,13 @@ def integrityCheck()->bool:
 
 
 if(__name__=="__main__"):
-
+    
+    #set the library ui header to the one we just made
+    easyCLI.setUIHeader(YahooFinanceGrabberHeader())
     #devious check to make sure no one is doing an illegal thing and distributing without the open source licenses
     print("initializing...")
     if(not integrityCheck()):
+        
         easyCLI.uiHeader()
         print(base64.b85decode("MN(2vQaT_^X=7z>b7dfAX>4UEb15KhZ*(ALZ*^{DE(%m=X>%ZOa&KpHVQnC3b0BYUWo{sIZ*_8GWgua0WFT#Ib95kLWgui}b98cPVs&(7WFU8GbZ8)HbaNnVX=7z>b7gZb3Q%liVRL05Wo~nIa%CWNXk{QwNkc_WQ$;Rxcyu6Xb0BbXWpib2bSxlYZe$>IXk{QwNkc_WQ$<rCWNC6`V{~tFc_3+XAPR7DWpib2bRc1FWFTX2ZggR3ZgU`IVRLyyOi3+AP)su|Oi4pUPE$oLba-?uAVOtfb#!TFb!<~_b#N_BNmMONNkc_WQ$;Rxcyufv3Ql!tbZcQPL2zMXXk{%jE-)=jNkc_WQ$;RxcyufvS7l;LX>=`2M^H>HGA=MJLQ_O7Olf0fZgXWWba-?uAYpD~AW&>!d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcyul".encode()).decode())
         input(base64.b85decode("aB^jHb0B4IbY*fNbZ;PLX>MtAXf6".encode()).decode())
