@@ -2,7 +2,7 @@ import hashlib
 import base64
 import random
 import string
-
+import os
 def makeSalt():
     saltMine=list("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~")
 
@@ -16,8 +16,10 @@ def makeSalt():
     return salt.encode()
 
 def makeSillyString():
-    
-    fileNames=["LICENSES/BeautifulSoup-MIT-LICENSE.txt","LICENSES/easyCLI-GPL3-LICENSE.txt","LICENSES/Nuitka-Apache-2.0-LICENSE.txt","LICENSES/Playwright-Apache-2.0-LICENSE.txt","LICENSES/Python-PSFL-2-LICENSE.txt","LICENSES/Mozilla-Public-License-2.0-LICENSE.txt","LICENSE.txt"]
+    fileNames=os.listdir("LICENSES/")
+    for i in range(len(fileNames)):
+        fileNames[i]="LICENSES/"+fileNames[i]
+    fileNames.extend(["LICENSE.txt",])
     print("\n")
     hashes=[""]*(len(fileNames)*3)
     

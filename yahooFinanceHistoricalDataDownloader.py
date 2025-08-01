@@ -1218,17 +1218,19 @@ def licenseScreen()->None:
     "Powered by:",
     " - Python © 2001-2025 Python Software Foundation",
     " - easyCLI © 2025 redcactus5",
-    " - BeautifulSoup © 2025 Leonard Richardson",
+    " - lxml © 2004 Infrae and lxml Contributors",
+    " - libxml2 © 1998-2012 Daniel Veillard and libxml2 Contributors",
+    " - libxslt © 2001-2002 Daniel Veillard and libxslt Contributors",
     " - Playwright © 2025 Microsoft",
-    " - Firefox © 1998-2025 Mozilla and Firefox Contributors",
-    " - Nuitka © Copyright 2025 Kay Hayen and Nuitka Contributors\n",
+    " - Nuitka © Copyright 2025 Kay Hayen and Nuitka Contributors",
+    " - Firefox © 1998-2025 Mozilla and Firefox Contributors\n",
     "This project includes components licensed under the following licenses:",
     " - Python Software Foundation License Version 2",
-    " - Apache License 2.0",
     " - GNU General Public License Version 3 (GPLv3)",
-    " - Mozilla Public License Version 2.0",
-    
-    " - MIT License\n",
+    " - BSD 3 Clause License",
+    " - MIT License",
+    " - Apache License 2.0",
+    " - Mozilla Public License Version 2.0\n",
     "See the LICENSES/ directory for full license texts and details.\n\n"]))
     
     
@@ -1348,7 +1350,7 @@ def startup()->None:
 
 
 def integrityCheck()->bool:
-    integrity=tuple(["Oi4pUPE$owFG6Kub#!TFb!<~_b#N_BNmMONNkc_WQ$;Rxcys", "VL4)9Wn(#GI5uH7IX5*mHe)qoH!?6cFk@q7WM*YIV`gGxIAbw0G%`13WnnU7W@0yHIW;n7I5uHnVl*=}", "z2n)$3MKl0fDDlZe<G~#A4O@g&ttN7B^SzUEYAD847fU_|Qcm}ipgJU>DjN4=8w*Ug<yvk;uxbRaMgP^c16*^<", "Oi4pUPE$owFJ)nKc|%M|Ek{sHGc8O>Lq$$gMJ{xBbN", "WjHZnI5T81H8f#nIbmUAVlZQ3Vqs=CG-PEsIbt(4V>MwoG&E#kFf(E}WHK-?Ibt(4Gh{F_W;bCsG+{Y7", "vqS7<4-71r<iE<n9C6eZH1swht9fmvPdvv~08PYTz(^6*3-y`5*ymw0v&|8Ez<+SQ<Gyu0R3e{ss&+2mU3OFSI", "Oi4pUPE$owFHUu7bZcQPL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "GBz<}V=yyiIb>ovW-w)CV=yx~Vm4-CFflM;F=8_^F*svoF)%VXG&yBCH#ah2GdN;4VmUQoVr4ZmVPj%8", "C6AY_s5i334&-10naEb8<oF2#4b+pjstqs4Wi3ex-t`s1^5$m#4c@TnaHphhPeH{QJ)p%9ns^KeVG~{p;`ojxT", "Oi4pUPE$owFHme@d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "Wj8ftGC5^2H8*85Gi5eoGBz<{I5IM2WoBkGIXGcAW;QcpGG${mW;Zf6WI1ADF*G%1G+{VlF*GwXVqrOE", "BMJ<14ON<I8!#T7>0ZlLZSz8j-$NAUu6)WglmRFXH*MKfTILK{OM5*zkY2jO<D57HBM08;(e7QA*f5dU4lh&<U", "Oi4pUPE$owFHm`OXm4&UP*X-sEix@kNkc_WQ$;Rxcys", "H8?S2H#lZwH#Rk4Gh#V8WHw|oVKHMjGBr0iH8Nv1H#TH9F=aDmGh{V3W;HWnIWspmIAu6wWjA6oF*jjk", "mMH%!b58s7-eYfP0_?}}qwSwbSx@Nf)@V-AF&l4oO-aQgjAo6*grgG?CWzh@e)9q-SK~Lh1gU}YJHhO0($6k+9", "Oi4pUPE$owFHLWHX>4p^El_o0Y-wXHOlf0fZgXWVGA=MJOi4pUPE$oLba-?", "H8(LhGBsvpG&DFdGd5y4Gc#c{G&440Fkv}3Vq`EgWHB*eH)AzoFf(E{Ff=w}H#T7~H8V9gW;JAFGBajo", "zEZpn$qfc`PDvN*(jA(N;#Cl>rST;y{raLfHPnMcBCl!Mcpfe1%cesb9Iz>37=7KoZ5_*hkMpcDzN+~7#7p^))", "Oi4pUPE$oLba-?", "IW}Q7G-YBjF*#u}Vl*)|W;Z!xW;SMKHDxd`Ha0h9GG#VqGB`OnVP!QrIAt|BFf=zfF*af{F)}nZV=*;j", "b)zSde|t6_G+t3<6)!v;hDD#({By=c(cIb<d`D}7Uk7_dvstGK?O2@A8%F`^0bun-}xKQ78c58|AGHM3g({csr"])
+    integrity=tuple(["Oi4pUPE$owFJ)nKc|%M|Ek{sHGc8O>Lq$$gMJ{xBbN", "Vq-HlWHvT4G+|_BW@a-oGch<eHf1znGcsc_H8C<cW;14EW->EmGGjAgVPs=CVL3B6H)b|sV`DimGGk&g", "3t=Pjtq-~6V7dz|+g$w9S5LB<}L}_`~oDwAVoJ8!CJesZsz%n<o}aUdS!r$A$hd6O(qK&>9t-IT2JHm*)?bBZo", "Oi4pUPE$owFKlUIcx`MlElo*OElf#6MNU&iE_8Tw", "V>UHqGGQ<>VKZbhHDoz6V`esFIXPrCH!wJ4W??fhFgGz_W??sFGiEVmIW{siGGZ_`W;r=AVPi2jF*7!1", "%%L?bD@a-Pld7~XBDNND6#rI$afW1B1?@1mq7)I9p2W#FPmlDZfcZ{To?*PGF6r(D_50s~KAjUZ<<zxLXFqu-z", "Oi4pUPE$owFKlUIcynxYElo*OElf#6MNU&iE_8Tw", "He@klFlJ&nI5RakHf3gEGBq?cIW#mdFl9I~IW=T4GBGzZWMgGAH#KEBG%;pjVPY^dW->4{W;bCnW?^D8", "1B@VO^Hgy3j8Mu|p5lVD!wi)4Uu^fdE~X;#HK(eviEkkev`hjS$UJ8&U=C|Ouy}TWu3p=Z~%(45wlU{+NT~yZW", "Oi4pUPE$owFKl>iY%M}lL@hHdLu_Gnb7d_|Nkc_WQ$;Rxcys", "WMpAvVKiblWi?|kFg9gjH#0XdFk&-eVq#=AWjQ%vH8e70GBr42Ic7LyWMMI8Wic^1F<~?{WMO4vVPQFC", "Qv||@6qWerf#}rb1uez90;eD#WO>1;+n^U)UlUwx(S#wGfXF%Kl~t_ro2O`LjQ3q>6#SLs({zssxSdfkU@aGUO", "Oi4pUPE$owFHLWHX>4p^El_o0Y-wXHOlf0fZgXWVGA=MJOi4pUPE$oLba-?", "Wn*SHV>UQpIXN;gGB{ymHD+OCWMnciV>x7IGi6~lGGs6~Ibk<BW;bRsIWuE4G+{D0H8M9jW@I#DH)UdD", "XB(1L_Sy2&P9JZ+J!x-f?(@tn2xv1G$$BzoCDKpY3e#sj+n$z|%}|LGs?z4Vehn(%D7w%YuNWEtKy3TTNu-g+#", "Oi4pUPE$owFHUu7bZcQPL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "G%+|bWH)0oVly^4Fgal{W;iltIA&opHZw3{IAS?uGdVCcIb$(1HaRwCGhsAgHZ*24GGjM2H8e3~IXO5v", "5r{34hDA762*_sxsAyy=ZeBuwz>gY%;4U_I4;5j-?+ApA%~(ng{VeU4vX&twl*+IbNMU*cR|01m#!iJLcTg~4*", "Oi4pUPE$owFHme@d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "VK+H2Gh#P4W;ZxAF)(IiGh}5lHe+RBHZ?b6FgRpoWi&TpVPR!sIc7IvV=y>0V`E`qVlgyiF=jP5Fkv__", "QcU>Kdbyfb<ySFE@4>+`7!%4SEI|ma2N{yrzO_d)vr^QZhV&WelXJC^O64yBeYUSlQ<JECu^DPR~o(MnRuQCH{", "Oi4pUPE$owFHm`OXm4&UP*X-sEix@kNkc_WQ$;Rxcys", "W-&E3IX5>qG&N;6F=J&oGBh@3W??ZlF*GtbW;kJCH#cE5HfCaCG-5P3IAl0wF*q_bH)b(0Wieu8H8f-}", "ap7*5qy*{YVlyPdw{s$8@^+yT>w&BXRhWlJg8*h$ESDueADR3=&`N`EnQ?C#(U(!^t6{43~rgE|2ZU;~ZI0ZWZ", "Oi4pUPE$oLba-?", "F)=VPG&VP8Wn(!wFlIGkFfw5^VK-xCHDzICGGQ?=Vl`oAWHMnmGcjc|FlI3`GGQ?@VKOmfIWl57Vqsxp", "w#vRqdvQx!OYd!3(ZDRqk4^O0agS{D^=@5BgHj)mf>Mgd-?%W#)et>?6z8FV&SAP`N7PvCW*BBnzP63-8Ye@gJ"])
     
     if(isinstance(integrity,tuple) and (len(integrity)>0) and (len(integrity)%3==0)):
         loops=int(len(integrity)/3)
