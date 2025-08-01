@@ -1317,21 +1317,18 @@ def startup():
 
 
 
-
-#need to update to properly do hash hiding
 def integrityCheck():
     integrity1=tuple("Oi4pUPE$owFG6Kub#!TFb!<~_b#N_BNmMONNkc_WQ$;Rxcys☺Oi4pUPE$owFJ)nKc|%M|Ek{sHGc8O>Lq$$gMJ{xBbN☺Oi4pUPE$owFHUu7bZcQPL2zMXXk{%jE-)=jNkc_WQ$;Rxcys☺Oi4pUPE$owFHme@d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcys☺Oi4pUPE$owFHm`OXm4&UP*X-sEix@kNkc_WQ$;Rxcys☺Oi4pUPE$owFHLWHX>4p^El_o0Y-wXHOlf0fZgXWVGA=MJOi4pUPE$oLba-?☺Oi4pUPE$oLba-?".split("☺"))
     integrity2=tuple("V_`QlFfn3fVm2^jVlrbjGGjPoHD+aDHZd||VKX>pIAJz7Gi75rVrDQgFl972HezODVKQPcWiVkdVK_55☺HZn3YWi)0uV>dTqWHc~0F*ac~FgIp2I5sk5WiT=_FgZ14WnwU9VKXu?Vq`RCVlic5W;QuAIXE{oH)CXG☺G-P99WHM%AH8nV5F*Rc{GdDFfH#0RcGcz_~Fl9A0VKOyjGc_<{W??okIW}cBVKregVKFc^Vly*iVL4@F☺H#at6Vq!TmIWjq8V>35nI5sjcVq#@CV>dE1FgRl|V>LEqG%z$ZGc;s4GB`M9W;tUqHDNb3HZm||W;J7F☺I5jqAH)1nkVK-$lH#adeVq!IBWiT;gW-&NnVPrWpWMwonW;HW2GC5*4WjHl3WMVU7HaTTvHDWSiGG;k6☺FkxmiHZ?F~Gc#dhHfA<BHDow5WH~lCF<~${I5Rb4Vq{}tGBh}1G&V41H#apiWH2-~H)Jq2W-~J~WHV(s☺HZn3YWi)0uV>dTqWHc~0F*ac~FgIp2I5sk5WiT=_FgZ14WnwU9VKXu?Vq`RCVlic5W;QuAIXE{oH)CXG☺<U)`E#Oex<Hs1h7#DrA(qJ4@fPilc3f5w2Xdir-!lf{DLvHGSe_JWIoJzUxT3QR^rPUG=_iBcpu^o$o7>;=K`y".split("☺"))
+    salt=integrity2[len(integrity2)-1].encode()
     for tegrity in range(len(integrity1)):
         pathCache=base64.b85decode(integrity1[tegrity].encode()).decode()
         if(os.path.exists(pathCache)):
             with open(pathCache, 'r') as current:
-                pathCache=None
                 #i would like to apologize to my ram (and cache)
-                
                 hasher=hashlib.sha256()
                 hasher.update(current.read().encode())
-                hasher.update(integrity2[len(integrity1)].encode())
+                hasher.update(salt)
                 if(base64.b85encode(hasher.hexdigest().encode()).decode()!=integrity2[tegrity]):
                     return False
 
