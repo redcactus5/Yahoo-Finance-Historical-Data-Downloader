@@ -1304,6 +1304,8 @@ def main(fileName)->bool|str:
     displayList=None
     endTime=timer.getUnitDeviatedTimeString()
     timer=None
+    import gc
+    gc.collect()
     return endTime
     
 
