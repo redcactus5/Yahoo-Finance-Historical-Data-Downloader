@@ -341,7 +341,7 @@ def retrieveTableAndName(htmlText)->tuple[str,Tag]:
 
 def retrieveHtmlListTablesAndName(htmlDataList:list[str])->list[tuple[str,Tag]]:
  
-    rawDataList:list[tuple[str,Tag]]=[("",Tag())]*len(htmlDataList)
+    rawDataList:list[tuple[str,Tag]]=[("",Tag(name="dummy"))]*len(htmlDataList)
     easyCLI.fastPrint("extracting relevant data...\n")
     
     for pageNumber, page in enumerate(htmlDataList):
