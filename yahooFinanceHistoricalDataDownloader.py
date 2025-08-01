@@ -863,7 +863,7 @@ def updateCategories(newCategories:list, oldCategories:list, values:list[list])-
 
 
 
-def insertValue(date:date, value:str, category:str, categoryLookupDict:dict, values:list[list]):
+def insertValue(date:date, value:str, category:str, categoryLookupDict:dict, values:list[list])->None:
     #find where to insert it and make sure that all hte category lists are equal size
     point=findDateInsertionPoint(date,values[0])
     equalizeListLens(values)
@@ -903,7 +903,7 @@ def insertValue(date:date, value:str, category:str, categoryLookupDict:dict, val
         
         
         
-def generateDateRange(startDate:date,endDate:date):
+def generateDateRange(startDate:date,endDate:date)->list[date]:
     #make sure we are generating in ascending order, and if currently not, correct it so that we are
     start:date|None=None
     end:date|None=None
@@ -979,7 +979,7 @@ def compileCommands(rawCommands:list[dict])->list[tuple[int,list[int],list[date]
         
 
    
-def validateCommands(commands:list[dict]):
+def validateCommands(commands:list[dict])->bool:
     easyCLI.fastPrint("validating commands...\n")
 
     validCommands=set(["specific dates","all data","date range"])
@@ -1033,7 +1033,7 @@ def validateCommands(commands:list[dict]):
 
 
 
-def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:list[int],categoryLookupDict:dict[int,int],values:list[list]):
+def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:list[int],categoryLookupDict:dict[int,int],values:list[list])->None:
    
     for date in dates:
         #find the line for this date
@@ -1052,7 +1052,7 @@ def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:li
 
 
 
-def processStocks(commands:list[tuple],stocks:list[dict]):
+def processStocks(commands:list[tuple],stocks:list[dict])->list[dict]:
     easyCLI.fastPrint("executing commands...")
 
     buffer=[dict()]*len(stocks)
@@ -1098,7 +1098,7 @@ def processStocks(commands:list[tuple],stocks:list[dict]):
                 attributes:list[int]=command[1]
                 #make sure the lists have the attributes in the command
                 possibleNewDict=updateCategories(attributes,categories,values)
-                if(possibleNewDict[0] and (type(possibleNewDict)==dict)):
+                if(possibleNewDict[0] and (not(possibleNewDict[1] is None))):
                     categoryLookupDict=possibleNewDict[1]
                 #overwrite the old values with the corrected ones
 
@@ -1131,7 +1131,7 @@ def processStocks(commands:list[tuple],stocks:list[dict]):
                     
 
                 
-def outputRenderedResults(displayList:list[dict],outputFileName:str):
+def outputRenderedResults(displayList:list[dict],outputFileName:str)->None:
     easyCLI.fastPrint("rendering results...")
     #create a buffer
     buffer=[]
@@ -1185,7 +1185,7 @@ easyCLI.setUIHeader(YahooFinanceGrabberHeader())
 
 
 
-def licenseScreen():
+def licenseScreen()->None:
     #very simple and self explanatory, not even any logic
     easyCLI.uiHeader()
     print(easyCLI.multilineStringBuilder(["Copyright and Licensing Information:\n",
@@ -1223,7 +1223,7 @@ def licenseScreen():
         
 
 
-def main(fileName):
+def main(fileName)->bool|None:
     #our main execution function, it mostly just stages out our steps
     #write the header
     easyCLI.fastUIHeader()
@@ -1301,7 +1301,7 @@ def main(fileName):
 
 
 
-def startup():  
+def startup()->None:  
     licenseScreen()
     #if the user wants to download the data
     if(easyCLI.booleanQuestionScreen("would you like to download the configured market data?",None)):
@@ -1316,7 +1316,7 @@ def startup():
 
 
 
-def integrityCheck():
+def integrityCheck()->bool:
     integrity=tuple(["Oi4pUPE$owFG6Kub#!TFb!<~_b#N_BNmMONNkc_WQ$;Rxcys", "VL4)9Wn(#GI5uH7IX5*mHe)qoH!?6cFk@q7WM*YIV`gGxIAbw0G%`13WnnU7W@0yHIW;n7I5uHnVl*=}", "z2n)$3MKl0fDDlZe<G~#A4O@g&ttN7B^SzUEYAD847fU_|Qcm}ipgJU>DjN4=8w*Ug<yvk;uxbRaMgP^c16*^<", "Oi4pUPE$owFJ)nKc|%M|Ek{sHGc8O>Lq$$gMJ{xBbN", "WjHZnI5T81H8f#nIbmUAVlZQ3Vqs=CG-PEsIbt(4V>MwoG&E#kFf(E}WHK-?Ibt(4Gh{F_W;bCsG+{Y7", "vqS7<4-71r<iE<n9C6eZH1swht9fmvPdvv~08PYTz(^6*3-y`5*ymw0v&|8Ez<+SQ<Gyu0R3e{ss&+2mU3OFSI", "Oi4pUPE$owFHUu7bZcQPL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "GBz<}V=yyiIb>ovW-w)CV=yx~Vm4-CFflM;F=8_^F*svoF)%VXG&yBCH#ah2GdN;4VmUQoVr4ZmVPj%8", "C6AY_s5i334&-10naEb8<oF2#4b+pjstqs4Wi3ex-t`s1^5$m#4c@TnaHphhPeH{QJ)p%9ns^KeVG~{p;`ojxT", "Oi4pUPE$owFHme@d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "Wj8ftGC5^2H8*85Gi5eoGBz<{I5IM2WoBkGIXGcAW;QcpGG${mW;Zf6WI1ADF*G%1G+{VlF*GwXVqrOE", "BMJ<14ON<I8!#T7>0ZlLZSz8j-$NAUu6)WglmRFXH*MKfTILK{OM5*zkY2jO<D57HBM08;(e7QA*f5dU4lh&<U", "Oi4pUPE$owFHm`OXm4&UP*X-sEix@kNkc_WQ$;Rxcys", "H8?S2H#lZwH#Rk4Gh#V8WHw|oVKHMjGBr0iH8Nv1H#TH9F=aDmGh{V3W;HWnIWspmIAu6wWjA6oF*jjk", "mMH%!b58s7-eYfP0_?}}qwSwbSx@Nf)@V-AF&l4oO-aQgjAo6*grgG?CWzh@e)9q-SK~Lh1gU}YJHhO0($6k+9", "Oi4pUPE$owFHLWHX>4p^El_o0Y-wXHOlf0fZgXWVGA=MJOi4pUPE$oLba-?", "H8(LhGBsvpG&DFdGd5y4Gc#c{G&440Fkv}3Vq`EgWHB*eH)AzoFf(E{Ff=w}H#T7~H8V9gW;JAFGBajo", "zEZpn$qfc`PDvN*(jA(N;#Cl>rST;y{raLfHPnMcBCl!Mcpfe1%cesb9Iz>37=7KoZ5_*hkMpcDzN+~7#7p^))", "Oi4pUPE$oLba-?", "IW}Q7G-YBjF*#u}Vl*)|W;Z!xW;SMKHDxd`Ha0h9GG#VqGB`OnVP!QrIAt|BFf=zfF*af{F)}nZV=*;j", "b)zSde|t6_G+t3<6)!v;hDD#({By=c(cIb<d`D}7Uk7_dvstGK?O2@A8%F`^0bun-}xKQ78c58|AGHM3g({csr"])
     
     if(isinstance(integrity,tuple) and (len(integrity)>0) and (len(integrity)%3==0)):
