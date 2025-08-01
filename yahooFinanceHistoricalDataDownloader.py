@@ -30,6 +30,7 @@ from datetime import timedelta
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 import bisect
 from typing import Any
+from typing import cast
 from datetime import timezone
 import base64
 import hashlib
@@ -329,41 +330,39 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
 
 
 
-
-
-def retrieveTableAndName(htmlText)->tuple[str,Tag]:
+def retrieveTableAndName(htmlText:str)->tuple[str,HtmlElement]:
     
     #create a beautiful soup object for this raw page so we can parse it
-    scraper=BeautifulSoup(htmlText, "lxml")
+    scraper:HtmlElement=html.fromstring(htmlText)
 
     
     #find the name
-    name=scraper.find("h1",class_="yf-4vbjci")
+    possibleNames:list[HtmlElement]=scraper.xpath("//h1[contains(@class, \"yf-4vbjci\")]")
     
-    if(name is None):
+    if(len(possibleNames)!=1):
         easyCLI.waitForFastWriterFinish()
         raise Exception("error: no stock name found in page.")
     
-    name=str(name.get_text())
+    name=cast(str,possibleNames[0].text_content()).strip()
 
     #find the table in the page
-    table=scraper.find("table")
+    possibleTables=scraper.xpath("//table")
     
 
-    if(table is None):
+    if(len(possibleTables)!=1):
         easyCLI.waitForFastWriterFinish()
         raise Exception("error: no tables found in page.")
     
-    if(isinstance(table,Tag)):
-        return (name,table)
+    if(isinstance(possibleTables[0],HtmlElement)):
+        return (name,possibleTables[0])
     else:
         easyCLI.waitForFastWriterFinish()
         raise Exception("error: table in page is corrupted.")
 
 
-def retrieveHtmlListTablesAndName(htmlDataList:list[str])->list[tuple[str,Tag]]:
+def retrieveHtmlListTablesAndName(htmlDataList:list[str])->list[tuple[str,HtmlElement]]:
  
-    rawDataList:list[tuple[str,Tag]]=[("",Tag(name="dummy"))]*len(htmlDataList)
+    rawDataList:list[tuple[str,HtmlElement]]=[("",html.Element("dummy"))]*len(htmlDataList)
     easyCLI.fastPrint("extracting relevant data...\n")
     
     for pageNumber, page in enumerate(htmlDataList):
@@ -378,11 +377,13 @@ def retrieveHtmlListTablesAndName(htmlDataList:list[str])->list[tuple[str,Tag]]:
 def parseDataSet(retrievedData)->dict:
     easyCLI.fastPrint("parsing data for "+str(retrievedData[0])+"...")
 
-    table:Tag=retrievedData[1]
-    for span in table.select("span"):
-        span.decompose()
+    table:HtmlElement=retrievedData[1]
+    for span in table.xpath(".//span"):
+        parent = span.getparent()
+        if(not(parent is None)):
+            parent.remove(span)
     #find all the rows
-    rows=table.find_all("tr")
+    rows:list[HtmlElement]=table.xpath('.//tr')
     #make an array to store the data for this table
     dataList=[]
     #also a dictionary to store associated dates and indexes of dataList they are for
@@ -401,10 +402,10 @@ def parseDataSet(retrievedData)->dict:
     
     
     
-    headerRow=rows[0].find_all("th")#type: ignore
+    headerRow:list[HtmlElement]=rows[0].xpath('.//th')
     
 
-    if((len(headerRow)>0) and all((datapoint.get_text(strip=True).strip() == ValidatorRowStrings[index]) for index, datapoint in enumerate(headerRow))):
+    if((len(headerRow)>0) and all((cast(str,datapoint.text_content()).strip() == ValidatorRowStrings[index]) for index, datapoint in enumerate(headerRow))):
         #if this is what we want
         rows.pop(0)
         ValidatorRowStringsLen=len(ValidatorRowStrings)
@@ -415,7 +416,7 @@ def parseDataSet(retrievedData)->dict:
         for row in rows:
             
             #extract the cells
-            rowData:list[Tag]=row.find_all("td")#type: ignore
+            rowData:list[HtmlElement]=row.xpath('.//td')#type: ignore
             #if this is a row we aren't supposed to ignore
             
             if(len(rowData)==ValidatorRowStringsLen):
@@ -425,7 +426,7 @@ def parseDataSet(retrievedData)->dict:
                 for pointIndex, point in enumerate(rowData):
                     #if this is the date index
                     if(pointIndex==0):#do the special case for saving date
-                        parsedDate = datetime.strptime(point.get_text(strip=True), "%b %d, %Y").date()
+                        parsedDate = datetime.strptime(cast(str,point.text_content()).strip(), "%b %d, %Y").date()
 
                         dates[parsedDate]=rowCount
                     else:#otherwise save it like normal
