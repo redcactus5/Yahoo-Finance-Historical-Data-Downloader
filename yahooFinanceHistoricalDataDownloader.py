@@ -1318,20 +1318,21 @@ def startup():
 
 
 def integrityCheck():
-    integrity1=tuple("Oi4pUPE$owFG6Kub#!TFb!<~_b#N_BNmMONNkc_WQ$;Rxcys☺Oi4pUPE$owFJ)nKc|%M|Ek{sHGc8O>Lq$$gMJ{xBbN☺Oi4pUPE$owFHUu7bZcQPL2zMXXk{%jE-)=jNkc_WQ$;Rxcys☺Oi4pUPE$owFHme@d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcys☺Oi4pUPE$owFHm`OXm4&UP*X-sEix@kNkc_WQ$;Rxcys☺Oi4pUPE$owFHLWHX>4p^El_o0Y-wXHOlf0fZgXWVGA=MJOi4pUPE$oLba-?☺Oi4pUPE$oLba-?".split("☺"))
-    integrity2=tuple("V_`QlFfn3fVm2^jVlrbjGGjPoHD+aDHZd||VKX>pIAJz7Gi75rVrDQgFl972HezODVKQPcWiVkdVK_55☺HZn3YWi)0uV>dTqWHc~0F*ac~FgIp2I5sk5WiT=_FgZ14WnwU9VKXu?Vq`RCVlic5W;QuAIXE{oH)CXG☺G-P99WHM%AH8nV5F*Rc{GdDFfH#0RcGcz_~Fl9A0VKOyjGc_<{W??okIW}cBVKregVKFc^Vly*iVL4@F☺H#at6Vq!TmIWjq8V>35nI5sjcVq#@CV>dE1FgRl|V>LEqG%z$ZGc;s4GB`M9W;tUqHDNb3HZm||W;J7F☺I5jqAH)1nkVK-$lH#adeVq!IBWiT;gW-&NnVPrWpWMwonW;HW2GC5*4WjHl3WMVU7HaTTvHDWSiGG;k6☺FkxmiHZ?F~Gc#dhHfA<BHDow5WH~lCF<~${I5Rb4Vq{}tGBh}1G&V41H#apiWH2-~H)Jq2W-~J~WHV(s☺HZn3YWi)0uV>dTqWHc~0F*ac~FgIp2I5sk5WiT=_FgZ14WnwU9VKXu?Vq`RCVlic5W;QuAIXE{oH)CXG☺<U)`E#Oex<Hs1h7#DrA(qJ4@fPilc3f5w2Xdir-!lf{DLvHGSe_JWIoJzUxT3QR^rPUG=_iBcpu^o$o7>;=K`y".split("☺"))
-    salt=integrity2[len(integrity2)-1].encode()
-    for tegrity in range(len(integrity1)):
-        pathCache=base64.b85decode(integrity1[tegrity].encode()).decode()
+    integrity1=tuple(["Oi4pUPE$owFG6Kub#!TFb!<~_b#N_BNmMONNkc_WQ$;Rxcys", "Oi4pUPE$owFJ)nKc|%M|Ek{sHGc8O>Lq$$gMJ{xBbN", "Oi4pUPE$owFHUu7bZcQPL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "Oi4pUPE$owFHme@d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "Oi4pUPE$owFHm`OXm4&UP*X-sEix@kNkc_WQ$;Rxcys", "Oi4pUPE$owFHLWHX>4p^El_o0Y-wXHOlf0fZgXWVGA=MJOi4pUPE$oLba-?", "Oi4pUPE$oLba-?"])
+    integrity2=tuple(["H8nFeIASs}GcjX0G-P5iIW}cxV=`i5I5}lyIb&gFWH4qnWMpMxWHe(iVq|1yGB{x}HZVCcVq`QqGGk;j", "$BzhvqF`f|e!}vj<_%tba~uxie?`6M%r<T4f7~?$#NMJxXt%qT1J!Z)Hw|3@DEU0Qn*7$uuNOhkVoK#F^}#gB{", "VK+HBF*PwXGGk;iHext7GC4G1W@KhLVmM<rGG#U}Vq-BlGG#V4G-F{jW@BSyH!wM5WH&KnGGbz7HDNYn", "T2$IVNL7%=#{2y>XrcvQXNBOH@TDRqn!jZe&C%m~SsvT)puIa2N84)}B0S-#w?>9vL58-hyoOEs*IXiN_G*QF%", "G-P37Fg0W`F*!LnHZ^23H)disVq#)8Vr4fsG+{L`H8wFeHaIvoIb$(nFfuVPVlg#lIXN*mVPY{eHZ?I~", "%gN<~r0vyL=gZdH`myEBd?uSfe~|+Rnvbn>9=daF-py>EF<dxW;?Iy2$vr~9sQ2SjIF~e#9o-)2n%VEz2_v_L4", "Vm4)FWH)0uWMwfnWjJPIVlXyhGchzVWHUE5Gd4IhHZ?V2VL34{Wj8i5FflM;G%z?hH!@)~VKX#iF=Amh", "85uY`?4e#+hwaBTwp9o2NYyvK;L<N!5C7k<p)8J%73TGp>orj|$<zC#jCow6mMlthG_4bUy9m2=W|<BaR?Frnm", "V`DTiGcz_cH#j*rF*Rg2V>B{iG&C|}VPRu3G-ft3IXO3CWMO18F)(6cIAJs~Ib|_0F*jp3G&VIbWnnWm", "z}UCoJ15gjUu?L?Hf97ZU--lG{~PSTJ9~8)Jl<B)?+KGceAdi0Su#Jt_^oV)O4#sWKC!ahwT+?!gVKMss)dF60", "HaB8qVKO;kFfwH`Ib}9DWHMzkIAmcrI5IUiV>mKqF=8_?W;kIsH#IReV=!YkWi(_mGBhwZF*r6eIb>sH", "ws5}kpVN>3Rb>hRD-#D!D%<oJ=g)t;S@i6yQ3&;woW*xj&56kN$hgcu^XDQ|o=3o<jr+ulI1OY1WzcN$@JuBTR", "Ic70pVqs=6WHe-9H#K5nWnnfjWHmTsHDzHiFgZ0gH8n9ZGc;mkWHB>iVP<1DH8Ei|WM*SGH85s4H#RUd", "}pNtah}eyF0{UKzu<-SZ1y?{G=gr?byTv5u$!2(z{{<RJ$I|2=)lJ1xQi$V_bWC?+z}Rssho7vDr6_(ocG&k_9"])
+    
+    readIndex=0
+    for fileName in range(len(integrity1)):
+        pathCache=base64.b85decode(integrity1[fileName].encode()).decode()
         if(os.path.exists(pathCache)):
             with open(pathCache, 'r') as current:
                 #i would like to apologize to my ram (and cache)
                 hasher=hashlib.sha256()
                 hasher.update(current.read().encode())
-                hasher.update(salt)
-                if(base64.b85encode(hasher.hexdigest().encode()).decode()!=integrity2[tegrity]):
-                    return False
-
+                hasher.update(integrity2[readIndex+1].encode())
+                if(base64.b85encode(hasher.hexdigest().encode()).decode()!=integrity2[readIndex]):
+                    return False 
+                readIndex+=2    
         else:
             return False
     return True
