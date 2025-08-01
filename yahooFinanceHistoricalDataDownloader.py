@@ -14,9 +14,9 @@ BROWSERPATH="webproxy/firefox.exe"
 #warning, this program is held together by duct tape and prayers
 #also, the moment yahoo changes their website, this script will no longer work
 
-from bs4 import BeautifulSoup
-from bs4 import element
-from bs4 import Tag
+
+from lxml import html
+from lxml.html import HtmlElement
 import json
 import playwright.sync_api
 import time
@@ -295,21 +295,27 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
             easyCLI.fastPrint("done.\n")
         #if there is an error first close the browser then crash, so we dont leave resources running
         except Exception as E:
-            if(not(page is None)):
+            if((not(page is None))and(not page.is_closed())):
                 page.close()
-            if(not(context is None)):
-                context.close()
-            if(not(browser is None)):
+            if((not(context is None))):
+                try:
+                    context.close()
+                except Exception:
+                    pass
+            if((not(browser is None))and browser.is_connected()):
                 browser.close()
             easyCLI.waitForFastWriterFinish()
             raise(E)
         
         except KeyboardInterrupt as E:
-            if(not(page is None)):
+            if((not(page is None))and(not page.is_closed())):
                 page.close()
-            if(not(context is None)):
-                context.close()
-            if(not(browser is None)):
+            if((not(context is None))):
+                try:
+                    context.close()
+                except Exception:
+                    pass
+            if((not(browser is None))and browser.is_connected()):
                 browser.close()
             easyCLI.waitForFastWriterFinish()
             raise(E)
