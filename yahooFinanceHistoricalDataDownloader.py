@@ -35,7 +35,7 @@ import base64
 import hashlib
 
 
-def antiSnifferRandomDelay(start,end,message=False):
+def antiSnifferRandomDelay(start,end,message=False)->None:
     #this function looks more complicated than it is
     
     wait=0
@@ -58,7 +58,7 @@ def antiSnifferRandomDelay(start,end,message=False):
         time.sleep(wait)
         
 
-def shuffle(inputList:list):
+def shuffle(inputList:list[tuple[str,date]])->tuple[list[tuple[str,date]],list[int]]:
     #make a copy of our input
     copyList=inputList.copy()
     #create a list of indexes
@@ -70,13 +70,13 @@ def shuffle(inputList:list):
     return (scrambledList,randomPosList)
 
 
-def typeDelay():
+def typeDelay()->None:
     #delay specifically optimized for typing mimicry
     delay=(1/float(random.randint(6,10)+random.random()))
     time.sleep(delay)
 
 
-def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downloadStartTimeout:float):
+def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downloadStartTimeout:float)->None:
     
     #avoid bot sniffers
     antiSnifferRandomDelay(1,2,True)
@@ -171,13 +171,13 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
 
 
 
-def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,downloadCompletionTimeout:float,downloadRetryLimit:int):
+def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,downloadCompletionTimeout:float,downloadRetryLimit:int)->list[str]:
     #grab our constants
     global BROWSERPATH
 
     easyCLI.fastPrint("starting webpage retrieval...\n")
     #make a list for what we download
-    pages=[None]*len(links)
+    pages=[""]*len(links)
     #shuffle our links to throw bot detectors off our scent
     scrambled=shuffle(links)
     #one is the shuffled links, the other is lookup table we use to put them back in order
@@ -312,7 +312,7 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
 def retrieveTableAndName(htmlText)->tuple[str,Tag]:
     
     #create a beautiful soup object for this raw page so we can parse it
-    scraper=BeautifulSoup(htmlText, "html.parser")
+    scraper=BeautifulSoup(htmlText, "lxml")
 
     
     #find the name
@@ -339,21 +339,21 @@ def retrieveTableAndName(htmlText)->tuple[str,Tag]:
         raise Exception("error: table in page is corrupted.")
 
 
-def retrieveHtmlListTablesAndName(htmlDataList):
+def retrieveHtmlListTablesAndName(htmlDataList:list[str])->list[tuple[str,Tag]]:
  
-    rawDataList=[]
+    rawDataList:list[tuple[str,Tag]]=[("",Tag())]*len(htmlDataList)
     easyCLI.fastPrint("extracting relevant data...\n")
     
     for pageNumber, page in enumerate(htmlDataList):
         easyCLI.fastPrint("extracting dataset "+str(pageNumber+1)+" of "+str(len(htmlDataList))+"...")
-        rawDataList.append(retrieveTableAndName(page))
+        rawDataList[pageNumber]=retrieveTableAndName(page)
         
     easyCLI.fastPrint("done.\n\n")
     return rawDataList
 
 
 
-def parseDataSet(retrievedData):
+def parseDataSet(retrievedData)->dict:
     easyCLI.fastPrint("parsing data for "+str(retrievedData[0])+"...")
 
     table:Tag=retrievedData[1]
@@ -396,7 +396,7 @@ def parseDataSet(retrievedData):
             rowData:list[Tag]=row.find_all("td")#type: ignore
             #if this is a row we aren't supposed to ignore
             
-            if(len(rowData)==ValidatorRowStringsLen):#type: ignore
+            if(len(rowData)==ValidatorRowStringsLen):
 
                 lineData={}
                 #go through its columns
@@ -407,7 +407,7 @@ def parseDataSet(retrievedData):
 
                         dates[parsedDate]=rowCount
                     else:#otherwise save it like normal
-                        lineData[pointIndex]=str(point.get_text(strip=True))#type: ignore
+                        lineData[pointIndex]=str(point.get_text(strip=True))
 
                 #save what we extracted
                 dataList.append(lineData)
@@ -429,7 +429,7 @@ def parseDataSet(retrievedData):
 
 
 
-def parseDataSets(rawDataList,sortAlphabetical):
+def parseDataSets(rawDataList,sortAlphabetical)->list[dict]:
     easyCLI.fastPrint("starting dataset parsing...\n")
 
     parsedData:list[dict]=[parseDataSet(dataSet) for dataSet in rawDataList]
@@ -654,7 +654,7 @@ def loadLinks() -> tuple[list[tuple[str,date]],bool,float,float,int] | bool:
 
 
 
-def loadCommands():
+def loadCommands()->list[dict]|bool:
 
     #create our main variables
     global COMMANDFILE
@@ -739,10 +739,9 @@ def findLine(dataset:list,datasetDates:dict,date:date)->dict|bool:
     #if that date doesn't exist, send back that information
     if(rawIndex is None):
         return False
-    index:int=rawIndex
     
     #and extract the index of that line from it
-    line=dataset[index]
+    line=dataset[rawIndex]
 
     return line
 
@@ -752,7 +751,7 @@ def findLine(dataset:list,datasetDates:dict,date:date)->dict|bool:
 
 
 
-def findDateInsertionPoint(date:date,dates:list[date]):
+def findDateInsertionPoint(date:date,dates:list[date])->tuple[int,int|bool]:
     #very self explanatory
 
 
@@ -781,7 +780,7 @@ def findDateInsertionPoint(date:date,dates:list[date]):
 
 
 
-def equalizeListLens(listSet:list[list]):
+def equalizeListLens(listSet:list[list])->None:
     #TLDR: make sure the 2d array is a rectangle
     
     #find the longest sublist
@@ -799,7 +798,7 @@ def equalizeListLens(listSet:list[list]):
 
 
 #make sure all categories exist
-def updateCategories(newCategories:list, oldCategories:list, values:list[list])->tuple[bool,dict]:
+def updateCategories(newCategories:list, oldCategories:list, values:list[list])->tuple[bool,dict|None]:
     
     #categoryLookupList={0:"date",1:"open",2:"high",3:"low",4:"close",5:"adj close",6:"volume"}
     #master category list 
@@ -854,7 +853,7 @@ def updateCategories(newCategories:list, oldCategories:list, values:list[list])-
         newDict.update(builderList)
         return (True,newDict)
     
-    return (False,None)#type: ignore
+    return (False,None)
                     
 
 
@@ -1099,7 +1098,7 @@ def processStocks(commands:list[tuple],stocks:list[dict]):
                 attributes:list[int]=command[1]
                 #make sure the lists have the attributes in the command
                 possibleNewDict=updateCategories(attributes,categories,values)
-                if(possibleNewDict[0]):
+                if(possibleNewDict[0] and (type(possibleNewDict)==dict)):
                     categoryLookupDict=possibleNewDict[1]
                 #overwrite the old values with the corrected ones
 
@@ -1279,10 +1278,14 @@ def main(fileName):
     dataSets=parseDataSets(rawData,links[1])
     #save ram, free no longer needed values
     rawData=None
+    #type ignore to make is calm down about about this manual free
+    links=None#type: ignore 
     #execute our commands on that parsed data
     displayList=processStocks(commands,dataSets)
     #save ram, free no longer needed values
     dataSets=None
+    #type ignore to make is calm down about about this manual free
+    commands=None#type: ignore
     outputRenderedResults(displayList,fileName)
     #stop the timer
     timer.stop()
@@ -1290,6 +1293,7 @@ def main(fileName):
     easyCLI.waitForFastWriterFinish()
     print("data retrieval complete!\n")
     print("finished in: "+timer.getUnitDeviatedTimeString()+"\n\n\n")
+    timer=None
     input("press enter to finish.")
     easyCLI.ln(3)
 
