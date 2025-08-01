@@ -430,7 +430,7 @@ def parseDataSet(retrievedData)->dict:
 
                         dates[parsedDate]=rowCount
                     else:#otherwise save it like normal
-                        lineData[pointIndex]=str(point.get_text(strip=True))
+                        lineData[pointIndex]=cast(str,point.text_content()).strip()
 
                 #save what we extracted
                 dataList.append(lineData)
