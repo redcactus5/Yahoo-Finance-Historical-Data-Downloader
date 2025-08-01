@@ -190,6 +190,7 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
         easyCLI.fastPrint("launching retriever proxy...")
         browser=None
         context=None
+        page=None
         try:
             #launch firefox, so we can client side render scrape. fucking web 2.0. also do it headless so we dont have windows pooping up scaring people
             browser = p.firefox.launch(executable_path=BROWSERPATH,headless=True)
@@ -293,6 +294,8 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
             easyCLI.fastPrint("done.\n")
         #if there is an error first close the browser then crash, so we dont leave resources running
         except Exception as E:
+            if(not(page is None)):
+                page.close()
             if(not(context is None)):
                 context.close()
             if(not(browser is None)):
@@ -301,6 +304,8 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
             raise(E)
         
         except KeyboardInterrupt as E:
+            if(not(page is None)):
+                page.close()
             if(not(context is None)):
                 context.close()
             if(not(browser is None)):
@@ -1231,7 +1236,7 @@ def licenseScreen()->None:
         
 
 
-def main(fileName)->bool|None:
+def main(fileName)->bool|str:
     #our main execution function, it mostly just stages out our steps
     #write the header
     easyCLI.fastUIHeader()
@@ -1297,12 +1302,10 @@ def main(fileName)->bool|None:
     #stop the timer
     timer.stop()
     displayList=None
-    easyCLI.waitForFastWriterFinish()
-    print("data retrieval complete!\n")
-    print("finished in: "+timer.getUnitDeviatedTimeString()+"\n\n\n")
+    endTime=timer.getUnitDeviatedTimeString()
     timer=None
-    input("press enter to finish.")
-    easyCLI.ln(3)
+    return endTime
+    
 
 
 
@@ -1316,7 +1319,14 @@ def startup()->None:
         #have the user the file name they want
         fileName=easyCLI.enterFileNameScreen("please enter the name of the output file.\nwarning, if the file already exists, it will be overwritten.","(do not include the file extension)")+".csv"
         #then start the main program
-        main(fileName)
+        endTime=main(fileName)
+        if(isinstance(endTime,str)):
+            easyCLI.waitForFastWriterFinish()
+            print("data retrieval complete!\n")
+            print("finished in: "+endTime)
+            easyCLI.ln(3)
+            input("press enter to finish.")
+            easyCLI.ln(3)
     #otherwise
     else:
         easyCLI.clear()
