@@ -1277,7 +1277,7 @@ def main(fileName)->bool|str:
     validateCommands(commands)
 
     commands=compileCommands(commands)
-    gc.collect()
+
     easyCLI.fastPrint("\nsetup complete.")
     easyCLI.fastln(4)
     easyCLI.fastPrint("starting data retrieval process...\n\n")
