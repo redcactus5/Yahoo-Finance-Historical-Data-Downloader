@@ -33,7 +33,8 @@ from typing import Any
 from datetime import timezone
 import base64
 import hashlib
-
+#i cant believe I have to use this lib
+import gc
 
 def antiSnifferRandomDelay(start,end,message=False)->None:
     #this function looks more complicated than it is
@@ -1276,6 +1277,7 @@ def main(fileName)->bool|str:
     validateCommands(commands)
 
     commands=compileCommands(commands)
+    gc.collect()
     easyCLI.fastPrint("\nsetup complete.")
     easyCLI.fastln(4)
     easyCLI.fastPrint("starting data retrieval process...\n\n")
@@ -1286,25 +1288,27 @@ def main(fileName)->bool|str:
     rawData=retrieveHtmlListTablesAndName(webPages)
     #save ram, free no longer needed values
     webPages=None
+    gc.collect()
     #parse that raw data
     dataSets=parseDataSets(rawData,links[1])
     #save ram, free no longer needed values
     rawData=None
     #type ignore to make is calm down about about this manual free
     links=None#type: ignore 
+    gc.collect()
     #execute our commands on that parsed data
     displayList=processStocks(commands,dataSets)
     #save ram, free no longer needed values
     dataSets=None
     #type ignore to make is calm down about about this manual free
     commands=None#type: ignore
+    gc.collect()
     outputRenderedResults(displayList,fileName)
     #stop the timer
     timer.stop()
     displayList=None
     endTime=timer.getUnitDeviatedTimeString()
     timer=None
-    import gc
     gc.collect()
     return endTime
     
