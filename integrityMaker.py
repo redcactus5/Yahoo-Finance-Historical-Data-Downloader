@@ -18,25 +18,21 @@ def makeSalt():
 def makeSillyString():
     
     fileNames=["LICENSES/BeautifulSoup-MIT-LICENSE.txt","LICENSES/easyCLI-GPL3-LICENSE.txt","LICENSES/Nuitka-Apache-2.0-LICENSE.txt","LICENSES/Playwright-Apache-2.0-LICENSE.txt","LICENSES/Python-PSFL-2-LICENSE.txt","LICENSES/Mozilla-Public-License-2.0-LICENSE.txt","LICENSE.txt"]
-    new=[]
-    for name in fileNames:
-        new.append(base64.b85encode(name.encode()).decode())
+    print("\n")
+    hashes=[""]*(len(fileNames)*3)
+    
+        
 
 
-    print("[",end="")
-    for index,name in enumerate(new):
-        print("\""+name+"\"",end="")
-        if(index<(len(new)-1)):
-            print(", ",end="")
-    print("]")
     
 
 
-    print("\n")
-    hashes=[""]*(len(fileNames)*2)
+    
     
     writeIndex=0
     for file in fileNames:
+        hashes[writeIndex]=(base64.b85encode(file.encode()).decode())
+        writeIndex+=1
         with open(file, 'r') as current:
             #i would like to apologize to my ram
             hasher=hashlib.sha256()
@@ -60,6 +56,7 @@ def makeSillyString():
     print("]")
     
     print("\n")
-  
+
+    
 
 makeSillyString()

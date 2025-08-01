@@ -1231,7 +1231,6 @@ def main(fileName):
     easyCLI.fastPrint("beginning setup...\n")
     #startup checks and loading of config files
     easyCLI.fastPrint("loading urls...")
-    
     #create and start our stopwatch
     timer=easyCLI.Stopwatch()
     timer.start()
@@ -1318,43 +1317,45 @@ def startup():
 
 
 def integrityCheck():
-    integrity1=tuple(["Oi4pUPE$owFG6Kub#!TFb!<~_b#N_BNmMONNkc_WQ$;Rxcys", "Oi4pUPE$owFJ)nKc|%M|Ek{sHGc8O>Lq$$gMJ{xBbN", "Oi4pUPE$owFHUu7bZcQPL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "Oi4pUPE$owFHme@d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "Oi4pUPE$owFHm`OXm4&UP*X-sEix@kNkc_WQ$;Rxcys", "Oi4pUPE$owFHLWHX>4p^El_o0Y-wXHOlf0fZgXWVGA=MJOi4pUPE$oLba-?", "Oi4pUPE$oLba-?"])
-    integrity2=tuple(["H8nFeIASs}GcjX0G-P5iIW}cxV=`i5I5}lyIb&gFWH4qnWMpMxWHe(iVq|1yGB{x}HZVCcVq`QqGGk;j", "$BzhvqF`f|e!}vj<_%tba~uxie?`6M%r<T4f7~?$#NMJxXt%qT1J!Z)Hw|3@DEU0Qn*7$uuNOhkVoK#F^}#gB{", "VK+HBF*PwXGGk;iHext7GC4G1W@KhLVmM<rGG#U}Vq-BlGG#V4G-F{jW@BSyH!wM5WH&KnGGbz7HDNYn", "T2$IVNL7%=#{2y>XrcvQXNBOH@TDRqn!jZe&C%m~SsvT)puIa2N84)}B0S-#w?>9vL58-hyoOEs*IXiN_G*QF%", "G-P37Fg0W`F*!LnHZ^23H)disVq#)8Vr4fsG+{L`H8wFeHaIvoIb$(nFfuVPVlg#lIXN*mVPY{eHZ?I~", "%gN<~r0vyL=gZdH`myEBd?uSfe~|+Rnvbn>9=daF-py>EF<dxW;?Iy2$vr~9sQ2SjIF~e#9o-)2n%VEz2_v_L4", "Vm4)FWH)0uWMwfnWjJPIVlXyhGchzVWHUE5Gd4IhHZ?V2VL34{Wj8i5FflM;G%z?hH!@)~VKX#iF=Amh", "85uY`?4e#+hwaBTwp9o2NYyvK;L<N!5C7k<p)8J%73TGp>orj|$<zC#jCow6mMlthG_4bUy9m2=W|<BaR?Frnm", "V`DTiGcz_cH#j*rF*Rg2V>B{iG&C|}VPRu3G-ft3IXO3CWMO18F)(6cIAJs~Ib|_0F*jp3G&VIbWnnWm", "z}UCoJ15gjUu?L?Hf97ZU--lG{~PSTJ9~8)Jl<B)?+KGceAdi0Su#Jt_^oV)O4#sWKC!ahwT+?!gVKMss)dF60", "HaB8qVKO;kFfwH`Ib}9DWHMzkIAmcrI5IUiV>mKqF=8_?W;kIsH#IReV=!YkWi(_mGBhwZF*r6eIb>sH", "ws5}kpVN>3Rb>hRD-#D!D%<oJ=g)t;S@i6yQ3&;woW*xj&56kN$hgcu^XDQ|o=3o<jr+ulI1OY1WzcN$@JuBTR", "Ic70pVqs=6WHe-9H#K5nWnnfjWHmTsHDzHiFgZ0gH8n9ZGc;mkWHB>iVP<1DH8Ei|WM*SGH85s4H#RUd", "}pNtah}eyF0{UKzu<-SZ1y?{G=gr?byTv5u$!2(z{{<RJ$I|2=)lJ1xQi$V_bWC?+z}Rssho7vDr6_(ocG&k_9"])
+    integrity=tuple(["Oi4pUPE$owFG6Kub#!TFb!<~_b#N_BNmMONNkc_WQ$;Rxcys", "VL4)9Wn(#GI5uH7IX5*mHe)qoH!?6cFk@q7WM*YIV`gGxIAbw0G%`13WnnU7W@0yHIW;n7I5uHnVl*=}", "z2n)$3MKl0fDDlZe<G~#A4O@g&ttN7B^SzUEYAD847fU_|Qcm}ipgJU>DjN4=8w*Ug<yvk;uxbRaMgP^c16*^<", "Oi4pUPE$owFJ)nKc|%M|Ek{sHGc8O>Lq$$gMJ{xBbN", "WjHZnI5T81H8f#nIbmUAVlZQ3Vqs=CG-PEsIbt(4V>MwoG&E#kFf(E}WHK-?Ibt(4Gh{F_W;bCsG+{Y7", "vqS7<4-71r<iE<n9C6eZH1swht9fmvPdvv~08PYTz(^6*3-y`5*ymw0v&|8Ez<+SQ<Gyu0R3e{ss&+2mU3OFSI", "Oi4pUPE$owFHUu7bZcQPL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "GBz<}V=yyiIb>ovW-w)CV=yx~Vm4-CFflM;F=8_^F*svoF)%VXG&yBCH#ah2GdN;4VmUQoVr4ZmVPj%8", "C6AY_s5i334&-10naEb8<oF2#4b+pjstqs4Wi3ex-t`s1^5$m#4c@TnaHphhPeH{QJ)p%9ns^KeVG~{p;`ojxT", "Oi4pUPE$owFHme@d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "Wj8ftGC5^2H8*85Gi5eoGBz<{I5IM2WoBkGIXGcAW;QcpGG${mW;Zf6WI1ADF*G%1G+{VlF*GwXVqrOE", "BMJ<14ON<I8!#T7>0ZlLZSz8j-$NAUu6)WglmRFXH*MKfTILK{OM5*zkY2jO<D57HBM08;(e7QA*f5dU4lh&<U", "Oi4pUPE$owFHm`OXm4&UP*X-sEix@kNkc_WQ$;Rxcys", "H8?S2H#lZwH#Rk4Gh#V8WHw|oVKHMjGBr0iH8Nv1H#TH9F=aDmGh{V3W;HWnIWspmIAu6wWjA6oF*jjk", "mMH%!b58s7-eYfP0_?}}qwSwbSx@Nf)@V-AF&l4oO-aQgjAo6*grgG?CWzh@e)9q-SK~Lh1gU}YJHhO0($6k+9", "Oi4pUPE$owFHLWHX>4p^El_o0Y-wXHOlf0fZgXWVGA=MJOi4pUPE$oLba-?", "H8(LhGBsvpG&DFdGd5y4Gc#c{G&440Fkv}3Vq`EgWHB*eH)AzoFf(E{Ff=w}H#T7~H8V9gW;JAFGBajo", "zEZpn$qfc`PDvN*(jA(N;#Cl>rST;y{raLfHPnMcBCl!Mcpfe1%cesb9Iz>37=7KoZ5_*hkMpcDzN+~7#7p^))", "Oi4pUPE$oLba-?", "IW}Q7G-YBjF*#u}Vl*)|W;Z!xW;SMKHDxd`Ha0h9GG#VqGB`OnVP!QrIAt|BFf=zfF*af{F)}nZV=*;j", "b)zSde|t6_G+t3<6)!v;hDD#({By=c(cIb<d`D}7Uk7_dvstGK?O2@A8%F`^0bun-}xKQ78c58|AGHM3g({csr"])
     
-    readIndex=0
-    for fileName in range(len(integrity1)):
-        pathCache=base64.b85decode(integrity1[fileName].encode()).decode()
-        if(os.path.exists(pathCache)):
-            with open(pathCache, 'r') as current:
-                #i would like to apologize to my ram (and cache)
-                hasher=hashlib.sha256()
-                hasher.update(current.read().encode())
-                hasher.update(integrity2[readIndex+1].encode())
-                if(base64.b85encode(hasher.hexdigest().encode()).decode()!=integrity2[readIndex]):
-                    return False 
-                readIndex+=2    
-        else:
-            return False
-    return True
+    if(isinstance(integrity,tuple) and (len(integrity)>0) and (len(integrity)%3==0)):
+        loops=int(len(integrity)/3)
+        readIndex=0
+        for fileName in range(loops):
+            pathCache=base64.b85decode(integrity[readIndex].encode()).decode()
+            readIndex+=2
+            if(os.path.exists(pathCache)):
+                with open(pathCache, 'r') as current:
+                    #i would like to apologize to my ram (and cache)
+                    hasher=hashlib.sha256()
+                    hasher.update(current.read().encode())
+                    hasher.update(integrity[readIndex].encode())
+                    readIndex-=1
+                    if(base64.b85encode(hasher.hexdigest().encode()).decode()!=integrity[readIndex]):
+                        return False 
+                    readIndex+=2      
+            else:
+                return False
+        return True
+    else:
+        return False
 
 
 
 if(__name__=="__main__"):
 
     #devious check to make sure no one is doing an illegal thing and distributing without the open source licenses
-    print("starting up...")
-    if(integrityCheck()):
-        startup()
-        print("now exiting...")
+    print("initializing...")
+    if(not integrityCheck()):
+        easyCLI.uiHeader()
+        print(base64.b85decode("MN(2vQaT_^X=7z>b7dfAX>4UEb15KhZ*(ALZ*^{DE(%m=X>%ZOa&KpHVQnC3b0BYUWo{sIZ*_8GWgua0WFT#Ib95kLWgui}b98cPVs&(7WFU8GbZ8)HbaNnVX=7z>b7gZb3Q%liVRL05Wo~nIa%CWNXk{QwNkc_WQ$;Rxcyu6Xb0BbXWpib2bSxlYZe$>IXk{QwNkc_WQ$<rCWNC6`V{~tFc_3+XAPR7DWpib2bRc1FWFTX2ZggR3ZgU`IVRLyyOi3+AP)su|Oi4pUPE$oLba-?uAVOtfb#!TFb!<~_b#N_BNmMONNkc_WQ$;Rxcyufv3Ql!tbZcQPL2zMXXk{%jE-)=jNkc_WQ$;RxcyufvS7l;LX>=`2M^H>HGA=MJLQ_O7Olf0fZgXWWba-?uAYpD~AW&>!d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcyul".encode()).decode())
+        input(base64.b85decode("aB^jHb0B4IbY*fNbZ;PLX>MtAXf6".encode()).decode())
         easyCLI.ln(1)
     else:
-        easyCLI.uiHeader()
-        print("ERROR: License file(s) not found.")
-        print("This program is open source and must be distributed with its licenses.")
-        print("Please ensure the LICENSE.txt is present, and the LICENSES directory is \npresent and contains easyCLI-GPL3-LICENSE.txt, BeautifulSoup-MIT-LICENSE.txt, \nNuitka-Apache-2.0-LICENSE.txt, WebKit-LGPL-2.0-BSD-License.txt, and Playwright-Apache-2.0-LICENSE.txt.")
-        input("press enter to finish.")
-        easyCLI.ln(1)
-        print("now exiting...")
-        easyCLI.ln(1)
+        startup()
+    print("now exiting...")
+    easyCLI.ln(1)
+    
         
          
