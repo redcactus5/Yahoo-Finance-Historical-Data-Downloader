@@ -889,9 +889,8 @@ def updateCategories(newCategories:list, oldCategories:list, values:list[list])-
 
 def insertValue(date:date, value:str, category:int, categoryLookupDict:dict, values:list[list])->None:
     #find where to insert it and make sure that all hte category lists are equal size
-    equalizeListLens(values)
     point=findDateInsertionPoint(date,values[0])
-    
+    equalizeListLens(values)
     #i am telling you linter, this will be an int, i wrote the code that makes the dict
     categoryIndex:int=categoryLookupDict[category]
     #if we are not creating a new spot for it
