@@ -887,7 +887,7 @@ def updateCategories(newCategories:list, oldCategories:list, values:list[list])-
 
 
 
-def insertValue(date:date, value:str, category:str, categoryLookupDict:dict, values:list[list])->None:
+def insertValue(date:date, value:str, category:int, categoryLookupDict:dict, values:list[list])->None:
     #find where to insert it and make sure that all hte category lists are equal size
     point=findDateInsertionPoint(date,values[0])
     equalizeListLens(values)
@@ -1071,7 +1071,7 @@ def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:li
             #otherwise, loop through all the attributes the command wants
             for attribute in attributes:
                 #and grab their values for the line, then write them to the buffer for this stock
-                insertValue(date,line[attribute-1],attribute,categoryLookupDict,values)#type: ignore
+                insertValue(date,line[attribute-1],attribute,categoryLookupDict,values)
 
 
 
@@ -1096,12 +1096,14 @@ def processStocks(commands:list[tuple],stocks:list[dict])->list[dict]:
             1: lambda stockDates, commandDates: list(stockDates.keys()),  # all available dates
             2: lambda stockDates, commandDates: generateDateRange(commandDates[0], commandDates[1]),  # date range
         }
+     
         stockListLen=str(len(stocks))
         commandsListLen=str(len(commands))
         #loop through our stocks
         for stockNumber, stock in enumerate(stocks):
-            #extract name and create a list for the categories, and a 2d list for the values
+           
             easyCLI.fastPrint("".join(("\nprocessing stock: \"",str(stock.get("name")),"\" (stock ",str(stockNumber+1)," of ",stockListLen,")...")))
+            #create variables for storing the data we retrieve, and extract the raw data from the stock object to varaibles
             name=str(stock.get("name"))
             categories=[0]
             categoryLookupDict:dict[int,int]={0:0}
@@ -1125,7 +1127,8 @@ def processStocks(commands:list[tuple],stocks:list[dict])->list[dict]:
                 if(possibleNewDict[0] and (not(possibleNewDict[1] is None))):
                     categoryLookupDict=possibleNewDict[1]
                 #overwrite the old values with the corrected ones
-
+                
+                #dont need to check if the command is valid here because it got checked when we validated earlier
                 #0:specific dates
                 #1:all data
                 #2:date range
