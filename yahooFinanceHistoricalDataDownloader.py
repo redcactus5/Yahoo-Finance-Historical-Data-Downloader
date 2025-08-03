@@ -1076,10 +1076,10 @@ def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:li
 
 
 
-def processStocks(commands:list[tuple],stocks:list[dict])->list[dict]:
+def processStocks(commands:list[tuple],stocks:list[dict])->list[tuple]:
     easyCLI.fastPrint("executing commands...")
 
-    buffer=[dict()]*len(stocks)
+    buffer=[tuple()]*len(stocks)
     
     #if we have something to do
     if(len(commands)>0):
@@ -1145,7 +1145,8 @@ def processStocks(commands:list[tuple],stocks:list[dict])->list[dict]:
             
             
             #save this stock's data as a render object
-            renderObj={"name":name,"categories":categories,"values":values}
+            #("name","categories","values")
+            renderObj=(name,categories,values)
             #put it in our buffer
             buffer[stockNumber]=renderObj
             easyCLI.fastPrint("processing done.\n")
@@ -1158,7 +1159,7 @@ def processStocks(commands:list[tuple],stocks:list[dict])->list[dict]:
                     
 
                 
-def outputRenderedResults(displayList:list[dict],outputFileName:str)->None:
+def outputRenderedResults(displayList:list[tuple],outputFileName:str)->None:
     easyCLI.fastPrint("rendering results...")
     #create a buffer
     buffer=[]
@@ -1169,12 +1170,12 @@ def outputRenderedResults(displayList:list[dict],outputFileName:str)->None:
     #loop through every render object
     for item in displayList:
         #render the header data
-        buffer.append([item["name"],])
+        buffer.append([item[0],])
         #convert the compiled categories back to human readable ones
-        categories=[categoryLookupList[datapoint] for datapoint in item["categories"]]
+        categories=[categoryLookupList[datapoint] for datapoint in item[1]]
         buffer.append(categories)
         #grab the data
-        values=item["values"]
+        values=item[2]
         categoriesLen=len(categories)
         #loop through the y indexes
         for y in range(len(values[0])):
