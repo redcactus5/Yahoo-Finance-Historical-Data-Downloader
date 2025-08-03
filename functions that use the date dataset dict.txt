@@ -1,0 +1,5 @@
+parseDataSet
+updateCategories
+insertValue
+executeCommand
+processStocks
