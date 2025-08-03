@@ -385,9 +385,9 @@ def parseDataSet(retrievedData)->dict:
     #find all the rows
     rows:list[HtmlElement]=table.xpath('.//tr')
     #make an array to store the data for this table
-    dataList=[]
+    dataList:list[tuple]=[]
     #also a dictionary to store associated dates and indexes of dataList they are for
-    dates={}
+    dates:dict[date,int]={}
 
 
     #safety check to make sure the table is populated
@@ -408,7 +408,8 @@ def parseDataSet(retrievedData)->dict:
     if((len(headerRow)>0) and all((cast(str,datapoint.text_content()).strip() == ValidatorRowStrings[index]) for index, datapoint in enumerate(headerRow))):
         #if this is what we want
         rows.pop(0)
-        ValidatorRowStringsLen=len(ValidatorRowStrings)
+        #subtract one sice we dont include date in our main data lists
+        ValidatorRowStringsLen=len(ValidatorRowStrings)-1
         
         #because we dont add some rows, we use this variable to avoid desync. I tried using an index counter, but we desync when we skip an index.
         rowCount=0
@@ -421,7 +422,7 @@ def parseDataSet(retrievedData)->dict:
             
             if(len(rowData)==ValidatorRowStringsLen):
 
-                lineData={}
+                lineData=[""]*ValidatorRowStringsLen
                 #go through its columns
                 for pointIndex, point in enumerate(rowData):
                     #if this is the date index
@@ -430,10 +431,10 @@ def parseDataSet(retrievedData)->dict:
 
                         dates[parsedDate]=rowCount
                     else:#otherwise save it like normal
-                        lineData[pointIndex]=cast(str,point.text_content()).strip()
+                        lineData[pointIndex-1]=cast(str,point.text_content()).strip()
 
                 #save what we extracted
-                dataList.append(lineData)
+                dataList.append(tuple(lineData))
                 #increment rowcount since we found a row
                 rowCount+=1
     else:
@@ -753,7 +754,7 @@ def loadCommands()->list[dict]|bool:
 
 
         
-def findLine(dataset:list,datasetDates:dict,date:date)->dict|bool:
+def findLine(dataset:list,datasetDates:dict,date:date)->tuple|bool:
     #use our date and dataset values smartly to find the exact line we want then return it
     
     
@@ -1065,12 +1066,12 @@ def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:li
         if(rawLine is False):
             easyCLI.fastPrint("\nno data for date: "+date.strftime("%m/%d/%Y"))
             easyCLI.fastPrint("skipping...\n")
-        elif(type(rawLine)==dict):
-            line:dict=rawLine
+        elif(type(rawLine)==tuple):
+            line:tuple=rawLine
             #otherwise, loop through all the attributes the command wants
             for attribute in attributes:
                 #and grab their values for the line, then write them to the buffer for this stock
-                insertValue(date,line.get(attribute),attribute,categoryLookupDict,values)#type: ignore
+                insertValue(date,line[attribute-1],attribute,categoryLookupDict,values)#type: ignore
 
 
 
