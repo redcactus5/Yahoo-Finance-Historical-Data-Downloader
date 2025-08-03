@@ -409,8 +409,8 @@ def parseDataSet(retrievedData)->dict:
         #if this is what we want
         rows.pop(0)
         #subtract one sice we dont include date in our main data lists
-        ValidatorRowStringsLen=len(ValidatorRowStrings)-1
-        
+        ValidatorRowStringsLen=len(ValidatorRowStrings)
+        dataRowLen=ValidatorRowStringsLen-1
         #because we dont add some rows, we use this variable to avoid desync. I tried using an index counter, but we desync when we skip an index.
         rowCount=0
         #go through every row
@@ -422,7 +422,7 @@ def parseDataSet(retrievedData)->dict:
             
             if(len(rowData)==ValidatorRowStringsLen):
 
-                lineData=[""]*ValidatorRowStringsLen
+                lineData=[""]*dataRowLen
                 #go through its columns
                 for pointIndex, point in enumerate(rowData):
                     #if this is the date index
@@ -766,7 +766,6 @@ def findLine(dataset:list,datasetDates:dict,date:date)->tuple|bool:
     
     #and extract the index of that line from it
     line=dataset[rawIndex]
-
     return line
 
     
@@ -1058,7 +1057,6 @@ def validateCommands(commands:list[dict])->bool:
 
 
 def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:list[int],categoryLookupDict:dict[int,int],values:list[list])->None:
-   
     for date in dates:
         #find the line for this date
         rawLine=findLine(stockData,stockDates,date)
@@ -1072,6 +1070,9 @@ def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:li
             for attribute in attributes:
                 #and grab their values for the line, then write them to the buffer for this stock
                 insertValue(date,line[attribute-1],attribute,categoryLookupDict,values)
+        else:
+            easyCLI.waitForFastWriterFinish()
+            raise Exception("error: internal row data error, internal row data corrupted.")
 
 
 
