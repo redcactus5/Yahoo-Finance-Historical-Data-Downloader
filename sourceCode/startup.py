@@ -170,7 +170,7 @@ class YahooFinanceGrabberHeader(easyCLI.UIHeaderClass):
     #simple header class required by easy cli
     def __init__(self):
         super().__init__(None)
-        self.vNumber="v1.3"
+        self.vNumber="v1.4"
         self.vString="Yahoo Finance Historical Data Downloader "+self.vNumber+" by redcacus5"+"\n\n"
 
     def drawUIHeader(self):
@@ -206,8 +206,8 @@ def startup()->None:
         message="critical error: integrity check failed, renderer is corrupted or missing."
         prompt=easyCLI.multilineStringBuilder([
             "this error can likely be fixed by downloading a new copy of the renderer.",
-            "this can be performed automatically. please note that the program will.", 
-            "have to be restarted after the download.\n",
+            "this can be performed automatically. please note that the program will", 
+            "close automatically after the download. \n",
             "would you like to download the renderer?"
         ])
         userDecision=easyCLI.booleanQuestionScreen(message,prompt)
@@ -216,6 +216,12 @@ def startup()->None:
             easyCLI.ln(2)
             input("press enter to finish.")
             easyCLI.ln(1)
+        else:
+            easyCLI.uiHeader()
+            print("renderer download will not be performed.")
+            easyCLI.ln(3)
+            
+
     else:
         try:
             commandLineInterface()
@@ -223,7 +229,7 @@ def startup()->None:
             easyCLI.uiHeader()
             print(fail.message)
             easyCLI.ln()
-            print("root error: "+str(fail.getRootError()))
+            print("root cause: "+str(fail.getRootError()))
             easyCLI.ln(3)
             input("press enter to finish.")
 

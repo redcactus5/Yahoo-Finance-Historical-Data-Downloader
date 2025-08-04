@@ -383,7 +383,7 @@ def retrieveTableAndName(htmlText:str)->tuple[str,HtmlElement]:
 
 
 
-def parseDataSet(retrievedData)->dict:
+def parseDataSet(retrievedData)->tuple[str,list[tuple],dict]:
     easyCLI.fastPrint("parsing data for "+str(retrievedData[0])+"...")
 
     table:HtmlElement=retrievedData[1]
@@ -455,7 +455,8 @@ def parseDataSet(retrievedData)->dict:
     
 
     #return the data we extracted
-    return {"name":str(retrievedData[0]),"data":dataList,"dates":dates}
+    #("name","data","dates")
+    return (str(retrievedData[0]),dataList,dates)
 
 
 def retrieveAndParseDataSet(rawHTML:str,currentIndex:int,inputListLen:str):
@@ -472,7 +473,7 @@ def retrieveAndParseDataSet(rawHTML:str,currentIndex:int,inputListLen:str):
 
 
 #combination function to allow memory optimization.
-def retrieveAndParseDataSets(htmlDataList:list[str],sortAlphabetical:bool)->list[dict]:
+def retrieveAndParseDataSets(htmlDataList:list[str],sortAlphabetical:bool)->list[tuple]:
     easyCLI.fastPrint("extracting and parsing datasets...\n")
     #cache some variables
     inputListLen=str(len(htmlDataList))
@@ -482,7 +483,7 @@ def retrieveAndParseDataSets(htmlDataList:list[str],sortAlphabetical:bool)->list
        
 
     if(sortAlphabetical):
-        processedData=sorted(processedData, key=lambda dataSet: dataSet["name"])
+        processedData=sorted(processedData, key=lambda dataSet: dataSet[0])
 
     easyCLI.fastPrint("processing successful.\n\n")
     return processedData
@@ -1063,7 +1064,7 @@ def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:li
 
 
 
-def processStocks(commands:list[tuple],stocks:list[dict])->list[tuple]:
+def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
     easyCLI.fastPrint("executing commands...")
 
     buffer=[tuple()]*len(stocks)
@@ -1089,14 +1090,14 @@ def processStocks(commands:list[tuple],stocks:list[dict])->list[tuple]:
         #loop through our stocks
         for stockNumber, stock in enumerate(stocks):
            
-            easyCLI.fastPrint("".join(("\nprocessing stock: \"",str(stock.get("name")),"\" (stock ",str(stockNumber+1)," of ",stockListLen,")...")))
+            easyCLI.fastPrint("".join(("\nprocessing stock: \"",str(stock[0]),"\" (stock ",str(stockNumber+1)," of ",stockListLen,")...")))
             #create variables for storing the data we retrieve, and extract the raw data from the stock object to varaibles
-            name=str(stock.get("name"))
+            name=str(stock[0])
             categories=[0]
             categoryLookupDict:dict[int,int]={0:0}
             values:list[list]=[[]]
-            stockDates:dict=stock["dates"]
-            stockData:list=stock["data"]
+            stockDates:dict=stock[2]
+            stockData:list=stock[1]
             #create a variable for our progress through this stock
             
             #loop through our commands
