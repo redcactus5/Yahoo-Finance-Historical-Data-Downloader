@@ -200,7 +200,7 @@ def startup()->None:
         easyCLI.ln(3)
         input("press enter to finish.")
         easyCLI.ln(1)
-        return
+        
     elif(not integrityCheck()):
         #something wrong with firefox
         message="critical error: integrity check failed, renderer is corrupted or missing."
@@ -215,6 +215,7 @@ def startup()->None:
             downloadPageRenderer()
             easyCLI.ln(2)
             input("press enter to finish.")
+            easyCLI.ln(1)
     else:
         try:
             commandLineInterface()
