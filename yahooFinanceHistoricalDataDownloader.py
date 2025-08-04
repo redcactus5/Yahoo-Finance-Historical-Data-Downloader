@@ -360,19 +360,6 @@ def retrieveTableAndName(htmlText:str)->tuple[str,HtmlElement]:
         raise Exception("error: table in page is corrupted.")
 
 
-def retrieveHtmlListTablesAndName(htmlDataList:list[str])->list[tuple[str,HtmlElement]]:
- 
-    rawDataList:list[tuple[str,HtmlElement]]=[("",html.Element("dummy"))]*len(htmlDataList)
-    easyCLI.fastPrint("extracting relevant data...\n")
-    
-    for pageNumber, page in enumerate(htmlDataList):
-        easyCLI.fastPrint("extracting dataset "+str(pageNumber+1)+" of "+str(len(htmlDataList))+"...")
-        rawDataList[pageNumber]=retrieveTableAndName(page)
-        
-    easyCLI.fastPrint("done.\n\n")
-    return rawDataList
-
-
 
 def parseDataSet(retrievedData)->dict:
     easyCLI.fastPrint("parsing data for "+str(retrievedData[0])+"...")
@@ -449,9 +436,49 @@ def parseDataSet(retrievedData)->dict:
     return {"name":str(retrievedData[0]),"data":dataList,"dates":dates}
 
 
+def retrieveAndParseDataSet(rawHTML:str,currentIndex:int,inputListLen:str):
+    easyCLI.fastPrint("".join(("processing dataset ",str(currentIndex+1)," of ",inputListLen)))
+    easyCLI.fastPrint("extracting dataset...")
+    rawData=retrieveTableAndName(rawHTML)
+    easyCLI.fastPrint("parsing dataset...")
+    parsedData=parseDataSet(rawData)
+    rawData=None
+    #gc.collect()
+    easyCLI.fastPrint("done.\n")
+    return parsedData
 
 
 
+#combination function to allow memory optimization.
+def retrieveAndParseDataSets(htmlDataList:list[str],sortAlphabetical:bool)->list[dict]:
+    easyCLI.fastPrint("extracting and parsing datasets...\n")
+    #cache some variables
+    inputListLen=str(len(htmlDataList))
+    
+    #make our output list all fancy like
+    processedData=[retrieveAndParseDataSet(page,pageNumber,inputListLen) for pageNumber, page in enumerate(htmlDataList)]
+       
+
+    if(sortAlphabetical):
+        processedData=sorted(processedData, key=lambda dataSet: dataSet["name"])
+
+    easyCLI.fastPrint("processing successful.\n\n")
+    return processedData
+    
+
+
+'''
+def retrieveHtmlListTablesAndName(htmlDataList:list[str])->list[tuple[str,HtmlElement]]:
+ 
+    rawDataList:list[tuple[str,HtmlElement]]=[("",html.Element("dummy"))]*len(htmlDataList)
+    easyCLI.fastPrint("extracting relevant data...\n")
+    
+    for pageNumber, page in enumerate(htmlDataList):
+        easyCLI.fastPrint("extracting dataset "+str(pageNumber+1)+" of "+str(len(htmlDataList))+"...")
+        rawDataList[pageNumber]=retrieveTableAndName(page)
+        
+    easyCLI.fastPrint("done.\n\n")
+    return rawDataList
 
 def parseDataSets(rawDataList,sortAlphabetical)->list[dict]:
     easyCLI.fastPrint("starting dataset parsing...\n")
@@ -464,8 +491,7 @@ def parseDataSets(rawDataList,sortAlphabetical)->list[dict]:
     
     easyCLI.fastPrint("parsing complete.\n\n")
     return parsedData
-
-
+'''
 
 
 
@@ -1299,15 +1325,10 @@ def main(fileName)->bool|str:
     
     #grab the webpages
     webPages=retrieveWebPages(links[0],links[2],links[3],links[4])
-    #extract their raw data
-    rawData=retrieveHtmlListTablesAndName(webPages)
-    #save ram, free no longer needed values
-    webPages=None
-    gc.collect()
-    #parse that raw data
-    dataSets=parseDataSets(rawData,links[1])
-    #save ram, free no longer needed values
-    rawData=None
+    
+    #use combo function retrieve and parse data sets to save ram freeing more often
+    dataSets=retrieveAndParseDataSets(webPages,links[1])
+
     #type ignore to make is calm down about about this manual free
     links=None#type: ignore 
     gc.collect()
