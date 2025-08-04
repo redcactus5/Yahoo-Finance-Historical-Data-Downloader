@@ -57,8 +57,9 @@ def makeSillyString():
             print(", ",end="")
     print("]")
     
-    print("\n")
+    print("\n"*2)
 
-    
+
+def findWebProxyFiles
 
 makeSillyString()
