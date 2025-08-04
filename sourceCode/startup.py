@@ -65,7 +65,7 @@ def downloadPageRenderer():
     print("download completed successfully!")
 
 
-
+#needs to be fixed tomorrow
 def configureLicense(scrambledPart:str,orderingList:list[int])->str:
     return "".join([scrambledPart[int(orderingList[index])] for index in range(len(orderingList))])
 
