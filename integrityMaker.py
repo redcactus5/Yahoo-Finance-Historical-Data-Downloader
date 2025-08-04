@@ -57,10 +57,12 @@ def makeSillyString():
 
     
     print("(",end="")
-    for index,name in enumerate(hashes):
+    for index,name in enumerate(nuhashes):
         print("\""+name+"\"",end="")
-        if(index<(len(hashes)-1)):
+        if(index<(len(nuhashes)-1)):
             print(", ",end="")
+            if(index%4==0):
+                print()
         else:
             print(")")
 
@@ -71,8 +73,9 @@ def makeSillyString():
    
         if(index<(len(decoders)-1)):
             message5.append(", ")
-            
             message5.append("\n")
+            
+            
         else:
             message5.append(")")
     print("\n"*2)
@@ -114,7 +117,7 @@ def shuffle(inputList:list[str])->tuple[list[str],list[int]]:
     return (scrambledList,randomPosList)
 
 #makeFileString()
-#makeSillyString()
+makeSillyString()
 def makeSecurityErrorMessage():
     import dependencies.easyCLI as easyCLI
     errorMessage=easyCLI.multilineStringBuilder(("ERROR: integrity check failed, License file(s) not found.",
@@ -137,8 +140,7 @@ def makeSecurityErrorMessage():
         message3.append("\"")
         if(index<(len(message2)-1)):
             message3.append(", ")
-            if(index%20==0):
-                message3.append("\n")
+
         else:
             message3.append(")")
     
@@ -149,11 +151,10 @@ def makeSecurityErrorMessage():
         message5.append("\"")
         if(index<(len(message2)-1)):
             message5.append(", ")
-            if(index%20==0):
-                message5.append("\n")
+
         else:
             message5.append(")")
     print("".join(message3))
     print("\n\n\n")
     print("".join(message5))
-makeSecurityErrorMessage()
+#makeSecurityErrorMessage()
