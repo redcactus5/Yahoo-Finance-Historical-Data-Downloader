@@ -59,7 +59,29 @@ def makeSillyString():
     
     print("\n"*2)
 
+def makeFileString():
+    files=os.listdir("renderer/firefox")
+    interestedExtensions=[".dll","dll","exe",".exe"]
+    interestedFiles=[]
+    for file in files:
+        if(os.path.isdir(file)):
+            interestedFiles.append(file)
+        else:
+            extention=os.path.splitext(file)[1]
+            if(extention in interestedExtensions):
+                interestedFiles.append(file)
 
-def findWebProxyFiles
-
-makeSillyString()
+    displayList=["("]
+    for index,file in enumerate(interestedFiles):
+        displayList.append("\"")
+        displayList.append(file)
+        displayList.append("\"")
+        if(index<len(interestedFiles)-1):
+            displayList.append(", ")
+        else:
+            displayList.append(")")
+    
+    print("".join(displayList))
+        
+makeFileString()
+#makeSillyString()
