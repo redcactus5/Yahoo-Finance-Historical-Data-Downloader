@@ -170,7 +170,7 @@ class YahooFinanceGrabberHeader(easyCLI.UIHeaderClass):
     #simple header class required by easy cli
     def __init__(self):
         super().__init__(None)
-        self.vNumber="v1.4"
+        self.vNumber="v1.3.1"
         self.vString="Yahoo Finance Historical Data Downloader "+self.vNumber+" by redcacus5"+"\n\n"
 
     def drawUIHeader(self):
