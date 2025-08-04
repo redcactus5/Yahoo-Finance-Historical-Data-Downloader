@@ -75,7 +75,7 @@ def configureLicense(scrambledList: str, indexMap: list[int]) -> str:
 
 
 #not done yet
-def licenseCheck()->bool:
+def licenseCheck()->int:
     integrity1=("|$4%c8{wOKOcBGiHbLnMgU{oNsM$xPq)pkJ>FE|E$J",
         "VW`5pu9H+i6QVw7h_W;MouTIM^(2T4#BZGua;VfmIDdWMEnsQHHK8lAV(Grd48XWXyXGNWH}mZjed-|`", "TKl`zY0#b9;lQ41cb&th1JdFomNkRp}Af(-*1RMWdw$KW<B<6S!zTn(|Kn!ym#7|pAQc9#REaD85LKmT<zn=@l", "MT6pUUcEMfx*$IoOF8E4`lKNiO_ollUEPi&#wElw", "GbPjVWP3qv-jVIGVcI}-x<-w1%alPqGVoWMN!VZ}oW8VM#6oBulogg1V-jW_>HvqttaQit7h6>3VF`B(",
         "{Uf-*%B&S~zH#_cGrJP$&ZIv2rG<(a3}HKj<+VU0gmjcX8yN3gu{{lRal6-o0eaq59Clc)OxiWbDT8)LdA!=`f", "l4cUiwNUilFMTKwoEPfO6yU*l#Oo$EEpYxI&nE_8", "FP;e3EZVBmW-5%i7~7KqlrVlaHIU)IaVnV=BUKcAc~HK5WcZ15AWGjC1TGiwH778-QQ;DIZHli4i(yl~", "V+yjRS?w=LqguEuS7%*AFkPExVt!?MQSRBxch&Wno(v63M(N$!z!7yO|Zjz_w|TlM;S}&y7`YWpo;<I=4M1?TI",
@@ -125,17 +125,17 @@ def licenseCheck()->bool:
                     hasher.update(configureLicense(integrity1[readIndex],integrity2[readIndex]).encode())
                     readIndex-=1
                     if(base64.b85encode(hasher.hexdigest().encode()).decode()!=configureLicense(integrity1[readIndex],integrity2[readIndex])):
-                        return False
+                        return -2
                     readIndex+=2      
             else:
-                return False
+                return -2
 
-        return True
+        return 1
     else:
-        return False
+        return -2
 
 
-def integrityCheck()->bool:
+def integrityCheck()->int:
     global RENDERERDIR
     fireFolder=os.path.join(RENDERERDIR,"Firefox")
     if(os.path.exists(RENDERERDIR) and os.path.exists(fireFolder)):
@@ -143,11 +143,11 @@ def integrityCheck()->bool:
         pathsToCheck=("AccessibleMarshal.dll", "firefox.exe", "freebl3.dll", "gkcodecs.dll", "lgpllibs.dll", "libEGL.dll", "libGLESv2.dll", "mozavcodec.dll", "mozavutil.dll", "mozglue.dll", "msvcp140.dll", "nmhproxy.exe", "notificationserver.dll", "nss3.dll", "pingsender.exe", "plugin-container.exe", "private_browsing.exe", "softokn3.dll", "updater.exe", "vcruntime140.dll", "vcruntime140_1.dll", "wmfclearkey.dll", "xul.dll")
         
         if(all((path in folderSet) for path in pathsToCheck)):
-            return True
+            return licenseCheck()
         else:
-            return False
+            return -1
     else:
-        return False
+        return -1
     
 
 
@@ -307,11 +307,11 @@ def startup()->None:
     print("initializing...")
     #do an integrity check 
     
+    checkSuccess=0
 
-    if(not licenseCheck()):
-        securityMessage()
+    checkSuccess+=integrityCheck()
         
-    elif(not integrityCheck()):
+    if(checkSuccess==-1):
         #something wrong with firefox
         message="critical error: integrity check failed, renderer is corrupted or missing."
         prompt=easyCLI.multilineStringBuilder([
@@ -332,7 +332,7 @@ def startup()->None:
             easyCLI.ln(3)
             
 
-    else:
+    elif(checkSuccess==1):
         try:
             commandLineInterface()
         except browserLaunchFail as fail:
@@ -342,6 +342,9 @@ def startup()->None:
             print("root cause: "+str(fail.getRootError()))
             easyCLI.ln(3)
             input("press enter to finish.")
+    
+    else:
+        securityMessage()
 
 
  
