@@ -437,15 +437,14 @@ def parseDataSet(retrievedData)->dict:
 
 
 def retrieveAndParseDataSet(rawHTML:str,currentIndex:int,inputListLen:str):
-    easyCLI.fastPrint("".join(("processing dataset ",str(currentIndex+1)," of ",inputListLen)))
-    easyCLI.fastPrint("extracting dataset...")
+    easyCLI.fastPrint("".join(("extracting dataset ",str(currentIndex+1)," of ",inputListLen,"...")))
     rawData=retrieveTableAndName(rawHTML)
-    easyCLI.fastPrint("parsing dataset...")
+    easyCLI.fastPrint("done.")
     parsedData=parseDataSet(rawData)
     rawData=None
-    if(currentIndex%6==0):
+    if(currentIndex%5==0):
         gc.collect()
-    easyCLI.fastPrint("done.\n")
+    
     return parsedData
 
 
@@ -1348,13 +1347,15 @@ def startup()->None:
         print("well, thanks anyway!\n")
 
 
+#put function that downloads firefox here
+
 #not done yet
 def integrityCheck()->tuple[bool,tuple]:
     integrity1:tuple=tuple(["Oi4pUPE$owFJ)nKc|%M|Ek{sHGc8O>Lq$$gMJ{xBbN", "Vq-HlWHvT4G+|_BW@a-oGch<eHf1znGcsc_H8C<cW;14EW->EmGGjAgVPs=CVL3B6H)b|sV`DimGGk&g", "3t=Pjtq-~6V7dz|+g$w9S5LB<}L}_`~oDwAVoJ8!CJesZsz%n<o}aUdS!r$A$hd6O(qK&>9t-IT2JHm*)?bBZo", "Oi4pUPE$owFKlUIcx`MlElo*OElf#6MNU&iE_8Tw", "V>UHqGGQ<>VKZbhHDoz6V`esFIXPrCH!wJ4W??fhFgGz_W??sFGiEVmIW{siGGZ_`W;r=AVPi2jF*7!1", "%%L?bD@a-Pld7~XBDNND6#rI$afW1B1?@1mq7)I9p2W#FPmlDZfcZ{To?*PGF6r(D_50s~KAjUZ<<zxLXFqu-z", "Oi4pUPE$owFKlUIcynxYElo*OElf#6MNU&iE_8Tw", "He@klFlJ&nI5RakHf3gEGBq?cIW#mdFl9I~IW=T4GBGzZWMgGAH#KEBG%;pjVPY^dW->4{W;bCnW?^D8", "1B@VO^Hgy3j8Mu|p5lVD!wi)4Uu^fdE~X;#HK(eviEkkev`hjS$UJ8&U=C|Ouy}TWu3p=Z~%(45wlU{+NT~yZW", "Oi4pUPE$owFKl>iY%M}lL@hHdLu_Gnb7d_|Nkc_WQ$;Rxcys", "WMpAvVKiblWi?|kFg9gjH#0XdFk&-eVq#=AWjQ%vH8e70GBr42Ic7LyWMMI8Wic^1F<~?{WMO4vVPQFC", "Qv||@6qWerf#}rb1uez90;eD#WO>1;+n^U)UlUwx(S#wGfXF%Kl~t_ro2O`LjQ3q>6#SLs({zssxSdfkU@aGUO", "Oi4pUPE$owFHLWHX>4p^El_o0Y-wXHOlf0fZgXWVGA=MJOi4pUPE$oLba-?", "Wn*SHV>UQpIXN;gGB{ymHD+OCWMnciV>x7IGi6~lGGs6~Ibk<BW;bRsIWuE4G+{D0H8M9jW@I#DH)UdD", "XB(1L_Sy2&P9JZ+J!x-f?(@tn2xv1G$$BzoCDKpY3e#sj+n$z|%}|LGs?z4Vehn(%D7w%YuNWEtKy3TTNu-g+#", "Oi4pUPE$owFHUu7bZcQPL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "G%+|bWH)0oVly^4Fgal{W;iltIA&opHZw3{IAS?uGdVCcIb$(1HaRwCGhsAgHZ*24GGjM2H8e3~IXO5v", "5r{34hDA762*_sxsAyy=ZeBuwz>gY%;4U_I4;5j-?+ApA%~(ng{VeU4vX&twl*+IbNMU*cR|01m#!iJLcTg~4*", "Oi4pUPE$owFHme@d3SPYXJ~XSL2zMXXk{%jE-)=jNkc_WQ$;Rxcys", "VK+H2Gh#P4W;ZxAF)(IiGh}5lHe+RBHZ?b6FgRpoWi&TpVPR!sIc7IvV=y>0V`E`qVlgyiF=jP5Fkv__", "QcU>Kdbyfb<ySFE@4>+`7!%4SEI|ma2N{yrzO_d)vr^QZhV&WelXJC^O64yBeYUSlQ<JECu^DPR~o(MnRuQCH{", "Oi4pUPE$owFHm`OXm4&UP*X-sEix@kNkc_WQ$;Rxcys", "W-&E3IX5>qG&N;6F=J&oGBh@3W??ZlF*GtbW;kJCH#cE5HfCaCG-5P3IAl0wF*q_bH)b(0Wieu8H8f-}", "ap7*5qy*{YVlyPdw{s$8@^+yT>w&BXRhWlJg8*h$ESDueADR3=&`N`EnQ?C#(U(!^t6{43~rgE|2ZU;~ZI0ZWZ", "Oi4pUPE$oLba-?", "F)=VPG&VP8Wn(!wFlIGkFfw5^VK-xCHDzICGGQ?=Vl`oAWHMnmGcjc|FlI3`GGQ?@VKOmfIWl57Vqsxp", "w#vRqdvQx!OYd!3(ZDRqk4^O0agS{D^=@5BgHj)mf>Mgd-?%W#)et>?6z8FV&SAP`N7PvCW*BBnzP63-8Ye@gJ"])
     integrity2:tuple=("put salted hash here","put salt here")
 
 
-    errorMessage=(
+    errorMessages=(
         ("ERROR: integrity check failed, License file(s) not found.",
         "This program is open source and must be distributed with its licenses.",
         "Please ensure the LICENSE.txt is present in the program's root folder, and", 
@@ -1362,7 +1363,7 @@ def integrityCheck()->tuple[bool,tuple]:
         "\"libxml2-MIT-LICENSE.txt\", \"libxslt-MIT-LICENSE.txt\", \"Python-PSFL-2-LICENSE.txt\",", 
         "\"Mozilla-Public-License-2.0-LICENSE.txt\", \"Playwright-Apache-2.0-LICENSE.txt\",", 
         "\"Nuitka-Apache-2.0-LICENSE.txt\", and \"lxml-BSD-3-Clause-LICENSE.txt\".")
-        ,
+        ,#message 1 needs to be updated
         ("ERROR: integrity check failed, web proxy folder could not be found.",
         "please ensure the folder exists, and contains the web proxy files.",
         "these should have been included with the program when you received it.",
@@ -1386,21 +1387,21 @@ def integrityCheck()->tuple[bool,tuple]:
                     hasher.update(integrity1[readIndex].encode())
                     readIndex-=1
                     if(base64.b85encode(hasher.hexdigest().encode()).decode()!=integrity1[readIndex]):
-                        return (False,errorMessage[0])
+                        return (False,errorMessages[0])
                     readIndex+=2      
             else:
-                return (False,errorMessage[0])
+                return (False,errorMessages[0])
         readIndex=0
         loops=0
         if(os.path.exists("webproxy")):
 
             
 
-            return (True,("feel'in fine.","no issues anywhere."))
+            return (True,("feeling fine.",))
         else:
-            return (False,errorMessage[1])
+            return (False,errorMessages[1])
     else:
-        return (False,errorMessage[0])
+        return (False,errorMessages[0])
 
 
 
