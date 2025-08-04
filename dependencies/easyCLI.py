@@ -39,7 +39,7 @@ def recheckTerminalType():
         
 
         
-def multilineStringBuilder(lines:list[str])->str:
+def multilineStringBuilder(lines:list[str]|tuple[str])->str:
     return "\n".join(lines)
 
 

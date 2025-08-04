@@ -6,10 +6,6 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>. 
 '''
 
-URLLISTFILE="config/downloadConfig.json"
-COMMANDFILE="config/commands.json"
-RENDERERDIR="renderer"
-BROWSERPATH=RENDERERDIR+"/Firefox/firefox.exe"
 #warning, this program is held together by duct tape and prayers
 #also, the moment yahoo changes their website, this script will no longer work
 
@@ -33,6 +29,14 @@ from typing import cast
 from datetime import timezone
 #i cant believe I have to use this lib
 import gc
+
+
+
+URLLISTFILE=os.path.join("config","downloadConfig.json")
+COMMANDFILE=os.path.join("config","commands.json")
+RENDERERDIR="renderer"
+BROWSERPATH=os.path.join(RENDERERDIR,"Firefox","firefox.exe")
+
 
 def antiSnifferRandomDelay(start,end,message=False)->None:
     #this function looks more complicated than it is
