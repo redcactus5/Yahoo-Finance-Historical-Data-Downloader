@@ -66,9 +66,12 @@ def downloadPageRenderer():
 
 
 #needs to be fixed tomorrow
-def configureLicense(scrambledPart:str,orderingList:list[int])->str:
-    return "".join([scrambledPart[int(orderingList[index])] for index in range(len(orderingList))])
-
+def configureLicense(scrambledList: str, indexMap: list[int]) -> str:
+    restored = [""] * len(indexMap)
+    listedScrambledEggs=tuple(scrambledList)
+    for scrambledIndex, originalIndex in enumerate(indexMap):
+        restored[originalIndex] = listedScrambledEggs[scrambledIndex]
+    return "".join(restored)
 
 
 #not done yet

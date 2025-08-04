@@ -24,10 +24,11 @@ def makeSillyString():
     print("\n")
     hashes=[""]*(len(fileNames)*3)
     
-        
-
-
     
+    
+
+
+    debug=[]
 
 
     
@@ -35,18 +36,26 @@ def makeSillyString():
     writeIndex=0
     for file in fileNames:
         hashes[writeIndex]=(base64.b85encode(file.encode()).decode())
+        debug.append(base64.b85encode(file.encode()).decode())
         writeIndex+=1
-        with open(file, 'r') as current:
+        with open(file, 'rt') as current:
             #i would like to apologize to my ram
             hasher=hashlib.sha256()
             text=current.read().encode()
             digisalt=makeSalt()
             hasher.update(text)
             hasher.update(digisalt)
-            hashes[writeIndex]=base64.b85encode(hasher.hexdigest().encode()).decode()
+            digest=base64.b85encode(hasher.hexdigest().encode()).decode()
+            hashes[writeIndex]=digest
+            debug.append(digest)
             writeIndex+=1
             hashes[writeIndex]=digisalt.decode()
+            debug.append(digisalt.decode())
             writeIndex+=1
+    
+
+    #print(debug)
+
 
     decoders=[]
     nuhashes=[]
