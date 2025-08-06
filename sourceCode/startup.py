@@ -97,7 +97,7 @@ def configureLicense(scrambledList: str, indexMap: list[int]) -> str:
     return "".join(restored)
 
 
-#not done yet
+
 def licenseCheck()->int:
     integrity1=("|$4%c8{wOKOcBGiHbLnMgU{oNsM$xPq)pkJ>FE|E$J",
         "VW`5pu9H+i6QVw7h_W;MouTIM^(2T4#BZGua;VfmIDdWMEnsQHHK8lAV(Grd48XWXyXGNWH}mZjed-|`", "TKl`zY0#b9;lQ41cb&th1JdFomNkRp}Af(-*1RMWdw$KW<B<6S!zTn(|Kn!ym#7|pAQc9#REaD85LKmT<zn=@l", "MT6pUUcEMfx*$IoOF8E4`lKNiO_ollUEPi&#wElw", "GbPjVWP3qv-jVIGVcI}-x<-w1%alPqGVoWMN!VZ}oW8VM#6oBulogg1V-jW_>HvqttaQit7h6>3VF`B(",
