@@ -14,31 +14,50 @@ import time
 import dependencies.easyCLI as easyCLI
 import os
 from sourceCode.backEnd import browserLaunchFail
-
+import sys
 from sourceCode.backEnd import RENDERERDIR
 
 
 
-
+#need to modify to just use the actual internal api, and doesn't automatically quit. 
+# also make sure it actually saves it to the right place.
 def downloadPageRenderer():
-    #we do this here because this is the only time we use subproccess and sh util
-    import subprocess
-    import shutil
-    global RENDERERDIR
     easyCLI.uiHeader()
     print("preparing to download...")
+    #we do this here because this is the only time we use sh util and internal playright code
+    import shutil
+    #i know this is awful practice, but what was i supposed to do?!
+    from playwright.__main__ import main as playwrightMain
+
+    
+    
     #if the browser exists, remove it, so we can replace it.
+    global RENDERERDIR
     if(os.path.exists(RENDERERDIR)):
         shutil.rmtree(RENDERERDIR)
     os.mkdir(RENDERERDIR)
 
     #set up download and download
     print("starting page renderer download...")
-    environmentVariables = os.environ.copy()
-    environmentVariables["PLAYWRIGHT_BROWSERS_PATH"] = RENDERERDIR
-    subprocess.run(["playwright", "install", "firefox"], env=environmentVariables, check=True)
+    argumentBackup = sys.argv[:]  # backup original args
+    sys.argv = ("playwright", "install", "firefox", "--path="+RENDERERDIR)
+    
+    saidCleaningUp=False
+    #attempt to install browser, while preventing auto exit so we can clean up after
+    try:
+        playwrightMain()  
+    except SystemExit:
+        
+        print("cleaning up...")
+        saidCleaningUp=True
+        sys.argv=argumentBackup
+    except Exception as cause:
+        raise Exception("error: download failed! an error occurred during the download process.")
+
     #remove the folders and files we dont care about
-    print("cleaning up...")
+    if(not saidCleaningUp):
+        print("cleaning up...")
+    
     rendererFolderContents=os.listdir(RENDERERDIR)
     #find the top level firefox folder
     success=False
@@ -221,7 +240,6 @@ class YahooFinanceGrabberHeader(easyCLI.UIHeaderClass):
     
 
 def securityMessage()->None:
-    import sys
     lookup=("413",
         "160", "453", "296", "405", "215", "202", "506", "291", "208", "369", "554", "121", "77", "1", "140", "387", "435", "544", "549", "153",
         "196", "604", "555", "131", "277", "588", "241", "67", "43", "637", "316", "417", "120", "490", "458", "416", "4", "323", "493", "73",
