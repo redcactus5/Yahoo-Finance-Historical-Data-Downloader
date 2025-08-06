@@ -88,7 +88,7 @@ def downloadPageRenderer():
     print("download completed successfully!")
 
 
-#needs to be fixed tomorrow
+
 def configureLicense(scrambledList: str, indexMap: list[int]) -> str:
     restored = [""] * len(indexMap)
     listedScrambledEggs=tuple(scrambledList)
