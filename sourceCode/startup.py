@@ -14,32 +14,55 @@ import time
 import dependencies.easyCLI as easyCLI
 import os
 from sourceCode.backEnd import browserLaunchFail
-
+import sys
 from sourceCode.backEnd import RENDERERDIR
 
 
 
-
+#need to modify to just use the actual internal api, and doesn't automatically quit. 
+# also make sure it actually saves it to the right place.
 def downloadPageRenderer():
-    #we do this here because this is the only time we use subproccess and sh util
-    import subprocess
-    import shutil
-    global RENDERERDIR
     easyCLI.uiHeader()
     print("preparing to download...")
+    #we do this here because this is the only time we use sh util and internal playright code
+    import shutil
+    #i know this is awful practice, but what was i supposed to do?!
+    from playwright.__main__ import main as playwrightMain
+
+    
+    
     #if the browser exists, remove it, so we can replace it.
-    if(os.path.exists(RENDERERDIR)):
-        shutil.rmtree(RENDERERDIR)
-    os.mkdir(RENDERERDIR)
+    global RENDERERDIR
+    downloadDir=os.path.abspath(RENDERERDIR)
+    if(os.path.exists(downloadDir)):
+        shutil.rmtree(downloadDir)
+    os.mkdir(downloadDir)
 
     #set up download and download
     print("starting page renderer download...")
-    environmentVariables = os.environ.copy()
-    environmentVariables["PLAYWRIGHT_BROWSERS_PATH"] = RENDERERDIR
-    subprocess.run(["playwright", "install", "firefox"], env=environmentVariables, check=True)
+    pathBackup=os.environ.get("PLAYWRIGHT_BROWSERS_PATH",None)
+    os.environ["PLAYWRIGHT_BROWSERS_PATH"] = downloadDir
+    argumentBackup = sys.argv[:]  # backup original args
+    sys.argv = ["playwright", "install", "firefox"]
+    
+  
+    #attempt to install browser, while preventing auto exit so we can clean up after
+    try:
+        playwrightMain()  
+    except SystemExit:
+        print("download stage completed.")
+    except Exception as cause:
+        raise Exception("error: download failed! an error occurred during the download process.\nroot cause: "+str(cause))
+    finally: 
+        print("cleaning up...")
+        if(not(pathBackup is None)):
+            os.environ["PLAYWRIGHT_BROWSERS_PATH"] = pathBackup
+        else:
+            os.environ.pop("PLAYWRIGHT_BROWSERS_PATH", None)
+        sys.argv=argumentBackup
+
     #remove the folders and files we dont care about
-    print("cleaning up...")
-    rendererFolderContents=os.listdir(RENDERERDIR)
+    rendererFolderContents=os.listdir(downloadDir)
     #find the top level firefox folder
     success=False
     searchDir=""
@@ -47,25 +70,25 @@ def downloadPageRenderer():
         if("firefox-" in content):
             success=True
             searchDir=content
-            
             break
     
     if(not success):
         raise Exception("error: download failed! could not find downloaded folder.")
     
-    foundFolderContents=os.listdir(os.path.join(RENDERERDIR,searchDir))
+    foundFolderContents=os.listdir(os.path.join(downloadDir,searchDir))
     if("firefox" in foundFolderContents):
-        shutil.copytree(os.path.join(RENDERERDIR,searchDir,"firefox"),os.path.join(RENDERERDIR,"firefox"))
+        shutil.copytree(os.path.join(downloadDir,searchDir,"firefox"),os.path.join(downloadDir,"firefox"))
     else:
         raise Exception("error: download failed! could not find downloaded folder.")
     
     for unneeded in rendererFolderContents:
+ 
         shutil.rmtree(os.path.join(RENDERERDIR,unneeded))
 
     print("download completed successfully!")
 
 
-#needs to be fixed tomorrow
+
 def configureLicense(scrambledList: str, indexMap: list[int]) -> str:
     restored = [""] * len(indexMap)
     listedScrambledEggs=tuple(scrambledList)
@@ -74,7 +97,7 @@ def configureLicense(scrambledList: str, indexMap: list[int]) -> str:
     return "".join(restored)
 
 
-#not done yet
+
 def licenseCheck()->int:
     integrity1=("|$4%c8{wOKOcBGiHbLnMgU{oNsM$xPq)pkJ>FE|E$J",
         "VW`5pu9H+i6QVw7h_W;MouTIM^(2T4#BZGua;VfmIDdWMEnsQHHK8lAV(Grd48XWXyXGNWH}mZjed-|`", "TKl`zY0#b9;lQ41cb&th1JdFomNkRp}Af(-*1RMWdw$KW<B<6S!zTn(|Kn!ym#7|pAQc9#REaD85LKmT<zn=@l", "MT6pUUcEMfx*$IoOF8E4`lKNiO_ollUEPi&#wElw", "GbPjVWP3qv-jVIGVcI}-x<-w1%alPqGVoWMN!VZ}oW8VM#6oBulogg1V-jW_>HvqttaQit7h6>3VF`B(",
@@ -221,7 +244,6 @@ class YahooFinanceGrabberHeader(easyCLI.UIHeaderClass):
     
 
 def securityMessage()->None:
-    import sys
     lookup=("413",
         "160", "453", "296", "405", "215", "202", "506", "291", "208", "369", "554", "121", "77", "1", "140", "387", "435", "544", "549", "153",
         "196", "604", "555", "131", "277", "588", "241", "67", "43", "637", "316", "417", "120", "490", "458", "416", "4", "323", "493", "73",
