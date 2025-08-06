@@ -33,32 +33,32 @@ def downloadPageRenderer():
     
     #if the browser exists, remove it, so we can replace it.
     global RENDERERDIR
-    if(os.path.exists(RENDERERDIR)):
-        shutil.rmtree(RENDERERDIR)
-    os.mkdir(RENDERERDIR)
+    downloadDir=os.path.abspath(RENDERERDIR)
+    if(os.path.exists(downloadDir)):
+        shutil.rmtree(downloadDir)
+    os.mkdir(downloadDir)
 
     #set up download and download
     print("starting page renderer download...")
+    pathBackup=os.environ.get("PLAYWRIGHT_BROWSERS_PATH",None)
+    os.environ["PLAYWRIGHT_BROWSERS_PATH"] = downloadDir
     argumentBackup = sys.argv[:]  # backup original args
-    sys.argv = ("playwright", "install", "firefox", "--path="+RENDERERDIR)
+    sys.argv = ["playwright", "install", "firefox"]
     
-    saidCleaningUp=False
+  
     #attempt to install browser, while preventing auto exit so we can clean up after
     try:
         playwrightMain()  
-    except SystemExit:
-        
-        print("cleaning up...")
-        saidCleaningUp=True
-        sys.argv=argumentBackup
     except Exception as cause:
-        raise Exception("error: download failed! an error occurred during the download process.")
+        raise Exception("error: download failed! an error occurred during the download process.\nroot cause: "+str(cause))
+    finally: 
+        print("cleaning up...")
+        if(not(pathBackup is None)):
+            os.environ["PLAYWRIGHT_BROWSERS_PATH"] = pathBackup
+        sys.argv=argumentBackup
 
     #remove the folders and files we dont care about
-    if(not saidCleaningUp):
-        print("cleaning up...")
-    
-    rendererFolderContents=os.listdir(RENDERERDIR)
+    rendererFolderContents=os.listdir(downloadDir)
     #find the top level firefox folder
     success=False
     searchDir=""
@@ -66,15 +66,14 @@ def downloadPageRenderer():
         if("firefox-" in content):
             success=True
             searchDir=content
-            
             break
     
     if(not success):
         raise Exception("error: download failed! could not find downloaded folder.")
     
-    foundFolderContents=os.listdir(os.path.join(RENDERERDIR,searchDir))
+    foundFolderContents=os.listdir(os.path.join(downloadDir,searchDir))
     if("firefox" in foundFolderContents):
-        shutil.copytree(os.path.join(RENDERERDIR,searchDir,"firefox"),os.path.join(RENDERERDIR,"firefox"))
+        shutil.copytree(os.path.join(downloadDir,searchDir,"firefox"),os.path.join(downloadDir,"firefox"))
     else:
         raise Exception("error: download failed! could not find downloaded folder.")
     
