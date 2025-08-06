@@ -49,12 +49,16 @@ def downloadPageRenderer():
     #attempt to install browser, while preventing auto exit so we can clean up after
     try:
         playwrightMain()  
+    except SystemExit:
+        print("download stage completed.")
     except Exception as cause:
         raise Exception("error: download failed! an error occurred during the download process.\nroot cause: "+str(cause))
     finally: 
         print("cleaning up...")
         if(not(pathBackup is None)):
             os.environ["PLAYWRIGHT_BROWSERS_PATH"] = pathBackup
+        else:
+            os.environ.pop("PLAYWRIGHT_BROWSERS_PATH", None)
         sys.argv=argumentBackup
 
     #remove the folders and files we dont care about
