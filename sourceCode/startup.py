@@ -79,7 +79,8 @@ def downloadPageRenderer():
         raise Exception("error: download failed! could not find downloaded folder.")
     
     for unneeded in rendererFolderContents:
-        shutil.rmtree(os.path.join(RENDERERDIR,unneeded))
+        print(unneeded)
+        #shutil.rmtree(os.path.join(RENDERERDIR,unneeded))
 
     print("download completed successfully!")
 
