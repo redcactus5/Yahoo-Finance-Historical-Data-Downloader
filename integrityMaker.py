@@ -119,6 +119,37 @@ def makeSillyString():
         shuffled=shuffle(list(hash))
         mainLicenseDecoders.append(shuffled[1])
         mainLicenseHashes.append("".join(shuffled[0]))
+
+
+    
+    print("(",end="")
+    for index,name in enumerate(mainLicenseHashes):
+        print("\""+name+"\"",end="")
+        if(index<(len(mainLicenseHashes)-1)):
+            print(", ",end="")
+            if(index%4==0):
+                print()
+        else:
+            print(")")
+
+    message5=["("]
+    for index, char in enumerate(mainLicenseDecoders):
+        
+        message5.append(str(char))
+   
+        if(index<(len(mainLicenseDecoders)-1)):
+            message5.append(", ")
+            message5.append("\n")
+            
+            
+        else:
+            message5.append(")")
+    print("\n"*2)
+    print("".join(message5))
+
+    print("\n"*2)
+
+    
     
 
     
