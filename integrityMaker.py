@@ -153,16 +153,7 @@ def makeSillyString():
 
     
     print("main license data:")
-    print("(",end="")
-    for index,name in enumerate(mainLicenseHashes):
-        print("\""+name+"\"",end="")
-        if(index<(len(mainLicenseHashes)-1)):
-            print(", ",end="")
-            if(index%4==0):
-                print()
-        else:
-            print(")")
-
+    
     message5=["("]
     for index, char in enumerate(mainLicenseDecoders):
         
@@ -179,6 +170,17 @@ def makeSillyString():
     print("".join(message5))
 
     print("\n"*2)
+    print("(",end="")
+    for index,name in enumerate(mainLicenseHashes):
+        print("\""+name+"\"",end="")
+        if(index<(len(mainLicenseHashes)-1)):
+            print(", ",end="")
+            if(index%4==0):
+                print()
+        else:
+            print(")")
+    print("\n"*2)
+
 
     
     
