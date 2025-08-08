@@ -97,24 +97,24 @@ def makeSillyString():
 
     base85LicenseOptions=[]
     hashDataUnscrambled=[]
-    writeIndex=0
+
     for file in licenseOptions:
         base85LicenseOptions.append(base64.b85encode(file.encode()).decode())
-        writeIndex+=1
-        with open(file, 'rt') as current:
-            #i would like to apologize to my ram
-            hasher=hashlib.sha256()
-            text=current.read().encode()
-            digitalSalt=makeSalt()
-            hasher.update(text)
-            hasher.update(digitalSalt)
-            digest=base64.b85encode(hasher.hexdigest().encode()).decode()
-            hashes[writeIndex]=digest
-            debug.append(digest)
-            writeIndex+=1
-            hashes[writeIndex]=digitalSalt.decode()
-            debug.append(digitalSalt.decode())
-            writeIndex+=1
+    
+    with open(licenseOptions[1], 'rt') as current:
+        #i would like to apologize to my ram
+        hasher=hashlib.sha256()
+        text=current.read().encode()
+        digitalSalt=makeSalt()
+        hasher.update(text)
+        hasher.update(digitalSalt)
+        digest=base64.b85encode(hasher.hexdigest().encode()).decode()
+        hashDataUnscrambled.append(digest)
+        hashDataUnscrambled.append(digitalSalt.decode())
+
+    
+        
+  
 
     
 
