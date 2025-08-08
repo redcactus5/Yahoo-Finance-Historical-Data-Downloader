@@ -18,8 +18,6 @@ def makeSalt():
 
 def makeSillyString():
     fileNames=os.listdir("LICENSES/")
-    for i in range(len(fileNames)):
-        fileNames[i]="LICENSES/"+fileNames[i]
     print("\n")
     hashes=[""]*(len(fileNames)*3)
     
@@ -51,6 +49,9 @@ def makeSillyString():
             hashes[writeIndex]=digitalSalt.decode()
             debug.append(digitalSalt.decode())
             writeIndex+=1
+
+    #the directory string
+    hashes.append(base64.b85encode("LICENSES".encode()).decode())
     
 
     #print(debug)

@@ -99,14 +99,13 @@ def configureLicense(scrambledList: str, indexMap: list[int]) -> str:
 
 
 def licenseCheck()->int:
-    integrity1=("|$4%c8{wOKOcBGiHbLnMgU{oNsM$xPq)pkJ>FE|E$J",
-        "VW`5pu9H+i6QVw7h_W;MouTIM^(2T4#BZGua;VfmIDdWMEnsQHHK8lAV(Grd48XWXyXGNWH}mZjed-|`", "TKl`zY0#b9;lQ41cb&th1JdFomNkRp}Af(-*1RMWdw$KW<B<6S!zTn(|Kn!ym#7|pAQc9#REaD85LKmT<zn=@l", "MT6pUUcEMfx*$IoOF8E4`lKNiO_ollUEPi&#wElw", "GbPjVWP3qv-jVIGVcI}-x<-w1%alPqGVoWMN!VZ}oW8VM#6oBulogg1V-jW_>HvqttaQit7h6>3VF`B(",
-        "{Uf-*%B&S~zH#_cGrJP$&ZIv2rG<(a3}HKj<+VU0gmjcX8yN3gu{{lRal6-o0eaq59Clc)OxiWbDT8)LdA!=`f", "l4cUiwNUilFMTKwoEPfO6yU*l#Oo$EEpYxI&nE_8", "FP;e3EZVBmW-5%i7~7KqlrVlaHIU)IaVnV=BUKcAc~HK5WcZ15AWGjC1TGiwH778-QQ;DIZHli4i(yl~", "V+yjRS?w=LqguEuS7%*AFkPExVt!?MQSRBxch&Wno(v63M(N$!z!7yO|Zjz_w|TlM;S}&y7`YWpo;<I=4M1?TI",
-        "_7;KOxsik4_M$LyUw>_QYNHuRl}iE$h%ocb|G@dcnldPWpLF", "h<B3im@cQMVLAhbtU5-GAHP@ZG*!W(;B(MPHI(MuB)Ffy4FG0C%I>Ibek8gnbWzphW7omI|IWtmoVFRv", "n0l?KHFi<wHC?HnbJJ2?N+xT*o-BHqiA4YP(5nlpYEPAhRF9{DE~$awFI_%u8EMHYOd;@AIHB(w9;INcpx@kek", "pEOoPGPAoHFHUigZ_?lL-XXfW^lOOUpW>LH4J04$pEww4fb0-iaMXEoY=V$",
-        "!5lWgfGRhfZFVH3HVf%osV8hHPHQVX|Wy00kcfgFmU>GI*Wis*VmWNf(89GAHG8_Fe=jm_H|a>tq3}8D", "E&p_A<+C8V;1GtDt6u^WUB+iJFZE7){q-_oFa=J?4dvya&;y@9YgGAILXF_n!DsXR+`A5bIOK)7_NvHE3}+!?=", "Eo{$sX4FwNcHZz_RPxickMjkuU;EQQ=p7y2XU%WL-bcj)$PO", "GgJ8G6uM{VlFkVHHIfB`6#_nNe@{Bl%{zv(8)1F4}HVV|(Z2Hd03&G{YFZGX?5N`+lXGWVl_ZF?2jh*x",
-        "%Olcz6dWd6>Sk8}T+jgknrCpLloH7&c?~Psb6Hc%(dRD9d6Xn!9LV!%ol|u2n5LP{ku9J7K1EK5#Y(6B!3qfZ%", "UxXX_mekcF-X)R;pLQ34YESk2Jwo~S$MXcHO@d%yi{j$WjPN=sEPz", "P$mb83tGlum7>MI0qVlPrqrGWKAPlQLK8hhnGIXH=3i-c8ro4)734XWIGPVWqo#kVqTn2BVI4IHn(_V&", "E@sKRIGn9IqdqO1i+Y)Sx2C6T8@Zj^ZTsF;!sQHkdsNcA9z<0L|{PQJa2`IW9DPt6Fk^c&FVc_{CqjuL4LifoR",
-        "wH$sxsc*o;OEUkUQ$O_W4P-E@miFNpRXc`mXyx&P4ik", "jH}@rKrVM#djikV9FtPhdeQ4WG#q43bZMiCf#?FgTV8W84rVGZ)HH$?G}F4HJh)*lhTHyRH(MR7HW0fn", "s>7D;zK&*QY><kT4?qk)|wS)6j9WzN7=;Q)U(|t`|7E3EbE6;kyB`uG349DECAnf>nfFP|@5fyU0;k5b~sm7lK", "O4oLi?bpUaP$-E",
-        "i=cA1A+GII|GaG*mYF|}kF$mk{IHFYFHgW0DHVFdG8j-WoU#9qgp3hB?+H)H_F5@c!6DeZp9Ae~J0fHl", "eig4$VH_=A8>PELcbF=1PTUzuDdS;Ma+yjI&-XBQol@l5QSYp4!U5mhmu%VE$my79+=}>Z@o4xbIV0mgLra%71")
+    integrity1=("OU{g$Oin$wP)>cK$cJpFb8HEsx4NMB%oJkG{|qMEL|", 
+        "5W56PG{2MVFC#{WcLHVQ#hmBH#)BuiVGP2knViO>3x0kmHa3q8Ic@~*2yHRDZ(Vo2{c=W*V4K5>Vi8Vj", "}H7V^X$9$(>WoCchV&$-5>Ll)#ukUbRk|&benSB&&Y-~+as=OHm~Q&inV40c^cJOw7f0uQ1iRO4L0fc1eY7XpC", "K6l$lU_oNlM#oEwM4`iElifPEOOTwxF*EpcI&U8U", "&57*d>Vo?jgW1?ni4G^KvnSbG%m8_~VHFgVgn*2>Gl1HH#GRk&4VkRWiFXWI(lY=IH2i&o4kGiD8Hm$x", 
+        "KqzMYzv!y+65Ue9?teP)ZM!UA=4Ja~`{A5jEy<>Fcl5AJkcr~m47;Nz`Enw2{lhO#~#``zDKFyq_9H=bC;q1v3", "o8E#4Ffin*E6El&lIyi_KU$oNpcwUwxlYPTUMOEO", "fr2I_?KGb;-=QB`HdnhGmGq_c#kegpVV5G`w3hKC9fiR#G*mI8uG5mWFFG%cl!sWI@HmrV&H5DR8)hl<", "-JjGizL9!7ZQrUtbGY>-AfA&uW@QZJ($Jz|DYmo%g%9Mr3KDXq4S|*tOuug6lBO#Lb)%=DO-zwO|S`s<c(K8t|", 
+        "_Y@Uwu7E_yOFdp$bs_LiGM|i;>Hx4nQoWL}l%RP$NkchdcKl", "h#t!GpEbFRzNBWQ0Bq0HxHlW14iiDeeb@WVWxjB?GIde9oH-^d1mH)H=PkW82Sk|;Dy6=*GIw&~2cIW+", "N9jVi_8AB=AFBk=>E()v$p45C<k}0-9G!OKl;_^tgic;|`wtTV+g!{<ai`mCK2wxC+t)U<3VBotC7v}I}W^Hyk", "E?AY4OlPo4g_ZEpwap^o$OG-MXfWWbXFP00-Oi4UHJfoLUHVXwip$H>l=EL",
+        "ooZV}dQ>_9lD(sq6FciBM&Vr|GGWM{?bWG0iKDliF8Wxl45<kZfIKHCWH%VmW_*Ba|uVG0G(~VHn+}XZ", "!nnVHT>7(VVhzBR(I<>^%_2`cPnUJg)`59a_m(Dp>`26{p^A1W=ZJx?pZ=H$AS4Hd1r4^eyKwTl#zl~?VcTFfm", "kj2$%4PyL;oEXc-cs7kUPR)ZjHUxQEz$F_QMuOXiWw=cN{bp", "-G?tmgd;lkI(KnjDD&5sEV?rHGH@x#I*Hh!9Vst3wWCawQ5-aP3AMVVRH()eHEHcHJ+LTqA4AAtHoZ@W",
+        "pi}+B*%K7Fc%FvOXA`;FK8xL|JO9fK}i(AB_$-TM>IV{#vjG7|Ug-l&Dazd6O&qnLE0zhOK3JQw<1CWN*Xc9vr", "mMw$XNyzSjxHPcXXkiQJce~od3%@OYL;)R_{Xsp4-jP2F=kE$SWEU", "BH+=shE*Fqqj?1V(IYeHC~;|a}GVg|B@ZcjHg8b)LGs-pEq&H&Hzc%;FGW#{nNsGGG9oGl9_t)Wv35D%", "o$97I-laNqYWVQfhyhN_kUc91SjbSt8*xN9IA<Sb19onL{UDY7@1*v9TnM#)AMu#0sJ1r-nTlk1Y=^Z7%+uTMF",
+        "iXciOoFOc4XEywks&$4pHsm-_NxUPRP;m@xQ$U`kEW*", "cLel~gvFVpHw%HL|W+ImYVGGmpPU>HX*xHVIAB)pq8fVN0e_|KctB@mmIo+AEm1AVi4HUFLYPWNNknq+", "WDzo4-aJ#3EZRmvgtmUc|f*OM;g4c)@mJ50To+9QNmkYsXeN(?g0G>>>+z;SMw~_aC(xQw$(uOUbS{undMQS4b")
     integrity2=([19, 32, 2, 17, 15, 27, 22, 9, 0, 14, 28, 26, 39, 25, 1, 24, 40, 30, 13, 18, 34, 4, 37, 8, 41, 23, 35, 7, 38, 5, 31, 12, 3, 21, 36, 29, 10, 6, 16, 20, 33, 11],
         [65, 56, 51, 22, 79, 57, 59, 5, 47, 73, 54, 72, 15, 68, 53, 14, 77, 0, 71, 41, 64, 34, 48, 20, 42, 63, 23, 78, 33, 29, 31, 11, 6, 10, 32, 12, 36, 50, 38, 49, 55, 4, 61, 70, 1, 58, 27, 74, 43, 30, 45, 66, 26, 76, 19, 75, 2, 60, 39, 7, 17, 24, 21, 40, 52, 3, 18, 28, 62, 35, 25, 9, 69, 37, 44, 46, 13, 67, 8, 16],
         [36, 31, 42, 19, 68, 2, 69, 62, 28, 70, 0, 3, 40, 30, 61, 1, 79, 85, 72, 10, 14, 41, 39, 73, 45, 75, 65, 6, 64, 38, 21, 18, 66, 82, 83, 46, 24, 8, 34, 81, 57, 27, 20, 56, 52, 58, 4, 15, 32, 29, 48, 60, 7, 35, 25, 13, 22, 71, 17, 77, 49, 5, 23, 26, 76, 63, 44, 84, 43, 78, 59, 54, 9, 16, 37, 11, 67, 80, 50, 51, 53, 47, 12, 74, 33, 55],
@@ -137,12 +136,10 @@ def licenseCheck()->int:
     if(isinstance(integrity1,tuple) and (len(integrity1)>0) and (len(integrity1)%3==0)):
         loops=int(len(integrity1)/3)
         readIndex=0
+        folder=base64.b85decode(configureLicense(integrity1[len(integrity1)-1],integrity2[len(integrity2)-1]).encode()).decode()
         for fileName in range(loops):
-            pathCache=base64.b85decode(configureLicense(integrity1[readIndex],integrity2[readIndex]).encode()).decode().split("/")
-            if(len(pathCache)==2):
-                pathCache=os.path.join(pathCache[0],pathCache[1])
-            else:
-                return -2
+            pathCache=os.path.join(folder,base64.b85decode(configureLicense(integrity1[readIndex],integrity2[readIndex]).encode()).decode())
+            
             readIndex+=2
             if(os.path.exists(pathCache)):
                 with open(pathCache, 'r') as current:
