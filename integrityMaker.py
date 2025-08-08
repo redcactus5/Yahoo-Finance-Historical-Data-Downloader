@@ -20,7 +20,6 @@ def makeSillyString():
     fileNames=os.listdir("LICENSES/")
     for i in range(len(fileNames)):
         fileNames[i]="LICENSES/"+fileNames[i]
-    fileNames.extend(["LICENSE.txt",])
     print("\n")
     hashes=[""]*(len(fileNames)*3)
     
@@ -42,15 +41,15 @@ def makeSillyString():
             #i would like to apologize to my ram
             hasher=hashlib.sha256()
             text=current.read().encode()
-            digisalt=makeSalt()
+            digitalSalt=makeSalt()
             hasher.update(text)
-            hasher.update(digisalt)
+            hasher.update(digitalSalt)
             digest=base64.b85encode(hasher.hexdigest().encode()).decode()
             hashes[writeIndex]=digest
             debug.append(digest)
             writeIndex+=1
-            hashes[writeIndex]=digisalt.decode()
-            debug.append(digisalt.decode())
+            hashes[writeIndex]=digitalSalt.decode()
+            debug.append(digitalSalt.decode())
             writeIndex+=1
     
 
@@ -89,6 +88,37 @@ def makeSillyString():
             message5.append(")")
     print("\n"*2)
     print("".join(message5))
+
+    print("\n"*2)
+
+
+    #put the special handling strings for the main license here
+    licenseOptions=[os.path.join("LICENSES","LICENSE.txt"),"LICENSE.txt"]
+
+    base85LicenseOptions=[]
+    hashDataUnscrambled=[]
+    writeIndex=0
+    for file in licenseOptions:
+        base85LicenseOptions.append(base64.b85encode(file.encode()).decode())
+        writeIndex+=1
+        with open(file, 'rt') as current:
+            #i would like to apologize to my ram
+            hasher=hashlib.sha256()
+            text=current.read().encode()
+            digitalSalt=makeSalt()
+            hasher.update(text)
+            hasher.update(digitalSalt)
+            digest=base64.b85encode(hasher.hexdigest().encode()).decode()
+            hashes[writeIndex]=digest
+            debug.append(digest)
+            writeIndex+=1
+            hashes[writeIndex]=digitalSalt.decode()
+            debug.append(digitalSalt.decode())
+            writeIndex+=1
+
+    
+
+
 
 def makeFileString():
     files=os.listdir("renderer/firefox")

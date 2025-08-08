@@ -138,7 +138,11 @@ def licenseCheck()->int:
         loops=int(len(integrity1)/3)
         readIndex=0
         for fileName in range(loops):
-            pathCache=base64.b85decode(configureLicense(integrity1[readIndex],integrity2[readIndex]).encode()).decode()
+            pathCache=base64.b85decode(configureLicense(integrity1[readIndex],integrity2[readIndex]).encode()).decode().split("/")
+            if(len(pathCache)==2):
+                pathCache=os.path.join(pathCache[0],pathCache[1])
+            else:
+                return -2
             readIndex+=2
             if(os.path.exists(pathCache)):
                 with open(pathCache, 'r') as current:
