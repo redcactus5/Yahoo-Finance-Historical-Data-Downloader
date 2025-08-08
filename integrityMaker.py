@@ -3,7 +3,19 @@ import base64
 import random
 import string
 import os
-import random
+
+def shuffle(inputList:list[str])->tuple[list[str],list[int]]:
+    #make a copy of our input
+    copyList=inputList.copy()
+    #create a list of indexes
+    randomPosList=list(range(len(copyList)))
+    #shuffle it
+    random.shuffle(randomPosList)
+    #put the items in copyList in the shuffled order
+    scrambledList = [copyList[i] for i in randomPosList]
+    return (scrambledList,randomPosList)
+
+
 def makeSalt():
     saltMine=list("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~")
 
@@ -18,9 +30,6 @@ def makeSalt():
 
 def makeSillyString():
     fileNames=os.listdir("LICENSES/")
-    for i in range(len(fileNames)):
-        fileNames[i]="LICENSES/"+fileNames[i]
-    fileNames.extend(["LICENSE.txt",])
     print("\n")
     hashes=[""]*(len(fileNames)*3)
     
@@ -38,20 +47,21 @@ def makeSillyString():
         hashes[writeIndex]=(base64.b85encode(file.encode()).decode())
         debug.append(base64.b85encode(file.encode()).decode())
         writeIndex+=1
-        with open(file, 'rt') as current:
+        with open(os.path.join("LICENSES",file), 'rt') as current:
             #i would like to apologize to my ram
             hasher=hashlib.sha256()
             text=current.read().encode()
-            digisalt=makeSalt()
+            digitalSalt=makeSalt()
             hasher.update(text)
-            hasher.update(digisalt)
+            hasher.update(digitalSalt)
             digest=base64.b85encode(hasher.hexdigest().encode()).decode()
             hashes[writeIndex]=digest
             debug.append(digest)
             writeIndex+=1
-            hashes[writeIndex]=digisalt.decode()
-            debug.append(digisalt.decode())
+            hashes[writeIndex]=digitalSalt.decode()
+            debug.append(digitalSalt.decode())
             writeIndex+=1
+
     
 
     #print(debug)
@@ -64,16 +74,8 @@ def makeSillyString():
         decoders.append(shuffled[1])
         nuhashes.append("".join(shuffled[0]))
 
+    #the directory string
     
-    print("(",end="")
-    for index,name in enumerate(nuhashes):
-        print("\""+name+"\"",end="")
-        if(index<(len(nuhashes)-1)):
-            print(", ",end="")
-            if(index%4==0):
-                print()
-        else:
-            print(")")
 
     message5=["("]
     for index, char in enumerate(decoders):
@@ -89,6 +91,107 @@ def makeSillyString():
             message5.append(")")
     print("\n"*2)
     print("".join(message5))
+
+    print("\n"*2)
+    print("(",end="")
+    for index,name in enumerate(nuhashes):
+        print("\""+name+"\"",end="")
+        if(index<(len(nuhashes)-1)):
+            print(", ",end="")
+            if(index%4==0):
+                print()
+        else:
+            print(")")
+
+    
+
+    print("\n"*2)
+
+
+    #put the special handling strings for the main license here
+    licenseOptions=["LICENSE.txt"]
+
+    base85LicenseOptions=[]
+    hashDataUnscrambled=[]
+
+    for file in licenseOptions:
+        base85LicenseOptions.append(base64.b85encode(file.encode()).decode())
+    
+    with open(licenseOptions[0], 'rt') as current:
+        #i would like to apologize to my ram
+        hasher=hashlib.sha256()
+        text=current.read().encode()
+        digitalSalt=makeSalt()
+        hasher.update(text)
+        hasher.update(digitalSalt)
+        digest=base64.b85encode(hasher.hexdigest().encode()).decode()
+        hashDataUnscrambled.append(digest)
+        hashDataUnscrambled.append(digitalSalt.decode())
+
+    mainLicenseDecoders=[]
+    mainLicenseHashes=[]
+
+    for hash in hashDataUnscrambled:
+        shuffled=shuffle(list(hash))
+        mainLicenseDecoders.append(shuffled[1])
+        mainLicenseHashes.append("".join(shuffled[0]))
+
+    scrambledOption=shuffle(list(base85LicenseOptions[0]))
+    scrambled="".join(scrambledOption[0])
+    descramble=scrambledOption[1]
+
+    print("\n\n main license file and root folder:")
+
+
+    shuffledRoot=shuffle(list(base64.b85encode("LICENSES".encode()).decode()))
+    print("(\""+"".join(shuffledRoot[0])+"\", ",end="")
+    print(str(shuffledRoot[1])+", ",end="")
+    print("\""+scrambled+"\", ",end="")
+    print(str(descramble)+")")
+    print("end main file\n\n")
+
+
+    
+    print("main license data:")
+    
+    message5=["("]
+    for index, char in enumerate(mainLicenseDecoders):
+        
+        message5.append(str(char))
+   
+        if(index<(len(mainLicenseDecoders)-1)):
+            message5.append(", ")
+            message5.append("\n")
+            
+            
+        else:
+            message5.append(")")
+    print()
+    print("".join(message5))
+
+    print("\n"*2)
+    print("(",end="")
+    for index,name in enumerate(mainLicenseHashes):
+        print("\""+name+"\"",end="")
+        if(index<(len(mainLicenseHashes)-1)):
+            print(", ",end="")
+            if(index%4==0):
+                print()
+        else:
+            print(")")
+    print("\n"*2)
+
+
+    
+    
+
+    
+        
+  
+
+    
+
+
 
 def makeFileString():
     files=os.listdir("renderer/firefox")
@@ -114,16 +217,7 @@ def makeFileString():
     
     print("".join(displayList))
         
-def shuffle(inputList:list[str])->tuple[list[str],list[int]]:
-    #make a copy of our input
-    copyList=inputList.copy()
-    #create a list of indexes
-    randomPosList=list(range(len(copyList)))
-    #shuffle it
-    random.shuffle(randomPosList)
-    #put the items in copyList in the shuffled order
-    scrambledList = [copyList[i] for i in randomPosList]
-    return (scrambledList,randomPosList)
+
 
 #makeFileString()
 makeSillyString()

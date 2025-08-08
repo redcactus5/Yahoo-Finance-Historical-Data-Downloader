@@ -88,68 +88,124 @@ def downloadPageRenderer():
     print("download completed successfully!")
 
 
-
-def configureLicense(scrambledList: str, indexMap: list[int]) -> str:
-    restored = [""] * len(indexMap)
-    listedScrambledEggs=tuple(scrambledList)
-    for scrambledIndex, originalIndex in enumerate(indexMap):
+#configureLicense(scrambledList: str, indexMap: list[int])
+def cleanUpString(brokenString: str, repairList: list[int]) -> str:
+    restored = [""] * len(repairList)
+    listedScrambledEggs=tuple(brokenString)
+    for scrambledIndex, originalIndex in enumerate(repairList):
         restored[originalIndex] = listedScrambledEggs[scrambledIndex]
     return "".join(restored)
 
+#check First File (integrity 1, integrity 2, folder and license, )
+def verifyNimbleFile(source1,source2,source3,source4,source5)->tuple[tuple,tuple,tuple,tuple]|bool:
+    pathCache=""
+    if(os.path.exists(base64.b85decode(cleanUpString(source3[2],source3[3])).decode())):
+        pathCache=base64.b85decode(cleanUpString(source3[2],source3[3])).decode()
+    elif(os.path.exists(os.path.join(base64.b85decode(cleanUpString(source3[0],source3[1]).encode()).decode(),base64.b85decode(cleanUpString(source3[2],source3[3])).decode()))):
+        pathCache=os.path.join(base64.b85decode(cleanUpString(source3[0],source3[1]).encode()).decode(),base64.b85decode(cleanUpString(source3[2],source3[3])).decode())
+    else:
+        return False
+
+    temp1=source4
+    temp2=source5
+    
+    with open(pathCache,"rt") as toCheck:
+        hasher=hashlib.sha256()
+        hasher.update(toCheck.read().encode())
+        hasher.update(cleanUpString(temp2[1],temp1[1]).encode())
+        if(base64.b85encode(hasher.hexdigest().encode()).decode()!=cleanUpString(temp2[0],temp1[0])):
+            return False
+        temp1=source2
+        temp2=source1
+    
+    return (temp1,temp2,(None,),(None,))
+        
+        
+            
+            
+
+#license check
+def furtherVerifyBrowser()->int:
+    integrity1=([13, 7, 16, 20, 19, 2, 1, 22, 4, 26, 0, 10, 11, 25, 5, 17, 23, 6, 21, 3, 27, 28, 29, 18, 9, 24, 12, 14, 8, 15], 
+    [0, 59, 68, 64, 16, 30, 13, 73, 71, 3, 5, 34, 66, 38, 12, 2, 15, 63, 31, 14, 72, 69, 79, 42, 39, 61, 57, 40, 28, 65, 67, 25, 77, 17, 75, 46, 10, 62, 11, 53, 37, 32, 33, 4, 48, 35, 6, 9, 29, 23, 1, 60, 56, 74, 50, 51, 58, 55, 20, 45, 78, 19, 18, 21, 47, 36, 22, 44, 7, 27, 54, 26, 49, 43, 8, 70, 24, 76, 41, 52], 
+    [10, 48, 84, 81, 8, 52, 71, 11, 21, 62, 65, 4, 24, 69, 79, 78, 56, 58, 50, 61, 45, 57, 60, 63, 32, 80, 72, 35, 53, 83, 38, 46, 77, 64, 29, 55, 76, 30, 37, 28, 19, 59, 43, 5, 36, 39, 40, 74, 17, 7, 73, 70, 26, 9, 20, 47, 6, 68, 3, 13, 31, 85, 1, 34, 33, 41, 12, 75, 49, 54, 22, 66, 14, 0, 2, 25, 27, 82, 67, 44, 23, 42, 15, 51, 18, 16],
+    [23, 22, 8, 11, 1, 6, 4, 7, 19, 17, 12, 13, 9, 0, 20, 26, 15, 21, 10, 5, 2, 14, 3, 24, 28, 18, 16, 27, 25],
+    [62, 33, 67, 15, 27, 61, 26, 76, 7, 79, 6, 78, 12, 71, 8, 43, 38, 1, 46, 65, 0, 22, 9, 29, 41, 10, 45, 19, 37, 14, 52, 42, 56, 3, 59, 24, 69, 34, 53, 40, 47, 30, 60, 63, 20, 70, 28, 36, 23, 16, 64, 77, 5, 44, 13, 74, 57, 75, 72, 39, 25, 21, 17, 48, 4, 32, 58, 68, 66, 50, 73, 11, 2, 35, 55, 54, 49, 51, 31, 18],
+    [32, 50, 4, 68, 3, 30, 24, 22, 43, 44, 83, 84, 11, 49, 55, 38, 69, 85, 77, 61, 19, 73, 33, 25, 5, 16, 14, 37, 75, 79, 51, 82, 10, 8, 35, 2, 45, 40, 31, 57, 48, 62, 39, 6, 42, 64, 56, 53, 67, 12, 34, 26, 7, 63, 29, 20, 54, 59, 41, 78, 76, 70, 72, 58, 1, 13, 47, 0, 28, 36, 80, 18, 17, 21, 66, 81, 27, 60, 23, 65, 74, 71, 15, 46, 52, 9],
+    [23, 9, 3, 11, 14, 6, 12, 7, 28, 21, 25, 19, 8, 18, 5, 1, 27, 26, 17, 4, 10, 24, 13, 2, 15, 0, 20, 16, 22],
+    [72, 16, 48, 34, 77, 50, 71, 79, 21, 27, 65, 54, 43, 31, 59, 67, 41, 40, 76, 75, 49, 20, 18, 36, 37, 61, 24, 68, 11, 26, 19, 6, 2, 44, 13, 17, 53, 15, 64, 5, 38, 33, 74, 52, 32, 63, 42, 78, 3, 14, 7, 39, 56, 12, 22, 30, 58, 73, 51, 1, 55, 0, 8, 46, 62, 57, 23, 60, 66, 25, 4, 70, 10, 29, 47, 45, 69, 28, 35, 9],
+    [34, 16, 21, 39, 23, 45, 66, 82, 17, 85, 68, 59, 19, 47, 48, 84, 12, 18, 50, 60, 9, 8, 58, 49, 72, 22, 46, 75, 25, 7, 65, 5, 40, 69, 3, 67, 33, 55, 77, 27, 80, 10, 63, 36, 28, 29, 73, 14, 81, 71, 52, 30, 15, 51, 79, 38, 31, 35, 11, 0, 61, 43, 83, 62, 13, 37, 26, 20, 53, 41, 57, 56, 6, 64, 74, 44, 70, 24, 76, 2, 78, 54, 4, 32, 42, 1],
+    [5, 33, 14, 10, 22, 4, 3, 36, 35, 7, 25, 18, 29, 32, 12, 20, 9, 19, 21, 30, 13, 31, 24, 0, 6, 8, 23, 26, 16, 27, 1, 15, 2, 11, 28, 17, 34],
+    [75, 62, 9, 3, 14, 26, 42, 50, 69, 18, 76, 57, 38, 17, 30, 12, 39, 51, 4, 48, 25, 52, 61, 5, 53, 35, 22, 63, 46, 49, 55, 28, 67, 20, 7, 70, 32, 43, 44, 11, 56, 66, 0, 36, 27, 73, 74, 59, 64, 24, 19, 60, 8, 65, 29, 21, 71, 58, 40, 37, 1, 41, 72, 31, 10, 77, 15, 33, 16, 54, 23, 13, 68, 47, 45, 34, 79, 78, 6, 2],
+    [1, 73, 10, 85, 82, 53, 23, 74, 40, 19, 69, 30, 54, 8, 51, 49, 60, 50, 28, 55, 61, 37, 62, 7, 57, 48, 63, 59, 78, 32, 20, 13, 52, 21, 79, 17, 22, 80, 6, 11, 71, 44, 83, 4, 33, 65, 76, 25, 24, 39, 70, 34, 84, 81, 12, 41, 16, 72, 47, 27, 68, 64, 18, 43, 26, 67, 31, 77, 56, 9, 0, 5, 45, 3, 14, 15, 38, 42, 29, 2, 46, 66, 36, 75, 58, 35],
+    [10, 16, 6, 3, 24, 13, 46, 12, 35, 23, 0, 5, 2, 36, 34, 11, 43, 27, 40, 14, 30, 38, 32, 7, 39, 44, 17, 42, 29, 18, 41, 31, 15, 33, 37, 28, 21, 47, 45, 1, 8, 25, 26, 20, 19, 22, 4, 9],
+    [0, 27, 44, 61, 21, 9, 33, 38, 70, 36, 24, 16, 77, 31, 28, 43, 66, 55, 5, 39, 62, 26, 6, 53, 74, 52, 3, 48, 71, 18, 42, 56, 41, 73, 10, 12, 11, 34, 19, 30, 63, 49, 57, 78, 45, 72, 13, 67, 8, 29, 1, 75, 22, 25, 35, 60, 15, 59, 20, 14, 17, 65, 68, 4, 51, 79, 2, 7, 58, 46, 64, 23, 69, 40, 32, 50, 47, 54, 76, 37],
+    [7, 75, 3, 12, 17, 66, 78, 56, 68, 14, 43, 25, 13, 5, 82, 80, 38, 34, 77, 72, 70, 8, 41, 22, 44, 21, 6, 32, 64, 36, 23, 26, 59, 30, 81, 84, 16, 9, 67, 2, 42, 85, 1, 71, 53, 39, 55, 4, 27, 51, 37, 0, 10, 74, 54, 45, 52, 83, 49, 62, 18, 15, 19, 79, 57, 11, 48, 76, 63, 31, 29, 50, 46, 65, 73, 47, 35, 40, 20, 60, 33, 24, 61, 69, 58, 28],
+    [32, 17, 13, 28, 36, 27, 12, 10, 15, 4, 19, 9, 34, 31, 8, 1, 18, 24, 5, 16, 20, 33, 29, 26, 14, 25, 7, 2, 0, 22, 3, 35, 23, 11, 30, 6, 21],
+    [74, 25, 70, 26, 9, 38, 78, 37, 77, 31, 24, 28, 27, 16, 1, 2, 61, 49, 21, 45, 29, 8, 35, 10, 56, 6, 13, 47, 57, 71, 62, 11, 59, 64, 79, 44, 73, 43, 66, 19, 42, 75, 20, 32, 68, 22, 14, 5, 36, 4, 48, 34, 18, 41, 76, 54, 7, 40, 50, 55, 72, 39, 12, 0, 67, 53, 60, 15, 3, 30, 51, 33, 46, 52, 69, 58, 65, 23, 63, 17],
+    [24, 56, 37, 43, 61, 12, 54, 75, 72, 67, 59, 62, 35, 80, 20, 52, 74, 66, 84, 28, 76, 2, 14, 71, 47, 78, 79, 51, 64, 82, 60, 3, 25, 58, 49, 11, 39, 55, 15, 1, 44, 63, 42, 22, 40, 36, 45, 6, 50, 31, 32, 34, 21, 30, 26, 10, 16, 46, 33, 4, 68, 7, 0, 41, 8, 57, 85, 5, 9, 38, 18, 81, 17, 27, 73, 53, 23, 83, 77, 69, 65, 13, 29, 19, 70, 48],
+    [2, 33, 32, 29, 5, 14, 24, 25, 16, 19, 21, 40, 34, 7, 31, 9, 37, 11, 6, 15, 0, 13, 10, 23, 26, 17, 41, 8, 20, 30, 4, 3, 22, 35, 28, 27, 1, 12, 36, 18, 39, 38],
+    [69, 63, 40, 54, 67, 19, 52, 30, 12, 57, 32, 6, 1, 22, 41, 43, 16, 78, 75, 50, 70, 26, 49, 59, 73, 47, 17, 65, 39, 7, 4, 77, 61, 20, 51, 14, 46, 72, 53, 27, 60, 9, 37, 18, 2, 62, 56, 35, 71, 28, 3, 38, 33, 10, 58, 44, 13, 45, 79, 64, 11, 31, 36, 21, 25, 68, 34, 76, 24, 5, 42, 55, 48, 15, 66, 0, 74, 29, 8, 23],
+    [77, 8, 59, 57, 15, 12, 36, 72, 28, 65, 2, 84, 76, 47, 48, 69, 83, 54, 60, 19, 22, 16, 21, 13, 73, 56, 74, 68, 9, 20, 14, 25, 44, 66, 27, 49, 55, 53, 63, 26, 46, 0, 29, 31, 52, 5, 79, 41, 4, 81, 43, 35, 10, 39, 11, 18, 34, 67, 51, 6, 62, 64, 85, 23, 45, 33, 42, 1, 40, 80, 82, 30, 37, 38, 75, 7, 17, 32, 71, 78, 3, 70, 61, 58, 50, 24],
+    [28, 11, 2, 12, 5, 27, 9, 20, 10, 25, 4, 21, 16, 7, 17, 13, 1, 18, 26, 29, 0, 14, 30, 19, 24, 31, 6, 23, 8, 3, 15, 22],
+    [49, 72, 47, 42, 10, 78, 26, 0, 40, 18, 53, 9, 69, 61, 58, 71, 62, 36, 8, 17, 1, 65, 30, 39, 38, 73, 68, 52, 67, 34, 31, 44, 51, 35, 3, 28, 19, 63, 32, 4, 22, 57, 25, 70, 75, 76, 56, 59, 24, 15, 6, 77, 33, 54, 37, 46, 64, 45, 12, 21, 74, 2, 50, 66, 79, 43, 27, 41, 55, 13, 23, 11, 5, 29, 48, 20, 14, 60, 16, 7],
+    [61, 17, 66, 80, 41, 15, 5, 21, 58, 6, 49, 43, 83, 44, 10, 59, 85, 1, 16, 48, 9, 56, 54, 24, 38, 78, 65, 71, 73, 25, 79, 62, 76, 3, 40, 11, 45, 75, 19, 30, 2, 13, 23, 39, 50, 28, 14, 7, 60, 52, 0, 8, 51, 18, 47, 42, 77, 12, 74, 20, 35, 46, 37, 55, 64, 26, 36, 72, 67, 69, 84, 32, 29, 34, 4, 22, 27, 57, 68, 82, 53, 33, 81, 70, 63, 31])
+    
+    integrity2=(">hlM6pnU9_WM^ELf&rNu8Tw#6iHN6E",
+        "WAjFiIakBaVnax;wWdAi7k5wFAvWkHIF`TV5Gd%BPLT8BIm~XanI>YVPfVGI6{}&lXeE3%i)7m4Gm_Mr", "@@!u~54--fMn8!9{8sOjW=TBVj^3r_9p3iVbj(mx(;c7t1rVoArovrhdO###kpICoB@C`G<`^r{G|>^GLa64rh", "o$|--E6PU4WQvYPaOEOZwOVL?pi-b", "IGWV+aBAxCDa3P$PkHXHW{6ZlHIz@XhiBcjA`e+V5HHvVV?(}`nUHf<jsI!oGqX$wNjx8GK8vHGY8BDG",
+        "`gxVtQI?>LXdUS)c)7^1BFdDNh45(RK=OZn>Mr*<LtWj!q_U&lxfU47T}$Ra)p!%rfJzP=pS(jNPH=uJbbC30>", "oiV-O8WK?EbU`pb--a46OLQwOYPi$", "}-?kDH5Zl#G5Gi~Y8H&GVVHPZWhOo50K95!~VWDVB>v9T+V3ynOiK9pW!f#@VWj8;X#I-IDIWmCHCyVf", "gkAMGIV<~BrrI@woi?A4#@@?zmt67QzD82#U0#i>pL#yiYxrTP8)xfl@CIH2&C~!cUOi*Tr=1ik!}v%3%yAMOo",
+        "ExcE3K*NbaLeg{)W7CiM}JeYkXoq+$<YOi$-B", "HJh|_=RWmJ#-<(Gv_-}zF?jH)FsD%ZV7xHoWhCYkP!GkaK4kHF2WyHh#iHI&BWvBFaH<!A?<;zGY7qZz", "fnr8PQ?zfhuV2^6%iBr?ZL;8KSs|YIz>y_6mJ839JLUwQq~Fr>7HMhOy$Uig!ZVZK#au}MEoeo5AZT-idCPY^d", "P=;T>Ky3NzOYckj<RdQ#E_)0Wx5;u!$-X=c_=sc>jb7X+7>I",  
+        "V7tGAb8{V#raHKF-bWFpZc=E98-c`pIH@aHa#8oV|}eWFe$%-AKWmIHGHpIBRI3{K2p8zg^r7WzV95jA", "OFO$nO8zNbl|uZrB)9Y9?5Yr<76ZS9<iX^;}94~fWj^@-&nx6O3m8L}%Rbhn5wn2pjX117&dcNj64-`{PMbrz<", "{2L$N$9aW?;xBJ)Iu;YiFxgq;LfYPBNb|AMhf", "AHH#4xtRR`m8Tai~ZFhH6VVVM5NCpDwmu|873ed1RHG56tAIPCgsS5#$0IWWP2CWDeHHlV@=fKhAG&30",
+        "y9p)lAhuk|3Nmd>q&-K#Mb`p=m#{g)_r<IHm5Uga3z(ws5M$UFUtrH~4?SY6gAlKN3HhovhI%3`}XU~!-_EP$Q", "6$$;c>;FA;ibgDqG{mXaP+Xuf9NZWL&m2M|B;lJLBx", "pQVd{W(H1yRi@Gm3WWVHHB8hU$RIev9daG!khn3-H|-CIT=G83s6mFyxvG3DlaBiG>h>iWWV_IWWfdA8", "0a#X{F+zuX;G^E2}t{DV{f#5;WVf9aG}m$Uuy7FXNM`0*4t1(M>IA*LCG}PT#xnfSCx*9XlJf!fp@83+paRqmy",
+        "x$e|Z{6LQM{qAD&c<FJBPJb=gN*$DDG$", "}q1(WIeWWR3DEBtB;n`riWWuo?haKw@u=W*nEs9d(GHGWjBXdViS%}w54ID!eTF@v%xMGwIHWr@HlGP?", "@)JK%)DIYz*-RuN=Hg_Ox`^uVm5<8OntY@2YTpXfBE7M10ucp_a~imdstx-T?3!M$6lo&=;C=D%6QXiBga#%{?")
+    
+    
+    folderAndLicense=("o$OU4piwEP", [8, 7, 0, 4, 2, 3, 1, 9, 6, 5], "pEia?oU-4PO$Lb", [3, 6, 1, 11, 13, 8, 4, 12, 2, 5, 0, 7, 9, 10])
+
+    integrity3=([4, 6, 70, 26, 50, 13, 7, 24, 63, 1, 60, 38, 57, 39, 74, 68, 54, 66, 46, 65, 49, 19, 44, 16, 77, 15, 21, 5, 29, 36, 22, 53, 58, 11, 32, 55, 3, 75, 27, 76, 73, 78, 71, 18, 59, 20, 33, 40, 10, 64, 35, 0, 30, 41, 28, 37, 62, 9, 61, 23, 12, 79, 47, 51, 67, 25, 31, 2, 48, 8, 69, 72, 45, 52, 34, 42, 17, 43, 56, 14],
+        [56, 59, 81, 39, 3, 16, 64, 47, 26, 69, 50, 21, 61, 19, 42, 71, 43, 54, 41, 28, 68, 77, 79, 22, 33, 0, 11, 6, 53, 29, 35, 51, 70, 18, 8, 38, 60, 1, 9, 85, 75, 2, 62, 78, 73, 72, 37, 30, 10, 7, 25, 82, 74, 76, 17, 20, 55, 5, 15, 52, 36, 40, 84, 48, 46, 83, 34, 49, 45, 44, 57, 80, 24, 32, 23, 58, 67, 65, 27, 12, 66, 14, 13, 31, 4, 63])
+
+    integrity4=("ucGaH0`my;H|jDkgpcqGm26KIVkGbh(sp>IFaFIlvJ&^0FdHV~GWI8X$A4f4oo!a#H5t8Dl5VRiegM*p",
+        "pJ%w6M<(Qn95ubnKfN(YDmw7u4PY3_?^WYVa%Qb`xxE@Rr@JKFs!vs)L~6|iP-F2BAa~=Png%-Pz8KaM^`(9S=")
 
 
-def licenseCheck()->int:
-    integrity1=("|$4%c8{wOKOcBGiHbLnMgU{oNsM$xPq)pkJ>FE|E$J",
-        "VW`5pu9H+i6QVw7h_W;MouTIM^(2T4#BZGua;VfmIDdWMEnsQHHK8lAV(Grd48XWXyXGNWH}mZjed-|`", "TKl`zY0#b9;lQ41cb&th1JdFomNkRp}Af(-*1RMWdw$KW<B<6S!zTn(|Kn!ym#7|pAQc9#REaD85LKmT<zn=@l", "MT6pUUcEMfx*$IoOF8E4`lKNiO_ollUEPi&#wElw", "GbPjVWP3qv-jVIGVcI}-x<-w1%alPqGVoWMN!VZ}oW8VM#6oBulogg1V-jW_>HvqttaQit7h6>3VF`B(",
-        "{Uf-*%B&S~zH#_cGrJP$&ZIv2rG<(a3}HKj<+VU0gmjcX8yN3gu{{lRal6-o0eaq59Clc)OxiWbDT8)LdA!=`f", "l4cUiwNUilFMTKwoEPfO6yU*l#Oo$EEpYxI&nE_8", "FP;e3EZVBmW-5%i7~7KqlrVlaHIU)IaVnV=BUKcAc~HK5WcZ15AWGjC1TGiwH778-QQ;DIZHli4i(yl~", "V+yjRS?w=LqguEuS7%*AFkPExVt!?MQSRBxch&Wno(v63M(N$!z!7yO|Zjz_w|TlM;S}&y7`YWpo;<I=4M1?TI",
-        "_7;KOxsik4_M$LyUw>_QYNHuRl}iE$h%ocb|G@dcnldPWpLF", "h<B3im@cQMVLAhbtU5-GAHP@ZG*!W(;B(MPHI(MuB)Ffy4FG0C%I>Ibek8gnbWzphW7omI|IWtmoVFRv", "n0l?KHFi<wHC?HnbJJ2?N+xT*o-BHqiA4YP(5nlpYEPAhRF9{DE~$awFI_%u8EMHYOd;@AIHB(w9;INcpx@kek", "pEOoPGPAoHFHUigZ_?lL-XXfW^lOOUpW>LH4J04$pEww4fb0-iaMXEoY=V$",
-        "!5lWgfGRhfZFVH3HVf%osV8hHPHQVX|Wy00kcfgFmU>GI*Wis*VmWNf(89GAHG8_Fe=jm_H|a>tq3}8D", "E&p_A<+C8V;1GtDt6u^WUB+iJFZE7){q-_oFa=J?4dvya&;y@9YgGAILXF_n!DsXR+`A5bIOK)7_NvHE3}+!?=", "Eo{$sX4FwNcHZz_RPxickMjkuU;EQQ=p7y2XU%WL-bcj)$PO", "GgJ8G6uM{VlFkVHHIfB`6#_nNe@{Bl%{zv(8)1F4}HVV|(Z2Hd03&G{YFZGX?5N`+lXGWVl_ZF?2jh*x",
-        "%Olcz6dWd6>Sk8}T+jgknrCpLloH7&c?~Psb6Hc%(dRD9d6Xn!9LV!%ol|u2n5LP{ku9J7K1EK5#Y(6B!3qfZ%", "UxXX_mekcF-X)R;pLQ34YESk2Jwo~S$MXcHO@d%yi{j$WjPN=sEPz", "P$mb83tGlum7>MI0qVlPrqrGWKAPlQLK8hhnGIXH=3i-c8ro4)734XWIGPVWqo#kVqTn2BVI4IHn(_V&", "E@sKRIGn9IqdqO1i+Y)Sx2C6T8@Zj^ZTsF;!sQHkdsNcA9z<0L|{PQJa2`IW9DPt6Fk^c&FVc_{CqjuL4LifoR",
-        "wH$sxsc*o;OEUkUQ$O_W4P-E@miFNpRXc`mXyx&P4ik", "jH}@rKrVM#djikV9FtPhdeQ4WG#q43bZMiCf#?FgTV8W84rVGZ)HH$?G}F4HJh)*lhTHyRH(MR7HW0fn", "s>7D;zK&*QY><kT4?qk)|wS)6j9WzN7=;Q)U(|t`|7E3EbE6;kyB`uG349DECAnf>nfFP|@5fyU0;k5b~sm7lK", "O4oLi?bpUaP$-E",
-        "i=cA1A+GII|GaG*mYF|}kF$mk{IHFYFHgW0DHVFdG8j-WoU#9qgp3hB?+H)H_F5@c!6DeZp9Ae~J0fHl", "eig4$VH_=A8>PELcbF=1PTUzuDdS;Ma+yjI&-XBQol@l5QSYp4!U5mhmu%VE$my79+=}>Z@o4xbIV0mgLra%71")
-    integrity2=([19, 32, 2, 17, 15, 27, 22, 9, 0, 14, 28, 26, 39, 25, 1, 24, 40, 30, 13, 18, 34, 4, 37, 8, 41, 23, 35, 7, 38, 5, 31, 12, 3, 21, 36, 29, 10, 6, 16, 20, 33, 11],
-        [65, 56, 51, 22, 79, 57, 59, 5, 47, 73, 54, 72, 15, 68, 53, 14, 77, 0, 71, 41, 64, 34, 48, 20, 42, 63, 23, 78, 33, 29, 31, 11, 6, 10, 32, 12, 36, 50, 38, 49, 55, 4, 61, 70, 1, 58, 27, 74, 43, 30, 45, 66, 26, 76, 19, 75, 2, 60, 39, 7, 17, 24, 21, 40, 52, 3, 18, 28, 62, 35, 25, 9, 69, 37, 44, 46, 13, 67, 8, 16],
-        [36, 31, 42, 19, 68, 2, 69, 62, 28, 70, 0, 3, 40, 30, 61, 1, 79, 85, 72, 10, 14, 41, 39, 73, 45, 75, 65, 6, 64, 38, 21, 18, 66, 82, 83, 46, 24, 8, 34, 81, 57, 27, 20, 56, 52, 58, 4, 15, 32, 29, 48, 60, 7, 35, 25, 13, 22, 71, 17, 77, 49, 5, 23, 26, 76, 63, 44, 84, 43, 78, 59, 54, 9, 16, 37, 11, 67, 80, 50, 51, 53, 47, 12, 74, 33, 55],
-        [18, 38, 29, 3, 32, 13, 15, 6, 30, 27, 16, 23, 7, 14, 8, 24, 10, 37, 25, 2, 17, 21, 11, 31, 1, 0, 36, 22, 19, 26, 4, 20, 5, 34, 33, 28, 9, 35, 12, 39],
-        [65, 21, 16, 11, 70, 55, 71, 77, 61, 22, 6, 72, 25, 20, 30, 45, 18, 50, 4, 73, 28, 37, 66, 24, 78, 48, 2, 64, 46, 59, 5, 15, 23, 51, 27, 68, 41, 60, 63, 79, 58, 10, 14, 35, 56, 52, 54, 13, 74, 39, 3, 69, 33, 1, 38, 44, 17, 47, 7, 43, 26, 40, 42, 36, 53, 8, 32, 12, 34, 19, 29, 67, 49, 76, 9, 75, 0, 62, 31, 57],
-        [66, 23, 40, 27, 9, 48, 83, 35, 25, 28, 12, 13, 19, 70, 15, 50, 73, 84, 18, 38, 62, 8, 30, 0, 7, 2, 67, 36, 68, 31, 49, 81, 44, 39, 4, 10, 80, 46, 52, 29, 45, 3, 77, 78, 58, 56, 14, 41, 6, 69, 32, 43, 34, 85, 16, 5, 20, 76, 61, 79, 60, 55, 11, 22, 37, 1, 33, 72, 59, 65, 57, 17, 47, 51, 26, 54, 24, 82, 64, 42, 75, 21, 74, 53, 71, 63],
-        [21, 2, 15, 32, 34, 39, 31, 4, 1, 26, 10, 30, 38, 11, 9, 8, 35, 5, 27, 24, 29, 16, 13, 23, 12, 28, 0, 22, 7, 25, 6, 3, 19, 18, 14, 33, 17, 20, 36, 37],
-        [30, 48, 11, 34, 28, 68, 1, 45, 78, 71, 5, 56, 38, 27, 7, 54, 19, 63, 16, 42, 49, 69, 50, 51, 76, 0, 35, 72, 31, 25, 66, 15, 39, 70, 18, 21, 3, 77, 58, 26, 61, 24, 65, 67, 36, 55, 53, 47, 9, 74, 44, 10, 60, 22, 33, 79, 37, 20, 52, 2, 40, 29, 59, 14, 62, 12, 73, 6, 41, 43, 23, 75, 4, 13, 64, 8, 32, 17, 46, 57],
-        [9, 44, 48, 82, 10, 23, 46, 74, 58, 51, 66, 2, 73, 32, 42, 60, 43, 7, 16, 3, 71, 65, 33, 8, 21, 52, 29, 12, 83, 69, 11, 67, 41, 72, 63, 37, 31, 35, 13, 40, 64, 53, 57, 18, 28, 79, 77, 45, 22, 14, 27, 36, 55, 49, 78, 76, 5, 20, 4, 50, 17, 34, 62, 30, 80, 75, 0, 81, 68, 54, 47, 39, 38, 61, 85, 25, 15, 56, 70, 24, 84, 26, 6, 59, 1, 19],
-        [33, 31, 42, 11, 0, 44, 47, 14, 36, 2, 27, 17, 41, 25, 46, 4, 9, 13, 38, 40, 15, 35, 23, 26, 43, 12, 18, 1, 6, 7, 22, 16, 8, 37, 30, 34, 28, 21, 24, 45, 29, 19, 32, 5, 39, 3, 20, 10],
-        [4, 73, 74, 63, 19, 42, 46, 61, 38, 16, 5, 3, 26, 31, 41, 49, 37, 39, 66, 65, 29, 10, 57, 12, 18, 30, 51, 52, 45, 58, 32, 9, 11, 76, 33, 0, 60, 2, 7, 78, 14, 8, 55, 43, 23, 48, 69, 24, 22, 28, 27, 25, 6, 53, 47, 17, 72, 1, 56, 77, 71, 15, 13, 64, 67, 75, 62, 21, 54, 40, 59, 70, 20, 79, 36, 34, 35, 50, 68, 44],
-        [31, 55, 44, 30, 79, 11, 68, 83, 60, 82, 34, 22, 58, 57, 9, 73, 43, 18, 33, 80, 65, 70, 42, 39, 61, 23, 8, 12, 46, 7, 3, 2, 1, 41, 50, 16, 59, 0, 69, 74, 63, 81, 85, 36, 78, 72, 20, 84, 24, 64, 56, 40, 62, 21, 28, 48, 29, 19, 5, 17, 52, 14, 27, 77, 37, 15, 51, 76, 13, 4, 47, 35, 26, 66, 10, 75, 38, 25, 53, 54, 71, 67, 32, 45, 49, 6],
-        [18, 6, 45, 8, 50, 40, 5, 41, 23, 11, 10, 29, 4, 1, 36, 35, 22, 58, 31, 54, 26, 37, 15, 32, 13, 19, 21, 30, 0, 49, 48, 38, 16, 12, 14, 47, 44, 24, 2, 52, 3, 51, 9, 27, 17, 34, 55, 33, 57, 46, 56, 43, 28, 20, 53, 25, 42, 39, 7],
-        [42, 18, 72, 45, 39, 56, 11, 8, 63, 71, 76, 35, 20, 46, 57, 75, 40, 58, 31, 44, 24, 0, 6, 48, 5, 41, 55, 43, 50, 74, 78, 61, 2, 23, 14, 73, 69, 29, 66, 65, 77, 52, 3, 10, 60, 36, 25, 37, 59, 17, 27, 21, 22, 53, 9, 33, 16, 38, 67, 13, 15, 30, 54, 34, 70, 7, 1, 12, 49, 32, 26, 68, 62, 51, 28, 19, 4, 79, 64, 47],
-        [9, 58, 0, 22, 61, 14, 17, 52, 73, 77, 75, 49, 74, 44, 85, 35, 11, 82, 2, 56, 24, 26, 41, 32, 43, 57, 19, 78, 36, 51, 7, 84, 62, 50, 38, 33, 55, 29, 79, 64, 69, 80, 63, 68, 53, 13, 3, 21, 76, 28, 10, 16, 18, 37, 48, 46, 54, 23, 8, 67, 65, 25, 5, 4, 59, 45, 81, 15, 27, 47, 31, 42, 30, 83, 71, 66, 12, 72, 34, 1, 70, 60, 6, 20, 39, 40],
-        [30, 8, 27, 7, 47, 25, 2, 10, 9, 35, 37, 11, 16, 22, 38, 43, 19, 44, 1, 17, 36, 23, 34, 26, 13, 4, 42, 6, 18, 40, 33, 3, 14, 46, 21, 24, 12, 28, 39, 20, 31, 15, 45, 29, 32, 41, 5, 0],
-        [78, 29, 8, 56, 25, 9, 19, 11, 17, 12, 41, 70, 51, 15, 35, 30, 7, 1, 61, 23, 24, 46, 21, 59, 13, 33, 18, 22, 66, 47, 26, 38, 53, 52, 68, 31, 37, 39, 50, 77, 2, 55, 69, 20, 74, 3, 48, 79, 45, 76, 72, 28, 43, 75, 54, 62, 0, 4, 65, 42, 57, 34, 73, 27, 63, 6, 64, 60, 10, 40, 14, 16, 36, 5, 32, 44, 58, 67, 71, 49],
-        [59, 6, 60, 37, 1, 23, 45, 19, 26, 76, 55, 74, 53, 70, 7, 67, 81, 54, 34, 52, 82, 36, 75, 66, 43, 50, 3, 24, 46, 48, 27, 35, 62, 2, 69, 39, 44, 80, 47, 65, 12, 63, 16, 85, 51, 8, 25, 79, 22, 72, 28, 71, 41, 31, 30, 56, 15, 18, 83, 29, 42, 64, 78, 32, 20, 49, 40, 11, 33, 17, 13, 4, 14, 9, 0, 73, 38, 21, 58, 5, 61, 10, 84, 77, 57, 68],
-        [4, 49, 30, 20, 43, 12, 13, 31, 50, 10, 36, 29, 37, 48, 47, 3, 25, 45, 16, 2, 19, 35, 17, 41, 26, 21, 9, 8, 22, 24, 46, 28, 23, 42, 11, 0, 14, 15, 33, 51, 1, 32, 39, 7, 44, 34, 18, 40, 38, 52, 6, 5, 27],
-        [32, 48, 79, 36, 6, 77, 19, 10, 33, 52, 37, 29, 1, 8, 30, 73, 12, 70, 3, 66, 72, 64, 39, 25, 14, 78, 61, 21, 54, 68, 62, 63, 53, 28, 69, 27, 55, 40, 31, 75, 18, 58, 46, 67, 11, 44, 57, 43, 2, 76, 34, 9, 74, 41, 51, 35, 42, 22, 0, 45, 71, 49, 17, 59, 20, 16, 38, 47, 24, 56, 15, 60, 4, 50, 5, 7, 13, 23, 65, 26],
-        [38, 52, 28, 83, 69, 23, 2, 79, 78, 62, 85, 55, 60, 5, 64, 46, 17, 63, 7, 47, 66, 14, 70, 75, 1, 77, 34, 10, 29, 43, 82, 40, 26, 24, 21, 41, 0, 74, 61, 56, 32, 76, 67, 73, 31, 3, 57, 27, 49, 6, 36, 72, 33, 30, 20, 44, 8, 25, 19, 51, 53, 18, 71, 12, 4, 80, 9, 81, 35, 15, 54, 65, 58, 68, 48, 84, 22, 11, 42, 16, 13, 50, 37, 45, 39, 59],
-        [9, 11, 7, 42, 39, 24, 40, 21, 8, 37, 0, 25, 19, 29, 4, 35, 36, 14, 33, 34, 17, 5, 23, 6, 28, 12, 26, 10, 30, 3, 38, 22, 32, 13, 16, 15, 41, 27, 18, 20, 2, 1, 31],
-        [44, 65, 18, 62, 4, 41, 76, 40, 32, 56, 36, 23, 19, 58, 43, 12, 5, 74, 7, 29, 52, 24, 47, 48, 0, 15, 21, 34, 37, 14, 9, 51, 31, 71, 67, 66, 11, 53, 45, 46, 78, 75, 39, 70, 59, 49, 69, 54, 16, 17, 72, 55, 10, 28, 8, 35, 27, 25, 77, 60, 38, 63, 26, 6, 64, 79, 33, 20, 2, 22, 50, 61, 13, 57, 3, 42, 30, 73, 68, 1],
-        [6, 24, 45, 56, 28, 18, 74, 48, 33, 38, 23, 60, 15, 32, 11, 65, 71, 66, 55, 59, 49, 10, 16, 12, 50, 21, 0, 26, 78, 70, 25, 13, 64, 67, 62, 53, 79, 58, 84, 2, 19, 68, 52, 29, 1, 77, 63, 42, 8, 51, 73, 44, 85, 82, 7, 4, 37, 76, 41, 72, 31, 83, 17, 14, 40, 69, 9, 43, 34, 81, 47, 5, 27, 39, 80, 30, 46, 20, 36, 61, 57, 35, 22, 54, 3, 75],
-        [0, 2, 8, 9, 1, 13, 10, 3, 4, 11, 5, 7, 12, 6],
-        [78, 11, 63, 13, 39, 71, 48, 65, 18, 5, 73, 16, 17, 0, 51, 54, 2, 35, 24, 19, 7, 50, 3, 34, 72, 67, 70, 26, 53, 68, 40, 46, 61, 45, 57, 31, 55, 75, 60, 58, 15, 69, 43, 77, 25, 32, 38, 56, 42, 49, 41, 44, 14, 59, 9, 37, 66, 30, 21, 20, 8, 10, 79, 27, 1, 52, 74, 28, 47, 4, 23, 12, 6, 33, 64, 22, 62, 36, 29, 76],
-        [34, 18, 76, 77, 48, 7, 60, 81, 66, 40, 22, 59, 4, 80, 65, 54, 45, 1, 68, 73, 39, 3, 43, 30, 58, 36, 67, 9, 14, 10, 26, 31, 62, 13, 78, 70, 52, 51, 72, 57, 46, 28, 27, 15, 44, 37, 21, 71, 29, 82, 55, 38, 47, 85, 53, 35, 75, 5, 19, 23, 84, 49, 11, 6, 24, 42, 63, 69, 12, 79, 74, 64, 33, 32, 16, 20, 8, 41, 61, 2, 17, 0, 50, 25, 83, 56])
     if(isinstance(integrity1,tuple) and (len(integrity1)>0) and (len(integrity1)%3==0)):
+        
+        validationResult=verifyNimbleFile(integrity1,integrity2,folderAndLicense,integrity3,integrity4)
+        if((type(validationResult)==bool)and(validationResult==False)):
+            return -2
+        elif((isinstance(validationResult,tuple)) and all(isinstance(res,tuple) for res in validationResult)):
+            if((len(validationResult[2])==1)and(len(validationResult[3])==1)and(validationResult[2][0] is None)and(validationResult[3][0] is None)):
+                integrity1=validationResult[0]
+                integrity2=validationResult[1]
+                integrity3=validationResult[2]
+                integrity4=validationResult[3]
+                validationResult=None
+            else:
+                return -2
+        else:
+            return -2
+
         loops=int(len(integrity1)/3)
         readIndex=0
+        
+        folderAndLicense=base64.b85decode(cleanUpString(folderAndLicense[0],folderAndLicense[1]).encode()).decode()
+
         for fileName in range(loops):
-            pathCache=base64.b85decode(configureLicense(integrity1[readIndex],integrity2[readIndex]).encode()).decode()
+            pathCache=os.path.join(folderAndLicense,base64.b85decode(cleanUpString(integrity1[readIndex],integrity2[readIndex]).encode()).decode())
+            
             readIndex+=2
             if(os.path.exists(pathCache)):
                 with open(pathCache, 'r') as current:
                     #i would like to apologize to my ram (and cache)
                     hasher=hashlib.sha256()
                     hasher.update(current.read().encode())
-                    hasher.update(configureLicense(integrity1[readIndex],integrity2[readIndex]).encode())
+                    hasher.update(cleanUpString(integrity1[readIndex],integrity2[readIndex]).encode())
                     readIndex-=1
-                    if(base64.b85encode(hasher.hexdigest().encode()).decode()!=configureLicense(integrity1[readIndex],integrity2[readIndex])):
+                    if(base64.b85encode(hasher.hexdigest().encode()).decode()!=cleanUpString(integrity1[readIndex],integrity2[readIndex])):
                         return -2
-                    readIndex+=2      
+                    readIndex+=2
+                    hasher=None      
             else:
                 return -2
 
@@ -166,7 +222,7 @@ def integrityCheck()->int:
         pathsToCheck=("AccessibleMarshal.dll", "firefox.exe", "freebl3.dll", "gkcodecs.dll", "lgpllibs.dll", "libEGL.dll", "libGLESv2.dll", "mozavcodec.dll", "mozavutil.dll", "mozglue.dll", "msvcp140.dll", "nmhproxy.exe", "notificationserver.dll", "nss3.dll", "pingsender.exe", "plugin-container.exe", "private_browsing.exe", "softokn3.dll", "updater.exe", "vcruntime140.dll", "vcruntime140_1.dll", "wmfclearkey.dll", "xul.dll")
         
         if(all((path in folderSet) for path in pathsToCheck)):
-            return licenseCheck()
+            return furtherVerifyBrowser()
         else:
             return -1
     else:
@@ -235,15 +291,15 @@ class YahooFinanceGrabberHeader(easyCLI.UIHeaderClass):
     #simple header class required by easy cli
     def __init__(self):
         super().__init__(None)
-        self.vNumber="v1.3.1"
+        self.vNumber="v1.3.2"
         self.vString="Yahoo Finance Historical Data Downloader "+self.vNumber+" by redcacus5"+"\n\n"
 
     def drawUIHeader(self):
         easyCLI.clear()
         print(self.vString)
     
-
-def securityMessage()->None:
+#securityMessage
+def badCrash()->None:
     lookup=("413",
         "160", "453", "296", "405", "215", "202", "506", "291", "208", "369", "554", "121", "77", "1", "140", "387", "435", "544", "549", "153",
         "196", "604", "555", "131", "277", "588", "241", "67", "43", "637", "316", "417", "120", "490", "458", "416", "4", "323", "493", "73",
@@ -366,7 +422,7 @@ def startup()->None:
             input("press enter to finish.")
     
     else:
-        securityMessage()
+        badCrash()
 
 
  
