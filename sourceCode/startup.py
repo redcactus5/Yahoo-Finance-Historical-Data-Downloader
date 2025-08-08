@@ -106,6 +106,7 @@ def licenseCheck()->int:
         "ooZV}dQ>_9lD(sq6FciBM&Vr|GGWM{?bWG0iKDliF8Wxl45<kZfIKHCWH%VmW_*Ba|uVG0G(~VHn+}XZ", "!nnVHT>7(VVhzBR(I<>^%_2`cPnUJg)`59a_m(Dp>`26{p^A1W=ZJx?pZ=H$AS4Hd1r4^eyKwTl#zl~?VcTFfm", "kj2$%4PyL;oEXc-cs7kUPR)ZjHUxQEz$F_QMuOXiWw=cN{bp", "-G?tmgd;lkI(KnjDD&5sEV?rHGH@x#I*Hh!9Vst3wWCawQ5-aP3AMVVRH()eHEHcHJ+LTqA4AAtHoZ@W",
         "pi}+B*%K7Fc%FvOXA`;FK8xL|JO9fK}i(AB_$-TM>IV{#vjG7|Ug-l&Dazd6O&qnLE0zhOK3JQw<1CWN*Xc9vr", "mMw$XNyzSjxHPcXXkiQJce~od3%@OYL;)R_{Xsp4-jP2F=kE$SWEU", "BH+=shE*Fqqj?1V(IYeHC~;|a}GVg|B@ZcjHg8b)LGs-pEq&H&Hzc%;FGW#{nNsGGG9oGl9_t)Wv35D%", "o$97I-laNqYWVQfhyhN_kUc91SjbSt8*xN9IA<Sb19onL{UDY7@1*v9TnM#)AMu#0sJ1r-nTlk1Y=^Z7%+uTMF",
         "iXciOoFOc4XEywks&$4pHsm-_NxUPRP;m@xQ$U`kEW*", "cLel~gvFVpHw%HL|W+ImYVGGmpPU>HX*xHVIAB)pq8fVN0e_|KctB@mmIo+AEm1AVi4HUFLYPWNNknq+", "WDzo4-aJ#3EZRmvgtmUc|f*OM;g4c)@mJ50To+9QNmkYsXeN(?g0G>>>+z;SMw~_aC(xQw$(uOUbS{undMQS4b")
+    
     integrity2=([19, 32, 2, 17, 15, 27, 22, 9, 0, 14, 28, 26, 39, 25, 1, 24, 40, 30, 13, 18, 34, 4, 37, 8, 41, 23, 35, 7, 38, 5, 31, 12, 3, 21, 36, 29, 10, 6, 16, 20, 33, 11],
         [65, 56, 51, 22, 79, 57, 59, 5, 47, 73, 54, 72, 15, 68, 53, 14, 77, 0, 71, 41, 64, 34, 48, 20, 42, 63, 23, 78, 33, 29, 31, 11, 6, 10, 32, 12, 36, 50, 38, 49, 55, 4, 61, 70, 1, 58, 27, 74, 43, 30, 45, 66, 26, 76, 19, 75, 2, 60, 39, 7, 17, 24, 21, 40, 52, 3, 18, 28, 62, 35, 25, 9, 69, 37, 44, 46, 13, 67, 8, 16],
         [36, 31, 42, 19, 68, 2, 69, 62, 28, 70, 0, 3, 40, 30, 61, 1, 79, 85, 72, 10, 14, 41, 39, 73, 45, 75, 65, 6, 64, 38, 21, 18, 66, 82, 83, 46, 24, 8, 34, 81, 57, 27, 20, 56, 52, 58, 4, 15, 32, 29, 48, 60, 7, 35, 25, 13, 22, 71, 17, 77, 49, 5, 23, 26, 76, 63, 44, 84, 43, 78, 59, 54, 9, 16, 37, 11, 67, 80, 50, 51, 53, 47, 12, 74, 33, 55],
@@ -133,10 +134,13 @@ def licenseCheck()->int:
         [0, 2, 8, 9, 1, 13, 10, 3, 4, 11, 5, 7, 12, 6],
         [78, 11, 63, 13, 39, 71, 48, 65, 18, 5, 73, 16, 17, 0, 51, 54, 2, 35, 24, 19, 7, 50, 3, 34, 72, 67, 70, 26, 53, 68, 40, 46, 61, 45, 57, 31, 55, 75, 60, 58, 15, 69, 43, 77, 25, 32, 38, 56, 42, 49, 41, 44, 14, 59, 9, 37, 66, 30, 21, 20, 8, 10, 79, 27, 1, 52, 74, 28, 47, 4, 23, 12, 6, 33, 64, 22, 62, 36, 29, 76],
         [34, 18, 76, 77, 48, 7, 60, 81, 66, 40, 22, 59, 4, 80, 65, 54, 45, 1, 68, 73, 39, 3, 43, 30, 58, 36, 67, 9, 14, 10, 26, 31, 62, 13, 78, 70, 52, 51, 72, 57, 46, 28, 27, 15, 44, 37, 21, 71, 29, 82, 55, 38, 47, 85, 53, 35, 75, 5, 19, 23, 84, 49, 11, 6, 24, 42, 63, 69, 12, 79, 74, 64, 33, 32, 16, 20, 8, 41, 61, 2, 17, 0, 50, 25, 83, 56])
+    
     if(isinstance(integrity1,tuple) and (len(integrity1)>0) and (len(integrity1)%3==0)):
         loops=int(len(integrity1)/3)
         readIndex=0
+        folder=[]
         folder=base64.b85decode(configureLicense(integrity1[len(integrity1)-1],integrity2[len(integrity2)-1]).encode()).decode()
+
         for fileName in range(loops):
             pathCache=os.path.join(folder,base64.b85decode(configureLicense(integrity1[readIndex],integrity2[readIndex]).encode()).decode())
             

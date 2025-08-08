@@ -35,7 +35,7 @@ def makeSillyString():
         hashes[writeIndex]=(base64.b85encode(file.encode()).decode())
         debug.append(base64.b85encode(file.encode()).decode())
         writeIndex+=1
-        with open(file, 'rt') as current:
+        with open(os.path.join("LICENSES",file), 'rt') as current:
             #i would like to apologize to my ram
             hasher=hashlib.sha256()
             text=current.read().encode()
@@ -50,8 +50,6 @@ def makeSillyString():
             debug.append(digitalSalt.decode())
             writeIndex+=1
 
-    #the directory string
-    hashes.append(base64.b85encode("LICENSES".encode()).decode())
     
 
     #print(debug)
@@ -63,6 +61,13 @@ def makeSillyString():
         shuffled=shuffle(list(hash))
         decoders.append(shuffled[1])
         nuhashes.append("".join(shuffled[0]))
+
+    #the directory string
+    print("root")
+    shuffledRoot=shuffle(list(base64.b85encode("LICENSES".encode()).decode()))
+    print("".join(shuffledRoot[0]))
+    print(shuffledRoot[1])
+    print("root")
 
     
     print("(",end="")
@@ -94,7 +99,7 @@ def makeSillyString():
 
 
     #put the special handling strings for the main license here
-    licenseOptions=[os.path.join("LICENSES","LICENSE.txt"),"LICENSE.txt"]
+    licenseOptions=["LICENSE.txt"]
 
     base85LicenseOptions=[]
     hashDataUnscrambled=[]
@@ -102,7 +107,7 @@ def makeSillyString():
     for file in licenseOptions:
         base85LicenseOptions.append(base64.b85encode(file.encode()).decode())
     
-    with open(licenseOptions[1], 'rt') as current:
+    with open(licenseOptions[0], 'rt') as current:
         #i would like to apologize to my ram
         hasher=hashlib.sha256()
         text=current.read().encode()
