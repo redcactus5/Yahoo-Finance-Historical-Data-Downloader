@@ -144,10 +144,10 @@ def makeSillyString():
 
 
     shuffledRoot=shuffle(list(base64.b85encode("LICENSES".encode()).decode()))
-    print("[\""+"".join(shuffledRoot[0])+"\", ",end="")
+    print("(\""+"".join(shuffledRoot[0])+"\", ",end="")
     print(str(shuffledRoot[1])+", ",end="")
     print("\""+scrambled+"\", ",end="")
-    print(str(descramble)+"]")
+    print(str(descramble)+")")
     print("end main file\n\n")
 
 
