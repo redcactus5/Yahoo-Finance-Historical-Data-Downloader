@@ -3,7 +3,19 @@ import base64
 import random
 import string
 import os
-import random
+
+def shuffle(inputList:list[str])->tuple[list[str],list[int]]:
+    #make a copy of our input
+    copyList=inputList.copy()
+    #create a list of indexes
+    randomPosList=list(range(len(copyList)))
+    #shuffle it
+    random.shuffle(randomPosList)
+    #put the items in copyList in the shuffled order
+    scrambledList = [copyList[i] for i in randomPosList]
+    return (scrambledList,randomPosList)
+
+
 def makeSalt():
     saltMine=list("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~")
 
@@ -137,6 +149,8 @@ def makeSillyString():
     print("end main file\n\n")
 
 
+    
+    print("main license data:")
     print("(",end="")
     for index,name in enumerate(mainLicenseHashes):
         print("\""+name+"\"",end="")
@@ -159,7 +173,7 @@ def makeSillyString():
             
         else:
             message5.append(")")
-    print("\n"*2)
+    print()
     print("".join(message5))
 
     print("\n"*2)
@@ -199,16 +213,7 @@ def makeFileString():
     
     print("".join(displayList))
         
-def shuffle(inputList:list[str])->tuple[list[str],list[int]]:
-    #make a copy of our input
-    copyList=inputList.copy()
-    #create a list of indexes
-    randomPosList=list(range(len(copyList)))
-    #shuffle it
-    random.shuffle(randomPosList)
-    #put the items in copyList in the shuffled order
-    scrambledList = [copyList[i] for i in randomPosList]
-    return (scrambledList,randomPosList)
+
 
 #makeFileString()
 makeSillyString()

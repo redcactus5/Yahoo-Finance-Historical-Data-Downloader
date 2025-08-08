@@ -62,7 +62,7 @@ def antiSnifferRandomDelay(start,end,message=False)->None:
         time.sleep(wait)
         
 
-def shuffle(inputList:list[tuple[str,date]])->tuple[list[tuple[str,date]],list[int]]:
+def reversibleShuffle(inputList:list[tuple[str,date]])->tuple[list[tuple[str,date]],list[int]]:
     #make a copy of our input
     copyList=inputList.copy()
     #create a list of indexes
@@ -195,7 +195,7 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
     #make a list for what we download
     pages=[""]*len(links)
     #shuffle our links to throw bot detectors off our scent
-    scrambled=shuffle(links)
+    scrambled=reversibleShuffle(links)
     #one is the shuffled links, the other is lookup table we use to put them back in order
     links=scrambled[0]#type: ignore
     ogPos=scrambled[1]

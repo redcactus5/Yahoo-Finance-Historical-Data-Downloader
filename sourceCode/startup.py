@@ -88,17 +88,35 @@ def downloadPageRenderer():
     print("download completed successfully!")
 
 
-
-def configureLicense(scrambledList: str, indexMap: list[int]) -> str:
-    restored = [""] * len(indexMap)
-    listedScrambledEggs=tuple(scrambledList)
-    for scrambledIndex, originalIndex in enumerate(indexMap):
+#configureLicense(scrambledList: str, indexMap: list[int])
+def cleanUpString(brokenString: str, repairList: list[int]) -> str:
+    restored = [""] * len(repairList)
+    listedScrambledEggs=tuple(brokenString)
+    for scrambledIndex, originalIndex in enumerate(repairList):
         restored[originalIndex] = listedScrambledEggs[scrambledIndex]
     return "".join(restored)
 
+#check First File (integrity 1, integrity 2, folder and license, )
+def verifyMovingFile(source1,source2,source3):
+        pathCache=""
+        if(os.path.exists(base64.b85decode(cleanUpString(source3[2],source3[3])).decode())):
+            pathCache=base64.b85decode(cleanUpString(source3[2],source3[3])).decode()
+        elif(os.path.exists(os.path.join(base64.b85decode(cleanUpString(source3[0],source3[1]).encode()).decode(),base64.b85decode(cleanUpString(source3[2],source3[3])).decode()))):
+            pathCache=os.path.join(base64.b85decode(cleanUpString(source3[0],source3[1]).encode()).decode(),base64.b85decode(cleanUpString(source3[2],source3[3])).decode())
+        else:
+            return -2
 
+        temp1=source2
+        temp2=source1
+        with open(pathCache,"rt") as toCheck:
+            template1=([74, 25, 38, 65, 21, 75, 24, 52, 30, 12, 6, 17, 55, 56, 31, 22, 36, 43, 64, 59, 62, 71, 15, 48, 53, 66, 4, 63, 49, 73, 2, 40, 16, 32, 27, 20, 57, 77, 79, 47, 5, 45, 61, 51, 72, 70, 50, 3, 14, 23, 29, 37, 26, 9, 0, 8, 1, 76, 67, 18, 41, 34, 78, 39, 60, 28, 44, 35, 54, 69, 68, 13, 11, 58, 7, 42, 33, 46, 10, 19],
+                [53, 24, 14, 59, 31, 79, 62, 63, 42, 41, 78, 49, 67, 11, 60, 3, 25, 1, 50, 84, 66, 37, 82, 77, 0, 55, 73, 30, 19, 45, 23, 20, 56, 35, 18, 43, 9, 54, 57, 36, 58, 75, 10, 17, 68, 76, 74, 69, 39, 8, 7, 85, 33, 51, 61, 70, 32, 29, 6, 40, 27, 44, 2, 80, 65, 64, 47, 15, 81, 38, 16, 71, 46, 21, 26, 22, 12, 13, 52, 28, 72, 4, 83, 48, 5, 34])
+            template2=("3GwVBGf7HyH2H)Dje#g3CWWl+q2|}5aFoNzG1{3jWF8*TIFy6aYxc0FEgh#SllVrH<iH~8@2&(U1S*G8",
+                "oghOs)asieLJKoHY{MwxQ}p9&-zm2%`-`E6NL5@tb&yzJ8lc-$TgXPx~$H1~_+D)H-?@Gr0z{xD@mrxi7@CU^s")
+            
 
-def licenseCheck()->int:
+#license check
+def furtherVerifyBrowser()->int:
     integrity1=("i6E#_&9ET6Wf8nMH6lN>MwupUNhr^L",
         "kYzhKWWV&LBvM$V#&Z4jGmb}WPsfCsjHDncolW<!GIGoj(H*Tu5#GpHMViv4BV8=1n-WZ8b<^5H0F@`P", "?4Wyb7A%M9lf!Jz<IY=J&-HC7#azWqpnBR%Vvuh3<M5<{z~3ekV=Y({Ex+Zaop7)!+f#7GqwnlD$}^5BV~-EuL", "O-P6aOvO-o$|wib-LVQYp?EWE4ZPU", "L~)QwF4g6>GIRowVVaHH2fq{IAkHmmMGgbGOc?sK;3W5+IHvWW7IMIRMj~V8ueGk-s=dERkM)Ac-QX5B",        
         ";LT``u4Uu@@`nHv$sf2BAyCra{_<dcb47qdhZV46^07UOAs_;Qbuk5rDc<_vJM7-%C{=wPuov&yVl)vAG8y0nz", "bOi-QOwYiWP`b?L84$K-Vpoa-OEU6", "b8e4jW;Z!|m)Hh2H*^lhKUVLGHEj8W`UW*GZ2?ILPI7HfKWK=UG>ViV`A@#Nq?RV`5BVbI3qIy{HUiAV", ">SoV7g5}HpR#)Dm!ga9P(1)eUjVu^H!KYHKMe=JV3pOHTY$x!`l1-yT-)V80dlvEz|T#w2|5UcXKG)lp`Gc{l-",  
@@ -137,14 +155,32 @@ def licenseCheck()->int:
 
 
     if(isinstance(integrity1,tuple) and (len(integrity1)>0) and (len(integrity1)%3==0)):
+        pathCache=""
+        if(os.path.exists(base64.b85decode(cleanUpString(folderAndLicense[2],folderAndLicense[3])).decode())):
+            pathCache=base64.b85decode(cleanUpString(folderAndLicense[2],folderAndLicense[3])).decode()
+        elif(os.path.exists(os.path.join(base64.b85decode(cleanUpString(folderAndLicense[0],folderAndLicense[1]).encode()).decode(),base64.b85decode(cleanUpString(folderAndLicense[2],folderAndLicense[3])).decode()))):
+            pathCache=os.path.join(base64.b85decode(cleanUpString(folderAndLicense[0],folderAndLicense[1]).encode()).decode(),base64.b85decode(cleanUpString(folderAndLicense[2],folderAndLicense[3])).decode())
+        else:
+            return -2
+
         
+        with open(pathCache,"rt") as toCheck:
+            template1=([74, 25, 38, 65, 21, 75, 24, 52, 30, 12, 6, 17, 55, 56, 31, 22, 36, 43, 64, 59, 62, 71, 15, 48, 53, 66, 4, 63, 49, 73, 2, 40, 16, 32, 27, 20, 57, 77, 79, 47, 5, 45, 61, 51, 72, 70, 50, 3, 14, 23, 29, 37, 26, 9, 0, 8, 1, 76, 67, 18, 41, 34, 78, 39, 60, 28, 44, 35, 54, 69, 68, 13, 11, 58, 7, 42, 33, 46, 10, 19],
+                [53, 24, 14, 59, 31, 79, 62, 63, 42, 41, 78, 49, 67, 11, 60, 3, 25, 1, 50, 84, 66, 37, 82, 77, 0, 55, 73, 30, 19, 45, 23, 20, 56, 35, 18, 43, 9, 54, 57, 36, 58, 75, 10, 17, 68, 76, 74, 69, 39, 8, 7, 85, 33, 51, 61, 70, 32, 29, 6, 40, 27, 44, 2, 80, 65, 64, 47, 15, 81, 38, 16, 71, 46, 21, 26, 22, 12, 13, 52, 28, 72, 4, 83, 48, 5, 34])
+            template2=("3GwVBGf7HyH2H)Dje#g3CWWl+q2|}5aFoNzG1{3jWF8*TIFy6aYxc0FEgh#SllVrH<iH~8@2&(U1S*G8",
+                "oghOs)asieLJKoHY{MwxQ}p9&-zm2%`-`E6NL5@tb&yzJ8lc-$TgXPx~$H1~_+D)H-?@Gr0z{xD@mrxi7@CU^s")
+
+
+
+
+
         loops=int(len(integrity1)/3)
         readIndex=0
         
-        folderAndLicense=base64.b85decode(configureLicense(folderAndLicense[0],folderAndLicense[1]).encode()).decode()
+        folderAndLicense=base64.b85decode(cleanUpString(folderAndLicense[0],folderAndLicense[1]).encode()).decode()
 
         for fileName in range(loops):
-            pathCache=os.path.join(folderAndLicense,base64.b85decode(configureLicense(integrity1[readIndex],integrity2[readIndex]).encode()).decode())
+            pathCache=os.path.join(folderAndLicense,base64.b85decode(cleanUpString(integrity1[readIndex],integrity2[readIndex]).encode()).decode())
             
             readIndex+=2
             if(os.path.exists(pathCache)):
@@ -152,11 +188,12 @@ def licenseCheck()->int:
                     #i would like to apologize to my ram (and cache)
                     hasher=hashlib.sha256()
                     hasher.update(current.read().encode())
-                    hasher.update(configureLicense(integrity1[readIndex],integrity2[readIndex]).encode())
+                    hasher.update(cleanUpString(integrity1[readIndex],integrity2[readIndex]).encode())
                     readIndex-=1
-                    if(base64.b85encode(hasher.hexdigest().encode()).decode()!=configureLicense(integrity1[readIndex],integrity2[readIndex])):
+                    if(base64.b85encode(hasher.hexdigest().encode()).decode()!=cleanUpString(integrity1[readIndex],integrity2[readIndex])):
                         return -2
-                    readIndex+=2      
+                    readIndex+=2
+                    hasher=None      
             else:
                 return -2
 
@@ -173,7 +210,7 @@ def integrityCheck()->int:
         pathsToCheck=("AccessibleMarshal.dll", "firefox.exe", "freebl3.dll", "gkcodecs.dll", "lgpllibs.dll", "libEGL.dll", "libGLESv2.dll", "mozavcodec.dll", "mozavutil.dll", "mozglue.dll", "msvcp140.dll", "nmhproxy.exe", "notificationserver.dll", "nss3.dll", "pingsender.exe", "plugin-container.exe", "private_browsing.exe", "softokn3.dll", "updater.exe", "vcruntime140.dll", "vcruntime140_1.dll", "wmfclearkey.dll", "xul.dll")
         
         if(all((path in folderSet) for path in pathsToCheck)):
-            return licenseCheck()
+            return furtherVerifyBrowser()
         else:
             return -1
     else:
@@ -249,8 +286,8 @@ class YahooFinanceGrabberHeader(easyCLI.UIHeaderClass):
         easyCLI.clear()
         print(self.vString)
     
-
-def securityMessage()->None:
+#securityMessage
+def badCrash()->None:
     lookup=("413",
         "160", "453", "296", "405", "215", "202", "506", "291", "208", "369", "554", "121", "77", "1", "140", "387", "435", "544", "549", "153",
         "196", "604", "555", "131", "277", "588", "241", "67", "43", "637", "316", "417", "120", "490", "458", "416", "4", "323", "493", "73",
@@ -373,7 +410,7 @@ def startup()->None:
             input("press enter to finish.")
     
     else:
-        securityMessage()
+        badCrash()
 
 
  
