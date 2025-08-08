@@ -63,11 +63,7 @@ def makeSillyString():
         nuhashes.append("".join(shuffled[0]))
 
     #the directory string
-    print("root")
-    shuffledRoot=shuffle(list(base64.b85encode("LICENSES".encode()).decode()))
-    print("".join(shuffledRoot[0]))
-    print(shuffledRoot[1])
-    print("root")
+    
 
     
     print("(",end="")
@@ -126,8 +122,21 @@ def makeSillyString():
         mainLicenseDecoders.append(shuffled[1])
         mainLicenseHashes.append("".join(shuffled[0]))
 
+    scrambledOption=shuffle(list(base85LicenseOptions[0]))
+    scrambled="".join(scrambledOption[0])
+    descramble=scrambledOption[1]
 
-    
+    print("\n\n main license file and root folder:")
+
+
+    shuffledRoot=shuffle(list(base64.b85encode("LICENSES".encode()).decode()))
+    print("[\""+"".join(shuffledRoot[0])+"\", ",end="")
+    print(str(shuffledRoot[1])+", ",end="")
+    print("\""+scrambled+"\", ",end="")
+    print(str(descramble)+"]")
+    print("end main file\n\n")
+
+
     print("(",end="")
     for index,name in enumerate(mainLicenseHashes):
         print("\""+name+"\"",end="")
