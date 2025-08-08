@@ -77,17 +77,6 @@ def makeSillyString():
     #the directory string
     
 
-    
-    print("(",end="")
-    for index,name in enumerate(nuhashes):
-        print("\""+name+"\"",end="")
-        if(index<(len(nuhashes)-1)):
-            print(", ",end="")
-            if(index%4==0):
-                print()
-        else:
-            print(")")
-
     message5=["("]
     for index, char in enumerate(decoders):
         
@@ -102,6 +91,19 @@ def makeSillyString():
             message5.append(")")
     print("\n"*2)
     print("".join(message5))
+
+    print("\n"*2)
+    print("(",end="")
+    for index,name in enumerate(nuhashes):
+        print("\""+name+"\"",end="")
+        if(index<(len(nuhashes)-1)):
+            print(", ",end="")
+            if(index%4==0):
+                print()
+        else:
+            print(")")
+
+    
 
     print("\n"*2)
 

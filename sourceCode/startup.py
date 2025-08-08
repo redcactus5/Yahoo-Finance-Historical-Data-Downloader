@@ -97,22 +97,31 @@ def cleanUpString(brokenString: str, repairList: list[int]) -> str:
     return "".join(restored)
 
 #check First File (integrity 1, integrity 2, folder and license, )
-def verifyMovingFile(source1,source2,source3):
-        pathCache=""
-        if(os.path.exists(base64.b85decode(cleanUpString(source3[2],source3[3])).decode())):
-            pathCache=base64.b85decode(cleanUpString(source3[2],source3[3])).decode()
-        elif(os.path.exists(os.path.join(base64.b85decode(cleanUpString(source3[0],source3[1]).encode()).decode(),base64.b85decode(cleanUpString(source3[2],source3[3])).decode()))):
-            pathCache=os.path.join(base64.b85decode(cleanUpString(source3[0],source3[1]).encode()).decode(),base64.b85decode(cleanUpString(source3[2],source3[3])).decode())
-        else:
-            return -2
+def verifyNimbleFile(source1,source2,source3,source4,source5)->tuple[tuple,tuple,tuple,tuple]|bool:
+    pathCache=""
+    if(os.path.exists(base64.b85decode(cleanUpString(source3[2],source3[3])).decode())):
+        pathCache=base64.b85decode(cleanUpString(source3[2],source3[3])).decode()
+    elif(os.path.exists(os.path.join(base64.b85decode(cleanUpString(source3[0],source3[1]).encode()).decode(),base64.b85decode(cleanUpString(source3[2],source3[3])).decode()))):
+        pathCache=os.path.join(base64.b85decode(cleanUpString(source3[0],source3[1]).encode()).decode(),base64.b85decode(cleanUpString(source3[2],source3[3])).decode())
+    else:
+        return False
 
+    temp1=source4
+    temp2=source5
+    
+    with open(pathCache,"rt") as toCheck:
+        hasher=hashlib.sha256()
+        hasher.update(toCheck.read().encode())
+        hasher.update(cleanUpString(temp2[1],temp1[1]).encode())
+        if(base64.b85encode(hasher.hexdigest().encode()).decode()!=cleanUpString(temp2[0],temp1[0])):
+            return False
         temp1=source2
         temp2=source1
-        with open(pathCache,"rt") as toCheck:
-            template1=([74, 25, 38, 65, 21, 75, 24, 52, 30, 12, 6, 17, 55, 56, 31, 22, 36, 43, 64, 59, 62, 71, 15, 48, 53, 66, 4, 63, 49, 73, 2, 40, 16, 32, 27, 20, 57, 77, 79, 47, 5, 45, 61, 51, 72, 70, 50, 3, 14, 23, 29, 37, 26, 9, 0, 8, 1, 76, 67, 18, 41, 34, 78, 39, 60, 28, 44, 35, 54, 69, 68, 13, 11, 58, 7, 42, 33, 46, 10, 19],
-                [53, 24, 14, 59, 31, 79, 62, 63, 42, 41, 78, 49, 67, 11, 60, 3, 25, 1, 50, 84, 66, 37, 82, 77, 0, 55, 73, 30, 19, 45, 23, 20, 56, 35, 18, 43, 9, 54, 57, 36, 58, 75, 10, 17, 68, 76, 74, 69, 39, 8, 7, 85, 33, 51, 61, 70, 32, 29, 6, 40, 27, 44, 2, 80, 65, 64, 47, 15, 81, 38, 16, 71, 46, 21, 26, 22, 12, 13, 52, 28, 72, 4, 83, 48, 5, 34])
-            template2=("3GwVBGf7HyH2H)Dje#g3CWWl+q2|}5aFoNzG1{3jWF8*TIFy6aYxc0FEgh#SllVrH<iH~8@2&(U1S*G8",
-                "oghOs)asieLJKoHY{MwxQ}p9&-zm2%`-`E6NL5@tb&yzJ8lc-$TgXPx~$H1~_+D)H-?@Gr0z{xD@mrxi7@CU^s")
+    
+    return (temp1,temp2,(None,),(None,))
+        
+        
+            
             
 
 #license check
@@ -153,26 +162,29 @@ def furtherVerifyBrowser()->int:
     
     folderAndLicense=["oip4$OUPEw", [8, 1, 3, 2, 7, 0, 4, 5, 6, 9], "Lo-4?paU$OEbiP", [9, 8, 12, 2, 13, 3, 11, 4, 7, 0, 6, 10, 1, 5]]
 
+    integrity3=([74, 25, 38, 65, 21, 75, 24, 52, 30, 12, 6, 17, 55, 56, 31, 22, 36, 43, 64, 59, 62, 71, 15, 48, 53, 66, 4, 63, 49, 73, 2, 40, 16, 32, 27, 20, 57, 77, 79, 47, 5, 45, 61, 51, 72, 70, 50, 3, 14, 23, 29, 37, 26, 9, 0, 8, 1, 76, 67, 18, 41, 34, 78, 39, 60, 28, 44, 35, 54, 69, 68, 13, 11, 58, 7, 42, 33, 46, 10, 19],
+        [53, 24, 14, 59, 31, 79, 62, 63, 42, 41, 78, 49, 67, 11, 60, 3, 25, 1, 50, 84, 66, 37, 82, 77, 0, 55, 73, 30, 19, 45, 23, 20, 56, 35, 18, 43, 9, 54, 57, 36, 58, 75, 10, 17, 68, 76, 74, 69, 39, 8, 7, 85, 33, 51, 61, 70, 32, 29, 6, 40, 27, 44, 2, 80, 65, 64, 47, 15, 81, 38, 16, 71, 46, 21, 26, 22, 12, 13, 52, 28, 72, 4, 83, 48, 5, 34])
+
+    integrity4=("3GwVBGf7HyH2H)Dje#g3CWWl+q2|}5aFoNzG1{3jWF8*TIFy6aYxc0FEgh#SllVrH<iH~8@2&(U1S*G8",
+        "oghOs)asieLJKoHY{MwxQ}p9&-zm2%`-`E6NL5@tb&yzJ8lc-$TgXPx~$H1~_+D)H-?@Gr0z{xD@mrxi7@CU^s")
+
 
     if(isinstance(integrity1,tuple) and (len(integrity1)>0) and (len(integrity1)%3==0)):
-        pathCache=""
-        if(os.path.exists(base64.b85decode(cleanUpString(folderAndLicense[2],folderAndLicense[3])).decode())):
-            pathCache=base64.b85decode(cleanUpString(folderAndLicense[2],folderAndLicense[3])).decode()
-        elif(os.path.exists(os.path.join(base64.b85decode(cleanUpString(folderAndLicense[0],folderAndLicense[1]).encode()).decode(),base64.b85decode(cleanUpString(folderAndLicense[2],folderAndLicense[3])).decode()))):
-            pathCache=os.path.join(base64.b85decode(cleanUpString(folderAndLicense[0],folderAndLicense[1]).encode()).decode(),base64.b85decode(cleanUpString(folderAndLicense[2],folderAndLicense[3])).decode())
+        
+        validationResult=verifyNimbleFile(integrity1,integrity2,folderAndLicense,integrity3,integrity4)
+        if((type(validationResult)==bool)and(validationResult==False)):
+            return -2
+        elif((isinstance(validationResult,tuple)) and all(isinstance(res,tuple) for res in validationResult)):
+            if((len(validationResult[2])==1)and(len(validationResult[3])==1)and(validationResult[2][0] is None)and(validationResult[3][0] is None)):
+                integrity1=validationResult[0]
+                integrity2=validationResult[1]
+                integrity3=validationResult[2]
+                integrity4=validationResult[3]
+                validationResult=None
+            else:
+                return -2
         else:
             return -2
-
-        
-        with open(pathCache,"rt") as toCheck:
-            template1=([74, 25, 38, 65, 21, 75, 24, 52, 30, 12, 6, 17, 55, 56, 31, 22, 36, 43, 64, 59, 62, 71, 15, 48, 53, 66, 4, 63, 49, 73, 2, 40, 16, 32, 27, 20, 57, 77, 79, 47, 5, 45, 61, 51, 72, 70, 50, 3, 14, 23, 29, 37, 26, 9, 0, 8, 1, 76, 67, 18, 41, 34, 78, 39, 60, 28, 44, 35, 54, 69, 68, 13, 11, 58, 7, 42, 33, 46, 10, 19],
-                [53, 24, 14, 59, 31, 79, 62, 63, 42, 41, 78, 49, 67, 11, 60, 3, 25, 1, 50, 84, 66, 37, 82, 77, 0, 55, 73, 30, 19, 45, 23, 20, 56, 35, 18, 43, 9, 54, 57, 36, 58, 75, 10, 17, 68, 76, 74, 69, 39, 8, 7, 85, 33, 51, 61, 70, 32, 29, 6, 40, 27, 44, 2, 80, 65, 64, 47, 15, 81, 38, 16, 71, 46, 21, 26, 22, 12, 13, 52, 28, 72, 4, 83, 48, 5, 34])
-            template2=("3GwVBGf7HyH2H)Dje#g3CWWl+q2|}5aFoNzG1{3jWF8*TIFy6aYxc0FEgh#SllVrH<iH~8@2&(U1S*G8",
-                "oghOs)asieLJKoHY{MwxQ}p9&-zm2%`-`E6NL5@tb&yzJ8lc-$TgXPx~$H1~_+D)H-?@Gr0z{xD@mrxi7@CU^s")
-
-
-
-
 
         loops=int(len(integrity1)/3)
         readIndex=0
