@@ -112,6 +112,15 @@ def makeSillyString():
         hashDataUnscrambled.append(digest)
         hashDataUnscrambled.append(digitalSalt.decode())
 
+    mainLicenseDecoders=[]
+    mainLicenseHashes=[]
+
+    for hash in hashDataUnscrambled:
+        shuffled=shuffle(list(hash))
+        mainLicenseDecoders.append(shuffled[1])
+        mainLicenseHashes.append("".join(shuffled[0]))
+    
+
     
         
   
