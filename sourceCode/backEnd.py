@@ -384,7 +384,7 @@ def retrieveTableAndName(htmlText:str)->tuple[str,HtmlElement]:
 
 
 
-def parseDataSet(retrievedData)->tuple[str,list[tuple],dict]:
+def parseDataSet(retrievedData)->tuple[str,dict]:
     easyCLI.fastPrint("parsing data for "+str(retrievedData[0])+"...")
 
     table:HtmlElement=retrievedData[1]
@@ -394,10 +394,11 @@ def parseDataSet(retrievedData)->tuple[str,list[tuple],dict]:
             parent.remove(span)
     #find all the rows
     rows:list[HtmlElement]=table.xpath('.//tr')
-    #make an array to store the data for this table
-    dataList:list[tuple]=[]
-    #also a dictionary to store associated dates and indexes of dataList they are for
-    dates:dict[date,int]={}
+    
+    #this is essentially just a buffer we put key value pairs in while extracting the data
+    dataList:list[tuple[date,list[str]]]=[]
+  
+    
 
 
     #safety check to make sure the table is populated
@@ -418,35 +419,39 @@ def parseDataSet(retrievedData)->tuple[str,list[tuple],dict]:
     if((len(headerRow)>0) and all((cast(str,datapoint.text_content()).strip() == ValidatorRowStrings[index]) for index, datapoint in enumerate(headerRow))):
         #if this is what we want
         rows.pop(0)
-        #subtract one sice we dont include date in our main data lists
+        #subtract one since we dont include date in our main data lists
         ValidatorRowStringsLen=len(ValidatorRowStrings)
         dataRowLen=ValidatorRowStringsLen-1
-        #because we dont add some rows, we use this variable to avoid desync. I tried using an index counter, but we desync when we skip an index.
-        rowCount=0
+
         #go through every row
         for row in rows:
             
             #extract the cells
             rowData:list[HtmlElement]=row.xpath('.//td')#type: ignore
-            #if this is a row we aren't supposed to ignore
             
-            if(len(rowData)==ValidatorRowStringsLen):
+            #as is tradition, we cache a value we use more than once
+            rowDataLen=len(rowData)
 
+            #if this is a row we aren't supposed to ignore
+            if(rowDataLen==ValidatorRowStringsLen):
+                #extract the date for our key in the key value pair
+                lineDate:date=datetime.strptime(cast(str,rowData[0]).strip(), "%b %d, %Y").date()
+                
+                #pre allocate our list for our line data
                 lineData=[""]*dataRowLen
-                #go through its columns
-                for pointIndex, point in enumerate(rowData):
-                    #if this is the date index
-                    if(pointIndex==0):#do the special case for saving date
-                        parsedDate = datetime.strptime(cast(str,point.text_content()).strip(), "%b %d, %Y").date()
 
-                        dates[parsedDate]=rowCount
-                    else:#otherwise save it like normal
-                        lineData[pointIndex-1]=cast(str,point.text_content()).strip()
+                #go through all the other data, excluding the date, so we start at index 1
+                for pointIndex in range(1,rowDataLen):
+                    #extract the data point (i know this isn't the cleanest, but it is the fastest way to do this)
+                    lineData[pointIndex-1]=cast(str,rowData[pointIndex].text_content()).strip()
+                    #why the different indexing between the source and destination? our source data has one extra
+                    #index at the start, for the date. we save our date separately as the key, so we need to skip 
+                    #over the date index when extracting the actual data. 
+                
+                #create and save our key value pair for this line to the buffer
+                dataList.append((lineDate,lineData))
 
-                #save what we extracted
-                dataList.append(tuple(lineData))
-                #increment rowcount since we found a row
-                rowCount+=1
+         
     else:
         easyCLI.waitForFastWriterFinish()
         raise Exception("error: invalid data table.")
@@ -454,10 +459,11 @@ def parseDataSet(retrievedData)->tuple[str,list[tuple],dict]:
 
     easyCLI.fastPrint("done.\n")
     
-
+    dataDict:dict=dict()
+    dataDict.update(dataList)
     #return the data we extracted
-    #("name","data","dates")
-    return (str(retrievedData[0]),dataList,dates)
+    #("name","data")
+    return (str(retrievedData[0]),dataDict)
 
 
 def retrieveAndParseDataSet(rawHTML:str,currentIndex:int,inputListLen:str):
@@ -768,19 +774,18 @@ def loadCommands()->list[dict]|bool:
     return commandList
 
         
-def findLine(dataset:list,datasetDates:dict,date:date)->tuple|bool:
-    #use our date and dataset values smartly to find the exact line we want then return it
+def findLine(dataset:dict,date:date)->list|bool:
     
-    
-    #grab the dataList index for this date
-    rawIndex=datasetDates.get(date)
+    #very simple function, just grabs the data for a date from dict
+    #request the data
+    targetData=dataset.get(date)
     #if that date doesn't exist, send back that information
-    if(rawIndex is None):
+    if(targetData is None):
         return False
     
-    #and extract the index of that line from it
-    line=dataset[rawIndex]
-    return line
+    
+    #otherwise send back what was requested
+    return targetData
 
 
 def findDateInsertionPoint(date:date,dates:list[date])->tuple[int,int|bool]:
@@ -1076,7 +1081,7 @@ def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
         
         #preallocate for optimization reasons
         commandDates:list[date]=[]
-        stockDates:dict=dict()
+        stockData:dict=dict()
         dates=[]
         
         #minor optimization
@@ -1097,8 +1102,8 @@ def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
             categories=[0]
             categoryLookupDict:dict[int,int]={0:0}
             values:list[list]=[[]]
-            stockDates:dict=stock[2]
-            stockData:list=stock[1]
+
+
             #create a variable for our progress through this stock
             
             #loop through our commands
