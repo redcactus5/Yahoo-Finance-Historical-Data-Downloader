@@ -399,10 +399,10 @@ def parseDataSet(retrievedData)->tuple[str,dict]:
     dataList:list[tuple[date,list[str]]]=[]
   
     
-
+    rowsLen=len(rows)
 
     #safety check to make sure the table is populated
-    if(len(rows)<1):
+    if(rowsLen<1):
         easyCLI.waitForFastWriterFinish()
         raise Exception("error: data table is empty.")
     
@@ -418,16 +418,19 @@ def parseDataSet(retrievedData)->tuple[str,dict]:
 
     if((len(headerRow)>0) and all((cast(str,datapoint.text_content()).strip() == ValidatorRowStrings[index]) for index, datapoint in enumerate(headerRow))):
         #if this is what we want
-        rows.pop(0)
+        
         #subtract one since we dont include date in our main data lists
         ValidatorRowStringsLen=len(ValidatorRowStrings)
         dataRowLen=ValidatorRowStringsLen-1
 
-        #go through every row
-        for row in rows:
+        #go through every row (im not happy about using range here, 
+        #i would have preferred iterating directly, but this is the
+        #only way to do this without an expensive remove call, so it stays)
+        for rowIndex in range(1,rowsLen):
+            
             
             #extract the cells
-            rowData:list[HtmlElement]=row.xpath('.//td')#type: ignore
+            rowData:list[HtmlElement]=rows[rowIndex].xpath('.//td')#type: ignore
             
             #as is tradition, we cache a value we use more than once
             rowDataLen=len(rowData)
@@ -437,17 +440,15 @@ def parseDataSet(retrievedData)->tuple[str,dict]:
                 #extract the date for our key in the key value pair
                 lineDate:date=datetime.strptime(cast(str,rowData[0]).strip(), "%b %d, %Y").date()
                 
-                #pre allocate our list for our line data
-                lineData=[""]*dataRowLen
-
+                #what this line does:
                 #go through all the other data, excluding the date, so we start at index 1
-                for pointIndex in range(1,rowDataLen):
-                    #extract the data point (i know this isn't the cleanest, but it is the fastest way to do this)
-                    lineData[pointIndex-1]=cast(str,rowData[pointIndex].text_content()).strip()
-                    #why the different indexing between the source and destination? our source data has one extra
-                    #index at the start, for the date. we save our date separately as the key, so we need to skip 
-                    #over the date index when extracting the actual data. 
-                
+                #extract the data point (i know this isn't the cleanest, but it is the fastest way to do this)
+                #why the different indexing between the source and destination? our source data has one extra
+                #index at the start, for the date. we save our date separately as the key, so we need to skip 
+                #over the date index when extracting the actual data. 
+                #use list comprehension for speed because gotta go fast
+                lineData:list[str]=[cast(str,rowData[pointIndex].text_content()).strip() for pointIndex in range(1,rowDataLen)]
+
                 #create and save our key value pair for this line to the buffer
                 dataList.append((lineDate,lineData))
 
@@ -1071,14 +1072,15 @@ def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
         
         #preallocate for optimization reasons
         commandDates:list[date]=[]
-        stockData:dict=dict()
+        
+        stockDates=[]
         dates=[]
         
         #minor optimization, instead of elif tree, just multiple dispatch
         dateDispatcher = {
-            0: lambda stockData, commandDates: commandDates,  # specific dates
-            1: lambda stockData, commandDates: list(stockData.keys()),  # all available dates
-            2: lambda stockData, commandDates: generateDateRange(commandDates[0], commandDates[1]),  # date range
+            0: lambda stockDates, commandDates: commandDates,  # specific dates
+            1: lambda stockDates, commandDates: stockDates,  # all available dates
+            2: lambda stockDates, commandDates: generateDateRange(commandDates[0], commandDates[1]),  # date range
         }
      
         stockListLen=str(len(stocks))
@@ -1089,7 +1091,8 @@ def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
             easyCLI.fastPrint("".join(("\nprocessing stock: \"",str(stock[0]),"\" (stock ",str(stockNumber+1)," of ",stockListLen,")...")))
             #retrieve the two main data points from the stock tuple
             name=str(stock[0])
-            stockData=stock[1]
+            stockData:dict=stock[1]
+            stockDates=list(stockData.keys())
 
             #variables our output data
             categories=[0]
