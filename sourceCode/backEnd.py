@@ -26,6 +26,7 @@ from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 import bisect
 from typing import Any
 from typing import cast
+from typing import Iterable
 from datetime import timezone
 #i cant believe I have to use this lib
 import gc
@@ -387,7 +388,9 @@ def retrieveTableAndName(htmlText:str)->tuple[str,HtmlElement]:
 def parseDataSet(retrievedData)->tuple[str,dict]:
     easyCLI.fastPrint("parsing data for "+str(retrievedData[0])+"...")
 
+
     table:HtmlElement=retrievedData[1]
+    #(i hate poorly hinted libraries)
     for span in table.xpath(".//span"):
         parent = span.getparent()
         if(not(parent is None)):
@@ -396,6 +399,7 @@ def parseDataSet(retrievedData)->tuple[str,dict]:
     rows:list[HtmlElement]=table.xpath('.//tr')
     
     #this is essentially just a buffer we put key value pairs in while extracting the data
+    #why not prealloc it? because until we extract the data, we have no idea how big it is.
     dataList:list[tuple[date,list[str]]]=[]
   
     
@@ -408,7 +412,7 @@ def parseDataSet(retrievedData)->tuple[str,dict]:
     
 
     #validate to make sure the table is actually the one we want. if it fails, yahoo changed their website, or the link was wrong
-    ValidatorRowStrings=["Date","Open","High","Low","Close","Adj Close","Volume"]
+    ValidatorRowStrings=("Date","Open","High","Low","Close","Adj Close","Volume")
     #a nice set of lookup tables we need
     
     
@@ -429,7 +433,7 @@ def parseDataSet(retrievedData)->tuple[str,dict]:
         for rowIndex in range(1,rowsLen):
             
             
-            #extract the cells
+            #extract the cells, type ignore because xpath and HtmlElement are poorly hinted. shame! shame! shame!
             rowData:list[HtmlElement]=rows[rowIndex].xpath('.//td')#type: ignore
             
             #as is tradition, we cache a value we use more than once
@@ -1038,7 +1042,7 @@ def validateCommands(commands:list[dict])->bool:
 
 
 
-def executeCommand(stockData:dict,dates:list[date],attributes:list[int],categoryLookupDict:dict[int,int],values:list[list])->None:
+def executeCommand(stockData:dict,dates:Iterable[date],attributes:list[int],categoryLookupDict:dict[int,int],values:list[list])->None:
     for date in dates:
         #find the line for this date
         rawLine=stockData.get(date)
@@ -1064,17 +1068,11 @@ def executeCommand(stockData:dict,dates:list[date],attributes:list[int],category
 def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
     easyCLI.fastPrint("executing commands...")
 
+    #create our buffer for our output data
     buffer=[tuple()]*len(stocks)
     
     #if we have something to do
     if(len(commands)>0):
-        
-        
-        #preallocate for optimization reasons
-        commandDates:list[date]=[]
-        
-        stockDates=[]
-        dates=[]
         
         #minor optimization, instead of elif tree, just multiple dispatch
         dateDispatcher = {
@@ -1089,41 +1087,44 @@ def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
         for stockNumber, stock in enumerate(stocks):
            
             easyCLI.fastPrint("".join(("\nprocessing stock: \"",str(stock[0]),"\" (stock ",str(stockNumber+1)," of ",stockListLen,")...")))
-            #retrieve the two main data points from the stock tuple
+            #variables to represent the dataset
             name=str(stock[0])
             stockData:dict=stock[1]
-            stockDates=list(stockData.keys())
+            #extracting here
+            stockDates:Iterable=stockData.keys()
 
-            #variables our output data
+            #variables our output data and data processing
             categories=[0]
             categoryLookupDict:dict[int,int]={0:0}
             values:list[list]=[[]]
 
-
-            #create a variable for our progress through this stock
             
             #loop through our commands
             for commandNumber, command in enumerate(commands):
                 #do tuple and string magic for our cli
                 easyCLI.fastPrint("".join(("\nexecuting command ",str(commandNumber+1)," of ",commandsListLen,"...")))
 
-                #grab and validate the values we need from the command
-                
+                #grab the values we need from the command
                 action:int=command[0]
                 commandDates:list[date]=command[2]
                 attributes:list[int]=command[1]
+
+
                 #make sure the lists have the attributes in the command
                 possibleNewDict=updateCategories(attributes,categories,values)
+                #if anything changed
                 if(possibleNewDict[0] and (not(possibleNewDict[1] is None))):
+                    #overwrite the old values with the corrected ones
                     categoryLookupDict=possibleNewDict[1]
-                #overwrite the old values with the corrected ones
                 
+
+
                 #dont need to check if the command is valid here because it got checked when we validated earlier
                 #0:specific dates
                 #1:all data
                 #2:date range
                 #use our dispatcher to generate our dates list
-                dates = dateDispatcher[action](stockData, commandDates)
+                dates:Iterable = dateDispatcher[action](stockDates, commandDates)
                 #then execute the command
                 executeCommand(stockData,dates,attributes,categoryLookupDict,values)
                
@@ -1193,15 +1194,19 @@ def outputRenderedResults(displayList:list[tuple],outputFileName:str)->None:
 
 def main(fileName)->bool|str:
     #our main execution function, it mostly just stages out our steps
+
     #write the header
     easyCLI.fastUIHeader()
-    
+    #write beginning ui
     easyCLI.fastPrint("beginning setup...\n")
-    #startup checks and loading of config files
     easyCLI.fastPrint("loading urls...")
+
+    #this section is just startup checks and loading of config files
+
     #create and start our stopwatch
     timer=easyCLI.Stopwatch()
     timer.start()
+
     rawLinks=loadLinks()
     links:tuple=tuple()
     if((type(rawLinks)==bool)and(rawLinks==False)):
@@ -1214,7 +1219,9 @@ def main(fileName)->bool|str:
         raise Exception("error: url loading failed.")
     
     easyCLI.fastPrint("load successful.\n")
+
     easyCLI.fastPrint("loading commands...")
+
     rawCommands=loadCommands()
     commands:list=list()
     if((type(rawCommands)==bool)and(rawCommands==False)):
@@ -1231,7 +1238,7 @@ def main(fileName)->bool|str:
     validateCommands(commands)
 
     commands=compileCommands(commands)
-
+    #yup, all this just to get set up
     easyCLI.fastPrint("\nsetup complete.")
     easyCLI.fastln(4)
     easyCLI.fastPrint("starting data retrieval process...\n\n")
@@ -1242,8 +1249,11 @@ def main(fileName)->bool|str:
     #use combo function retrieve and parse data sets to save ram freeing more often
     dataSets=retrieveAndParseDataSets(webPages,links[1])
     
-    #type ignore to make is calm down about about this manual free
-    links=None#type: ignore 
+    #clear the no longer needed variables
+    links=()
+    webPages=None
+
+    #manually collect since the gc doesn't like to run here.
     gc.collect()
     #execute our commands on that parsed data
     displayList=processStocks(commands,dataSets)
