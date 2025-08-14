@@ -774,18 +774,6 @@ def loadCommands()->list[dict]|bool:
     return commandList
 
         
-def findLine(dataset:dict,date:date)->list|bool:
-    
-    #very simple function, just grabs the data for a date from dict
-    #request the data
-    targetData=dataset.get(date)
-    #if that date doesn't exist, send back that information
-    if(targetData is None):
-        return False
-    
-    
-    #otherwise send back what was requested
-    return targetData
 
 
 def findDateInsertionPoint(date:date,dates:list[date])->tuple[int,int|bool]:
@@ -1049,14 +1037,16 @@ def validateCommands(commands:list[dict])->bool:
 
 
 
-def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:list[int],categoryLookupDict:dict[int,int],values:list[list])->None:
+def executeCommand(stockData:dict,dates:list[date],attributes:list[int],categoryLookupDict:dict[int,int],values:list[list])->None:
     for date in dates:
         #find the line for this date
-        rawLine=findLine(stockData,stockDates,date)
+        rawLine=stockData.get(date)
+
         #if it doesn't exist, skip it
-        if(rawLine is False):
+        if(rawLine is None):
             easyCLI.fastPrint("\nno data for date: "+date.strftime("%m/%d/%Y"))
             easyCLI.fastPrint("skipping...\n")
+        
         elif(type(rawLine)==tuple):
             line:tuple=rawLine
             #otherwise, loop through all the attributes the command wants
@@ -1084,11 +1074,11 @@ def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
         stockData:dict=dict()
         dates=[]
         
-        #minor optimization
+        #minor optimization, instead of elif tree, just multiple dispatch
         dateDispatcher = {
-            0: lambda stockDates, commandDates: commandDates,  # specific dates
-            1: lambda stockDates, commandDates: list(stockDates.keys()),  # all available dates
-            2: lambda stockDates, commandDates: generateDateRange(commandDates[0], commandDates[1]),  # date range
+            0: lambda stockData, commandDates: commandDates,  # specific dates
+            1: lambda stockData, commandDates: list(stockData.keys()),  # all available dates
+            2: lambda stockData, commandDates: generateDateRange(commandDates[0], commandDates[1]),  # date range
         }
      
         stockListLen=str(len(stocks))
@@ -1097,8 +1087,11 @@ def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
         for stockNumber, stock in enumerate(stocks):
            
             easyCLI.fastPrint("".join(("\nprocessing stock: \"",str(stock[0]),"\" (stock ",str(stockNumber+1)," of ",stockListLen,")...")))
-            #create variables for storing the data we retrieve, and extract the raw data from the stock object to varaibles
+            #retrieve the two main data points from the stock tuple
             name=str(stock[0])
+            stockData=stock[1]
+
+            #variables our output data
             categories=[0]
             categoryLookupDict:dict[int,int]={0:0}
             values:list[list]=[[]]
@@ -1127,9 +1120,9 @@ def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
                 #1:all data
                 #2:date range
                 #use our dispatcher to generate our dates list
-                dates = dateDispatcher[action](stockDates, commandDates)
+                dates = dateDispatcher[action](stockData, commandDates)
                 #then execute the command
-                executeCommand(stockData,stockDates,dates,attributes,categoryLookupDict,values)
+                executeCommand(stockData,dates,attributes,categoryLookupDict,values)
                
 
             #convert the dates back to their original format
