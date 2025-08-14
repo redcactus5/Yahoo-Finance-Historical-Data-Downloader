@@ -1250,23 +1250,32 @@ def main(fileName)->bool|str:
     dataSets=retrieveAndParseDataSets(webPages,links[1])
     
     #clear the no longer needed variables
-    links=()
+    links=(None,)#closest we can get to none for this datatype
     webPages=None
 
     #manually collect since the gc doesn't like to run here.
     gc.collect()
+
     #execute our commands on that parsed data
     displayList=processStocks(commands,dataSets)
+
     #save ram, free no longer needed values
     dataSets=None
-    #type ignore to make is calm down about about this manual free
-    commands=None#type: ignore
+    commands=[None,]#closest we can get to none for this datatype
+
+    #manually collect since the gc doesn't like to run here.
     gc.collect()
+
+    #
     outputRenderedResults(displayList,fileName)
+
     #stop the timer
     timer.stop()
+    #clear this here so we dont waste time doing it after the process is technically done
     displayList=None
+    #grab our final total time taken
     endTime=timer.getUnitDeviatedTimeString()
+    #cant free it before we dont need it
     timer=None
     gc.collect()
     return endTime
