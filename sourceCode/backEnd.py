@@ -42,7 +42,7 @@ URLLISTFILE=os.path.join("config","downloadConfig.json")
 COMMANDFILE=os.path.join("config","commands.json")
 RENDERERDIR="renderer"
 BROWSERPATH=os.path.join(RENDERERDIR,"Firefox","firefox.exe")
-MEMORYLIMIT=200
+MEMORYLIMIT=300#in megabytes
 
 
 
@@ -500,13 +500,13 @@ def parseDataSet(retrievedData)->tuple[str,dict]:
     return (str(retrievedData[0]),dataDict)
 
 
-def retrieveAndParseDataSet(rawHTML:str,currentIndex:int,inputListLen:str,memoryLimit:int):
+def retrieveAndParseDataSet(rawHTML:str,currentIndex:int,inputListLen:str,memoryLimit:int,process:psutil.Process):
     easyCLI.fastPrint("".join(("extracting dataset ",str(currentIndex+1)," of ",inputListLen,"...")))
     rawData=retrieveTableAndName(rawHTML)
     easyCLI.fastPrint("done.")
     parsedData=parseDataSet(rawData)
     rawData=None
-    if(currentIndex%5==0):
+    if(process.memory_info().rss >= memoryLimit):
         gc.collect()
     
     return parsedData
@@ -520,13 +520,13 @@ def retrieveAndParseDataSets(htmlDataList:list[str],sortAlphabetical:bool)->list
     global MEMORYLIMIT
     convertedMemoryLimit=(MEMORYLIMIT*(1024*1024))
     #grab some library objects so we can do a specific syscall
-
+    process:psutil.Process=psutil.Process(os.getpid())
 
 
     inputListLen=str(len(htmlDataList))
     
     #make our output list all fancy like
-    processedData=[retrieveAndParseDataSet(page,pageNumber,inputListLen,convertedMemoryLimit) for pageNumber, page in enumerate(htmlDataList)]
+    processedData=[retrieveAndParseDataSet(page,pageNumber,inputListLen,convertedMemoryLimit,process) for pageNumber, page in enumerate(htmlDataList)]
        
 
     if(sortAlphabetical):
@@ -1194,7 +1194,7 @@ def outputRenderedResults(displayList:list[tuple],outputFileName:str)->None:
     easyCLI.fastPrint("rendering results CSV...")
     #create a buffer
     buffer=[]
-    categoryLookupList={0:"date",1:"open",2:"high",3:"low",4:"close",5:"adj close",6:"volume"}
+    categoryLookupList=("date","open","high","low","close","adj close","volume")
 
     gap=[[None]]*3
 
