@@ -3,7 +3,7 @@ a simple program to download daily historical financial data from stocks.
 unwillingly powered by yahoo finance.
 
 python dependencies needed for build:
-nuitka\n
-lxml\n
-playwright\n
+nuitka, 
+lxml, 
+playwright, and 
 psutil
