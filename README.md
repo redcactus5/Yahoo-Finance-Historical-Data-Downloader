@@ -6,3 +6,4 @@ python dependencies needed for build:
 nuitka
 lxml
 playwright
+psutil
