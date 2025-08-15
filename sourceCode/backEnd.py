@@ -408,12 +408,15 @@ def myDateToDate(dateStr:str)->date:
     dateSegments=dateStr.split("/")
     return date(int(dateSegments[2]),int(dateSegments[0]),int(dateSegments[1]))
 
-def dateToFirefoxDate(dateObj:date,conversionTuple:tuple)
+def dateToFirefoxDate(dateObj:date,conversionTuple:tuple)->str:
+    return "".join(((conversionTuple[dateObj.month-1])," ",str(dateObj.day),", ",str(dateObj.year)))
 
 
 
 def parseDataSet(retrievedData)->tuple[str,dict]:
     global STRINGMONTHTOINTDICT
+
+    localConversionDictCopy=STRINGMONTHTOINTDICT.copy()
     easyCLI.fastPrint("parsing data for "+str(retrievedData[0])+"...")
 
 
@@ -470,7 +473,7 @@ def parseDataSet(retrievedData)->tuple[str,dict]:
             #if this is a row we aren't supposed to ignore
             if(rowDataLen==ValidatorRowStringsLen):
                 #extract the date for our key in the key value pair
-                lineDate:date=firefoxDateToDate(cast(str,rowData[0]),STRINGMONTHTOINTDICT)
+                lineDate:date=firefoxDateToDate(cast(str,rowData[0]),localConversionDictCopy)
                 
                 #what this line does:
                 #go through all the other data, excluding the date, so we start at index 1
@@ -1098,7 +1101,8 @@ def executeCommand(stockData:dict,dates:Iterable[date],attributes:list[int],cate
 
 def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
     easyCLI.fastPrint("executing commands...")
-
+    global INTMONTHTOSTRINGTUPLE
+    localConversionTupleCopy=INTMONTHTOSTRINGTUPLE
     #create our buffer for our output data
     buffer=[tuple()]*len(stocks)
     
@@ -1161,7 +1165,7 @@ def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
                
 
             #convert the dates back to their original format
-            fixedDates=[datetime.strftime(date,"%b %d, %Y") for date in values[0]]
+            fixedDates=[dateToFirefoxDate(date,localConversionTupleCopy) for date in values[0]]
             values[0]=fixedDates
             
             
