@@ -97,12 +97,12 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     antiSnifferRandomDelay(1,2,True)
 
     easyCLI.fastPrint("configuring webpage for dataset download...")
-
+    easyCLI.fastPrint("1")
     #open the menu we want to use, and wait for it open
-    page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-1epmntv")
+    page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-26oafv")
     #these are just to add human like random delay
     antiSnifferRandomDelay(1,1)
-    
+    easyCLI.fastPrint("2")
 
     #click the box we want
     page.click("input[name='startDate']")
@@ -221,7 +221,8 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
         try:
             #launch firefox, so we can client side render scrape. fucking web 2.0. also do it headless so we dont have windows pooping up scaring people
             try:
-                browser = p.firefox.launch(executable_path=BROWSERPATH,headless=True)
+                browserDebugMode=True
+                browser = p.firefox.launch(executable_path=BROWSERPATH, headless=(not browserDebugMode))
             except Exception as e:
                 raise browserLaunchFail(e)
             #the user agent we are spoofing
