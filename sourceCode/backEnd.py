@@ -143,12 +143,11 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
   
     #error handling and special casing
     errorText="Date shouldn't be prior to"
-    whereErrorTextCanLive = doneButton.locator("xpath=..").("xpath=..")
+    whereErrorTextCanLive = doneButton.locator("xpath=..").locator("xpath=..")
 
     if(errorText in " ".join(whereErrorTextCanLive.all_inner_texts())):
-        whereErrorTextCanLive=page.locator("section[slot=\"content\"].container.yf-1th5n0r",has_text=errorText)
         text=whereErrorTextCanLive.text_content()
-        if(type(text)==str):
+        if((type(text)==str)and(errorText in text)):
             errorText=datetime.strptime(text.split("\"")[1],"%b %d, %Y").date().strftime("%m/%d/%Y")
         else:
             raise Exception("error: fatal error, section has no text.")
@@ -158,7 +157,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
         if(datetime.strptime(errorText,"%m/%d/%Y").date()==startDate):
             #if we have this very specific edge case, we basically do the same thing, but click a different button
             #grab said button
-            maxButtonLocator=page.locator("button.tertiary-btn", has_text="Max")
+            maxButtonLocator=page.locator("button[data-ylk*='slk:date-select-quickpick'][data-ylk*='elmt:fltr']",has_text="Max")
             maxButtonLocator.wait_for(state="attached")
             easyCLI.fastPrint("configuration complete.")
             easyCLI.fastPrint("requesting dataset from server...")
