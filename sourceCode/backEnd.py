@@ -145,6 +145,9 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     errorText="Date shouldn't be prior to"
     whereErrorTextCanLive = doneButton.locator("xpath=..").locator("xpath=..")
 
+    closeIdentifier=doneButton.locator("xpath=..").locator("xpath=..")
+
+
     if(errorText in " ".join(whereErrorTextCanLive.all_inner_texts())):
         text=whereErrorTextCanLive.text_content()
         if((type(text)==str)and(errorText in text)):
@@ -172,7 +175,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
         easyCLI.fastPrint("requesting dataset from server...")
         doneButton.click()
     
-    page.wait_for_selector('section[slot="content"].container.yf-1th5n0r', state='hidden',timeout=downloadStartTimeout)
+    closeIdentifier.wait_for(state='hidden',timeout=downloadStartTimeout)
     antiSnifferRandomDelay(1,1)
    
 
@@ -192,6 +195,16 @@ class browserLaunchFail(Exception):
     def getRootError(self):
         return self.sourceError
 
+
+def waitForTableLoad(page:playwright.sync_api.Page,timeOut:float):
+    #wait for table load
+    importantTable = page.locator("table").first
+    importantTable.wait_for(state="attached", timeout=timeOut)
+    #wait for first table entry load
+    first_td = importantTable.locator("td").first
+    first_td.wait_for(state="attached", timeout=timeOut)
+    #wait for first entry to stop loading
+    importantTable.locator(".loading").wait_for(state="detached", timeout=timeOut)
 
 
 
@@ -268,14 +281,10 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
 
                         
                         #basically a bunch of checks to make sure we are fully loaded before saving our data
-                        #wait for the table to load
-                        page.wait_for_selector("table.table.yf-1jecxey",timeout=downloadCompletionTimeout)
                         #wait for the title to load
                         page.wait_for_selector("h1.yf-4vbjci",timeout=downloadCompletionTimeout)
                         #wait for the table to load its data
-                        page.wait_for_selector("td.yf-1jecxey loading",timeout=downloadCompletionTimeout, state="detached")
-                        page.wait_for_selector("td.yf-1jecxey .loading",timeout=downloadCompletionTimeout, state="detached")
-                        page.wait_for_selector("td.yf-1jecxey",timeout=downloadCompletionTimeout)
+                        waitForTableLoad(page,downloadCompletionTimeout)
                         
                         
                         #wait extra time just to be safe, the only reason we aren't using the dedicated function is because 
