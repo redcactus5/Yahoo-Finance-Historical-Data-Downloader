@@ -1253,7 +1253,7 @@ def main(fileName)->bool|str:
     links=(None,)#closest we can get to none for this datatype
     webPages=None
 
-    #manually collect since the gc doesn't like to run here.
+    #manually collect since the gc doesn't know to run here.
     gc.collect()
 
     #execute our commands on that parsed data
@@ -1263,10 +1263,6 @@ def main(fileName)->bool|str:
     dataSets=None
     commands=[None,]#closest we can get to none for this datatype
 
-    #manually collect since the gc doesn't like to run here.
-    gc.collect()
-
-    #
     outputRenderedResults(displayList,fileName)
 
     #stop the timer
@@ -1275,7 +1271,7 @@ def main(fileName)->bool|str:
     displayList=None
     #grab our final total time taken
     endTime=timer.getUnitDeviatedTimeString()
-    #cant free it before we dont need it
+    #now free the timer
     timer=None
-    gc.collect()
+
     return endTime
