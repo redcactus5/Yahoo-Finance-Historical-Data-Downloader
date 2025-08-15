@@ -99,8 +99,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     easyCLI.fastPrint("configuring webpage for dataset download...")
     
     #open the menu we want to use, and wait for it open
-    page.click("button[data-ylk=\"elmt:menu;itc:1;elm:input;sec:qsp-historical;slk:date-select;subsec:calendar\"]")
-
+    page.click("button[data-ylk*='elmt:menu'][data-ylk*='slk:date-select']")
     #these are just to add human like random delay
     antiSnifferRandomDelay(1,1)
  
@@ -135,10 +134,8 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
         
 
     
-    
 
-
-    doneButton = page.locator("button.primary-btn.fin-size-small.rounded.yf-1epmntv", has_text="Done")
+    doneButton = page.locator("button[data-ylk*='slk:date-select'][data-ylk*='elmt:fltr']", has_text="Done")
     doneButton.wait_for(state="attached")
 
     #simulate waiting to click delay
@@ -146,11 +143,11 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
   
     #error handling and special casing
     errorText="Date shouldn't be prior to"
-    section = page.locator("section[slot=\"content\"].container.yf-1th5n0r")
+    whereErrorTextCanLive = doneButton.locator("xpath=..").("xpath=..")
 
-    if(errorText in " ".join(section.all_inner_texts())):
-        section=page.locator("section[slot=\"content\"].container.yf-1th5n0r",has_text=errorText)
-        text=section.text_content()
+    if(errorText in " ".join(whereErrorTextCanLive.all_inner_texts())):
+        whereErrorTextCanLive=page.locator("section[slot=\"content\"].container.yf-1th5n0r",has_text=errorText)
+        text=whereErrorTextCanLive.text_content()
         if(type(text)==str):
             errorText=datetime.strptime(text.split("\"")[1],"%b %d, %Y").date().strftime("%m/%d/%Y")
         else:
