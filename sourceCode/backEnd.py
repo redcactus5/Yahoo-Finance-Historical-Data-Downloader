@@ -478,7 +478,7 @@ def parseDataSet(retrievedData)->tuple[str,dict]:
             #if this is a row we aren't supposed to ignore
             if(rowDataLen==ValidatorRowStringsLen):
                 #extract the date for our key in the key value pair
-                lineDate:date=firefoxDateToDate(cast(str,rowData[0]),localConversionDictCopy)
+                lineDate:date=firefoxDateToDate(cast(str,rowData[0].text_content()).strip(),localConversionDictCopy)
                 
                 #what this line does:
                 #go through all the other data, excluding the date, so we start at index 1
