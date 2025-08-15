@@ -34,6 +34,9 @@ import gc
 
 
 
+STRINGMONTHTOINTDICT={"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12}
+INTMONTHTOSTRINGTUPLE=tuple(STRINGMONTHTOINTDICT.keys())
+
 URLLISTFILE=os.path.join("config","downloadConfig.json")
 COMMANDFILE=os.path.join("config","commands.json")
 RENDERERDIR="renderer"
@@ -393,11 +396,24 @@ def retrieveTableAndName(htmlText:str)->tuple[str,HtmlElement]:
 
 
 
-MONTHDICT={"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12}
+
+
+def firefoxDateToDate(dateStr:str,monthDict:dict[str,int])->date:
+    dateSegments=dateStr.split()
+    return date(int(dateSegments[2]),monthDict[dateSegments[0].lower()],int(dateSegments[1].strip(",")))
+
+
+
+def myDateToDate(dateStr:str)->date:
+    dateSegments=dateStr.split("/")
+    return date(int(dateSegments[2]),int(dateSegments[0]),int(dateSegments[1]))
+
+def dateToFirefoxDate(dateObj:date,conversionTuple:tuple)
 
 
 
 def parseDataSet(retrievedData)->tuple[str,dict]:
+    global STRINGMONTHTOINTDICT
     easyCLI.fastPrint("parsing data for "+str(retrievedData[0])+"...")
 
 
@@ -454,7 +470,7 @@ def parseDataSet(retrievedData)->tuple[str,dict]:
             #if this is a row we aren't supposed to ignore
             if(rowDataLen==ValidatorRowStringsLen):
                 #extract the date for our key in the key value pair
-                lineDate:date=datetime.strptime(cast(str,rowData[0]).strip(), "%b %d, %Y").date()
+                lineDate:date=firefoxDateToDate(cast(str,rowData[0]),STRINGMONTHTOINTDICT)
                 
                 #what this line does:
                 #go through all the other data, excluding the date, so we start at index 1
@@ -733,7 +749,7 @@ def loadCommands()->list[dict]|bool:
                 {
                     "command":"set this to either specific dates, date range, or all data",
                     "attributes":["put attributes you want here(the attributes are the categories at the top of the table on the webpage.)"],
-                    "dates":["put dates here. how they are used depends on the command, all data ignores this, date range uses it for the start and stop dates (only one pair per command supported for that), and specific dates only retrieves the dates listed here."]
+                    "dates":["put dates here. how they are used depends on the command, all data ignores this, date range uses it for the start and stop dates (only one pair per command supported for that), and specific dates only retrieves the dates listed here. date format is mm/dd/yyyy"]
                 }
             ]
     }
@@ -985,7 +1001,7 @@ def compileCommands(rawCommands:list[dict])->list[tuple[int,list[int],list[date]
         dateList:list[str]=command["dates"]
         newDateList=[]
         if(len(dateList)>0): 
-            newDateList=[datetime.strptime(date, "%m/%d/%Y").date() for date in dateList]
+            newDateList=[myDateToDate(date) for date in dateList]
             
 
         commandID=commandIDTable[command["command"]]
