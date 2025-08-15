@@ -76,11 +76,11 @@ def makeSillyString():
 
     #the directory string
     
-
+    
     message5=["("]
     for index, char in enumerate(decoders):
         
-        message5.append(str(char))
+        message5.append(str(tuple(char)))
    
         if(index<(len(decoders)-1)):
             message5.append(", ")
@@ -90,9 +90,12 @@ def makeSillyString():
         else:
             message5.append(")")
     print("\n"*2)
+    print("integrity1:")
     print("".join(message5))
 
     print("\n"*2)
+    
+    print("integrity2:")
     print("(",end="")
     for index,name in enumerate(nuhashes):
         print("\""+name+"\"",end="")
@@ -154,10 +157,11 @@ def makeSillyString():
     
     print("main license data:")
     
+    
     message5=["("]
     for index, char in enumerate(mainLicenseDecoders):
         
-        message5.append(str(char))
+        message5.append(str(tuple(char)))
    
         if(index<(len(mainLicenseDecoders)-1)):
             message5.append(", ")
@@ -167,9 +171,12 @@ def makeSillyString():
         else:
             message5.append(")")
     print()
+    print("integrity3:")
     print("".join(message5))
 
     print("\n"*2)
+    
+    print("integrity4:")
     print("(",end="")
     for index,name in enumerate(mainLicenseHashes):
         print("\""+name+"\"",end="")

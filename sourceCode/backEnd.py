@@ -26,17 +26,28 @@ from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 import bisect
 from typing import Any
 from typing import cast
+from typing import Iterable
 from datetime import timezone
+import psutil
 #i cant believe I have to use this lib
 import gc
 
 
 
 
+STRINGMONTHTOINTDICT={"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12}
+INTMONTHTOSTRINGTUPLE=tuple(STRINGMONTHTOINTDICT.keys())
+
 URLLISTFILE=os.path.join("config","downloadConfig.json")
 COMMANDFILE=os.path.join("config","commands.json")
 RENDERERDIR="renderer"
-BROWSERPATH=os.path.join(RENDERERDIR,"Firefox","firefox.exe")
+BROWSERPATH=os.path.join(RENDERERDIR,"firefox","firefox.exe")
+MEMORYLIMIT=200#in megabytes
+
+
+
+
+
 
 
 def antiSnifferRandomDelay(start,end,message=False)->None:
@@ -83,15 +94,15 @@ def typeDelay()->None:
 def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downloadStartTimeout:float)->None:
     
     #avoid bot sniffers
-    antiSnifferRandomDelay(1,2,True)
+    antiSnifferRandomDelay(2,3,True)
 
     easyCLI.fastPrint("configuring webpage for dataset download...")
-
+    
     #open the menu we want to use, and wait for it open
-    page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-1epmntv")
+    page.click("button[data-ylk*='elmt:menu'][data-ylk*='slk:date-select']")
     #these are just to add human like random delay
     antiSnifferRandomDelay(1,1)
-    
+ 
 
     #click the box we want
     page.click("input[name='startDate']")
@@ -123,10 +134,8 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
         
 
     
-    
 
-
-    doneButton = page.locator("button.primary-btn.fin-size-small.rounded.yf-1epmntv", has_text="Done")
+    doneButton = page.locator("button[data-ylk*='slk:date-select'][data-ylk*='elmt:fltr']", has_text="Done")
     doneButton.wait_for(state="attached")
 
     #simulate waiting to click delay
@@ -134,12 +143,14 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
   
     #error handling and special casing
     errorText="Date shouldn't be prior to"
-    section = page.locator("section[slot=\"content\"].container.yf-1th5n0r")
+    whereErrorTextCanLive = doneButton.locator("xpath=..").locator("xpath=..")
 
-    if(errorText in " ".join(section.all_inner_texts())):
-        section=page.locator("section[slot=\"content\"].container.yf-1th5n0r",has_text=errorText)
-        text=section.text_content()
-        if(type(text)==str):
+    closeIdentifier=doneButton.locator("xpath=..").locator("xpath=..")
+
+
+    if(errorText in " ".join(whereErrorTextCanLive.all_inner_texts())):
+        text=whereErrorTextCanLive.text_content()
+        if((type(text)==str)and(errorText in text)):
             errorText=datetime.strptime(text.split("\"")[1],"%b %d, %Y").date().strftime("%m/%d/%Y")
         else:
             raise Exception("error: fatal error, section has no text.")
@@ -149,7 +160,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
         if(datetime.strptime(errorText,"%m/%d/%Y").date()==startDate):
             #if we have this very specific edge case, we basically do the same thing, but click a different button
             #grab said button
-            maxButtonLocator=page.locator("button.tertiary-btn", has_text="Max")
+            maxButtonLocator=page.locator("button[data-ylk*='slk:date-select-quickpick'][data-ylk*='elmt:fltr']",has_text="Max")
             maxButtonLocator.wait_for(state="attached")
             easyCLI.fastPrint("configuration complete.")
             easyCLI.fastPrint("requesting dataset from server...")
@@ -164,7 +175,7 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
         easyCLI.fastPrint("requesting dataset from server...")
         doneButton.click()
     
-    page.wait_for_selector('section[slot="content"].container.yf-1th5n0r', state='hidden',timeout=downloadStartTimeout)
+    closeIdentifier.wait_for(state='hidden',timeout=downloadStartTimeout)
     antiSnifferRandomDelay(1,1)
    
 
@@ -184,6 +195,16 @@ class browserLaunchFail(Exception):
     def getRootError(self):
         return self.sourceError
 
+
+def waitForTableLoad(page:playwright.sync_api.Page,timeOut:float):
+    #wait for table load
+    importantTable = page.locator("table").first
+    importantTable.wait_for(state="attached", timeout=timeOut)
+    #wait for first table entry load
+    firstTD = importantTable.locator("td").first
+    firstTD.wait_for(state="attached", timeout=timeOut)
+    #wait for first entry to stop loading
+    page.wait_for_selector("td.loading", state="detached", timeout=timeOut)
 
 
 
@@ -210,7 +231,8 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
         try:
             #launch firefox, so we can client side render scrape. fucking web 2.0. also do it headless so we dont have windows pooping up scaring people
             try:
-                browser = p.firefox.launch(executable_path=BROWSERPATH,headless=True)
+                browserDebugMode=False
+                browser = p.firefox.launch(executable_path=BROWSERPATH, headless=(not browserDebugMode))
             except Exception as e:
                 raise browserLaunchFail(e)
             #the user agent we are spoofing
@@ -259,14 +281,10 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
 
                         
                         #basically a bunch of checks to make sure we are fully loaded before saving our data
-                        #wait for the table to load
-                        page.wait_for_selector("table.table.yf-1jecxey",timeout=downloadCompletionTimeout)
                         #wait for the title to load
                         page.wait_for_selector("h1.yf-4vbjci",timeout=downloadCompletionTimeout)
                         #wait for the table to load its data
-                        page.wait_for_selector("td.yf-1jecxey loading",timeout=downloadCompletionTimeout, state="detached")
-                        page.wait_for_selector("td.yf-1jecxey .loading",timeout=downloadCompletionTimeout, state="detached")
-                        page.wait_for_selector("td.yf-1jecxey",timeout=downloadCompletionTimeout)
+                        waitForTableLoad(page,downloadCompletionTimeout)
                         
                         
                         #wait extra time just to be safe, the only reason we aren't using the dedicated function is because 
@@ -302,6 +320,7 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
                             raise Exception("download error: retry limit exceeded for url: "+str(links[urlIndex]))
                         easyCLI.fastPrint("\ndownload timed out.")
                         easyCLI.fastPrint("retrying...\n")
+                        antiSnifferRandomDelay(1,3,True)
                         easyCLI.fastPrint("starting attempt "+str(tryCount)+"...")
 
 
@@ -353,6 +372,8 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
 
 
 
+
+
 def retrieveTableAndName(htmlText:str)->tuple[str,HtmlElement]:
     
     #create a beautiful soup object for this raw page so we can parse it
@@ -384,30 +405,51 @@ def retrieveTableAndName(htmlText:str)->tuple[str,HtmlElement]:
 
 
 
-def parseDataSet(retrievedData)->tuple[str,list[tuple],dict]:
+
+
+def firefoxDateToDate(dateStr:str,monthDict:dict[str,int])->date:
+    dateSegments=dateStr.split()
+    return date(int(dateSegments[2]),monthDict[dateSegments[0].lower()],int(dateSegments[1].strip(",")))
+
+
+
+def myDateToDate(dateStr:str)->date:
+    dateSegments=dateStr.split("/")
+    return date(int(dateSegments[2]),int(dateSegments[0]),int(dateSegments[1]))
+
+
+
+def parseDataSet(retrievedData)->tuple[str,dict]:
+    global STRINGMONTHTOINTDICT
+
+    localConversionDictCopy=STRINGMONTHTOINTDICT.copy()
     easyCLI.fastPrint("parsing data for "+str(retrievedData[0])+"...")
 
+
     table:HtmlElement=retrievedData[1]
+    #(i hate poorly hinted libraries)
     for span in table.xpath(".//span"):
         parent = span.getparent()
         if(not(parent is None)):
             parent.remove(span)
     #find all the rows
     rows:list[HtmlElement]=table.xpath('.//tr')
-    #make an array to store the data for this table
-    dataList:list[tuple]=[]
-    #also a dictionary to store associated dates and indexes of dataList they are for
-    dates:dict[date,int]={}
-
+    
+    #this is essentially just a buffer we put key value pairs in while extracting the data
+    #why not prealloc it? because until we extract the data, we have no idea how big it is.
+    dataList:list[tuple[date,list[str]]]=[]
+  
+    
+    rowsLen=len(rows)
 
     #safety check to make sure the table is populated
-    if(len(rows)<1):
+    if(rowsLen<1):
         easyCLI.waitForFastWriterFinish()
         raise Exception("error: data table is empty.")
     
 
     #validate to make sure the table is actually the one we want. if it fails, yahoo changed their website, or the link was wrong
-    ValidatorRowStrings=["Date","Open","High","Low","Close","Adj Close","Volume"]
+    ValidatorRowStrings=("Date","Open","High","Low","Close","Adj Close","Volume")
     #a nice set of lookup tables we need
     
     
@@ -417,36 +459,41 @@ def parseDataSet(retrievedData)->tuple[str,list[tuple],dict]:
 
     if((len(headerRow)>0) and all((cast(str,datapoint.text_content()).strip() == ValidatorRowStrings[index]) for index, datapoint in enumerate(headerRow))):
         #if this is what we want
-        rows.pop(0)
-        #subtract one sice we dont include date in our main data lists
+        
+        #subtract one since we dont include date in our main data lists
         ValidatorRowStringsLen=len(ValidatorRowStrings)
         dataRowLen=ValidatorRowStringsLen-1
-        #because we dont add some rows, we use this variable to avoid desync. I tried using an index counter, but we desync when we skip an index.
-        rowCount=0
-        #go through every row
-        for row in rows:
+
+        #go through every row (im not happy about using range here, 
+        #i would have preferred iterating directly, but this is the
+        #only way to do this without an expensive remove call, so it stays)
+        for rowIndex in range(1,rowsLen):
             
-            #extract the cells
-            rowData:list[HtmlElement]=row.xpath('.//td')#type: ignore
+            
+            #extract the cells, type ignore because xpath and HtmlElement are poorly hinted. shame! shame! shame!
+            rowData:list[HtmlElement]=rows[rowIndex].xpath('.//td')#type: ignore
+            
+            #as is tradition, we cache a value we use more than once
+            rowDataLen=len(rowData)
+
             #if this is a row we aren't supposed to ignore
-            
-            if(len(rowData)==ValidatorRowStringsLen):
+            if(rowDataLen==ValidatorRowStringsLen):
+                #extract the date for our key in the key value pair
+                lineDate:date=firefoxDateToDate(cast(str,rowData[0].text_content()).strip(),localConversionDictCopy)
+                
+                #what this line does:
+                #go through all the other data, excluding the date, so we start at index 1
+                #extract the data point (i know this isn't the cleanest, but it is the fastest way to do this)
+                #why the different indexing between the source and destination? our source data has one extra
+                #index at the start, for the date. we save our date separately as the key, so we need to skip 
+                #over the date index when extracting the actual data. 
+                #use list comprehension for speed because gotta go fast
+                lineData:list[str]=[cast(str,rowData[pointIndex].text_content()).strip() for pointIndex in range(1,rowDataLen)]
 
-                lineData=[""]*dataRowLen
-                #go through its columns
-                for pointIndex, point in enumerate(rowData):
-                    #if this is the date index
-                    if(pointIndex==0):#do the special case for saving date
-                        parsedDate = datetime.strptime(cast(str,point.text_content()).strip(), "%b %d, %Y").date()
+                #create and save our key value pair for this line to the buffer
+                dataList.append((lineDate,lineData))
 
-                        dates[parsedDate]=rowCount
-                    else:#otherwise save it like normal
-                        lineData[pointIndex-1]=cast(str,point.text_content()).strip()
-
-                #save what we extracted
-                dataList.append(tuple(lineData))
-                #increment rowcount since we found a row
-                rowCount+=1
+         
     else:
         easyCLI.waitForFastWriterFinish()
         raise Exception("error: invalid data table.")
@@ -454,19 +501,20 @@ def parseDataSet(retrievedData)->tuple[str,list[tuple],dict]:
 
     easyCLI.fastPrint("done.\n")
     
-
+    dataDict:dict=dict()
+    dataDict.update(dataList)
     #return the data we extracted
-    #("name","data","dates")
-    return (str(retrievedData[0]),dataList,dates)
+    #("name","data")
+    return (str(retrievedData[0]),dataDict)
 
 
-def retrieveAndParseDataSet(rawHTML:str,currentIndex:int,inputListLen:str):
+def retrieveAndParseDataSet(rawHTML:str,currentIndex:int,inputListLen:str,memoryLimit:int,process:psutil.Process):
     easyCLI.fastPrint("".join(("extracting dataset ",str(currentIndex+1)," of ",inputListLen,"...")))
     rawData=retrieveTableAndName(rawHTML)
     easyCLI.fastPrint("done.")
     parsedData=parseDataSet(rawData)
     rawData=None
-    if(currentIndex%5==0):
+    if(process.memory_info().rss >= memoryLimit):
         gc.collect()
     
     return parsedData
@@ -477,10 +525,16 @@ def retrieveAndParseDataSet(rawHTML:str,currentIndex:int,inputListLen:str):
 def retrieveAndParseDataSets(htmlDataList:list[str],sortAlphabetical:bool)->list[tuple]:
     easyCLI.fastPrint("extracting and parsing datasets...\n")
     #cache some variables
+    global MEMORYLIMIT
+    convertedMemoryLimit=(MEMORYLIMIT*(1024*1024))
+    #grab some library objects so we can do a specific syscall
+    process:psutil.Process=psutil.Process(os.getpid())
+
+
     inputListLen=str(len(htmlDataList))
     
     #make our output list all fancy like
-    processedData=[retrieveAndParseDataSet(page,pageNumber,inputListLen) for pageNumber, page in enumerate(htmlDataList)]
+    processedData=[retrieveAndParseDataSet(page,pageNumber,inputListLen,convertedMemoryLimit,process) for pageNumber, page in enumerate(htmlDataList)]
        
 
     if(sortAlphabetical):
@@ -707,7 +761,7 @@ def loadCommands()->list[dict]|bool:
                 {
                     "command":"set this to either specific dates, date range, or all data",
                     "attributes":["put attributes you want here(the attributes are the categories at the top of the table on the webpage.)"],
-                    "dates":["put dates here. how they are used depends on the command, all data ignores this, date range uses it for the start and stop dates (only one pair per command supported for that), and specific dates only retrieves the dates listed here."]
+                    "dates":["put dates here. how they are used depends on the command, all data ignores this, date range uses it for the start and stop dates (only one pair per command supported for that), and specific dates only retrieves the dates listed here. date format is mm/dd/yyyy"]
                 }
             ]
     }
@@ -768,19 +822,6 @@ def loadCommands()->list[dict]|bool:
     return commandList
 
         
-def findLine(dataset:list,datasetDates:dict,date:date)->tuple|bool:
-    #use our date and dataset values smartly to find the exact line we want then return it
-    
-    
-    #grab the dataList index for this date
-    rawIndex=datasetDates.get(date)
-    #if that date doesn't exist, send back that information
-    if(rawIndex is None):
-        return False
-    
-    #and extract the index of that line from it
-    line=dataset[rawIndex]
-    return line
 
 
 def findDateInsertionPoint(date:date,dates:list[date])->tuple[int,int|bool]:
@@ -972,7 +1013,7 @@ def compileCommands(rawCommands:list[dict])->list[tuple[int,list[int],list[date]
         dateList:list[str]=command["dates"]
         newDateList=[]
         if(len(dateList)>0): 
-            newDateList=[datetime.strptime(date, "%m/%d/%Y").date() for date in dateList]
+            newDateList=[myDateToDate(date) for date in dateList]
             
 
         commandID=commandIDTable[command["command"]]
@@ -1044,16 +1085,18 @@ def validateCommands(commands:list[dict])->bool:
 
 
 
-def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:list[int],categoryLookupDict:dict[int,int],values:list[list])->None:
+def executeCommand(stockData:dict,dates:Iterable[date],attributes:list[int],categoryLookupDict:dict[int,int],values:list[list])->None:
     for date in dates:
         #find the line for this date
-        rawLine=findLine(stockData,stockDates,date)
+        rawLine=stockData.get(date)
+
         #if it doesn't exist, skip it
-        if(rawLine is False):
-            easyCLI.fastPrint("\nno data for date: "+date.strftime("%m/%d/%Y"))
+        if(rawLine is None):
+            easyCLI.fastPrint("".join(("\nno data for date: ",str(date.month),"/",str(date.day),"/",str(date.year))))
             easyCLI.fastPrint("skipping...\n")
-        elif(type(rawLine)==tuple):
-            line:tuple=rawLine
+        
+        elif(type(rawLine)==list):
+            line:list=rawLine
             #otherwise, loop through all the attributes the command wants
             for attribute in attributes:
                 #and grab their values for the line, then write them to the buffer for this stock
@@ -1065,24 +1108,25 @@ def executeCommand(stockData:list,stockDates:dict,dates:list[date],attributes:li
 
 
 
+def massDateToFirefoxDate(dateObjList:list[date],conversionTuple:tuple)->list[str]:
+    return ["".join(((conversionTuple[dateObj.month-1])," ",str(dateObj.day),", ",str(dateObj.year))) for dateObj in dateObjList]
+
+
+
 def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
     easyCLI.fastPrint("executing commands...")
-
+    global INTMONTHTOSTRINGTUPLE
+    localConversionTupleCopy=INTMONTHTOSTRINGTUPLE
+    #create our buffer for our output data
     buffer=[tuple()]*len(stocks)
     
     #if we have something to do
     if(len(commands)>0):
         
-        
-        #preallocate for optimization reasons
-        commandDates:list[date]=[]
-        stockDates:dict=dict()
-        dates=[]
-        
-        #minor optimization
+        #minor optimization, instead of elif tree, just multiple dispatch
         dateDispatcher = {
             0: lambda stockDates, commandDates: commandDates,  # specific dates
-            1: lambda stockDates, commandDates: list(stockDates.keys()),  # all available dates
+            1: lambda stockDates, commandDates: stockDates,  # all available dates
             2: lambda stockDates, commandDates: generateDateRange(commandDates[0], commandDates[1]),  # date range
         }
      
@@ -1092,44 +1136,50 @@ def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
         for stockNumber, stock in enumerate(stocks):
            
             easyCLI.fastPrint("".join(("\nprocessing stock: \"",str(stock[0]),"\" (stock ",str(stockNumber+1)," of ",stockListLen,")...")))
-            #create variables for storing the data we retrieve, and extract the raw data from the stock object to varaibles
+            #variables to represent the dataset
             name=str(stock[0])
+            stockData:dict=stock[1]
+            #extracting here
+            stockDates:Iterable=stockData.keys()
+
+            #variables our output data and data processing
             categories=[0]
             categoryLookupDict:dict[int,int]={0:0}
             values:list[list]=[[]]
-            stockDates:dict=stock[2]
-            stockData:list=stock[1]
-            #create a variable for our progress through this stock
+
             
             #loop through our commands
             for commandNumber, command in enumerate(commands):
                 #do tuple and string magic for our cli
                 easyCLI.fastPrint("".join(("\nexecuting command ",str(commandNumber+1)," of ",commandsListLen,"...")))
 
-                #grab and validate the values we need from the command
-                
+                #grab the values we need from the command
                 action:int=command[0]
                 commandDates:list[date]=command[2]
                 attributes:list[int]=command[1]
+
+
                 #make sure the lists have the attributes in the command
                 possibleNewDict=updateCategories(attributes,categories,values)
+                #if anything changed
                 if(possibleNewDict[0] and (not(possibleNewDict[1] is None))):
+                    #overwrite the old values with the corrected ones
                     categoryLookupDict=possibleNewDict[1]
-                #overwrite the old values with the corrected ones
                 
+
+
                 #dont need to check if the command is valid here because it got checked when we validated earlier
                 #0:specific dates
                 #1:all data
                 #2:date range
                 #use our dispatcher to generate our dates list
-                dates = dateDispatcher[action](stockDates, commandDates)
+                dates:Iterable = dateDispatcher[action](stockDates, commandDates)
                 #then execute the command
-                executeCommand(stockData,stockDates,dates,attributes,categoryLookupDict,values)
+                executeCommand(stockData,dates,attributes,categoryLookupDict,values)
                
 
             #convert the dates back to their original format
-            fixedDates=[datetime.strftime(date,"%b %d, %Y") for date in values[0]]
-            values[0]=fixedDates
+            values[0]=massDateToFirefoxDate(values[0],localConversionTupleCopy)
             
             
             
@@ -1152,7 +1202,7 @@ def outputRenderedResults(displayList:list[tuple],outputFileName:str)->None:
     easyCLI.fastPrint("rendering results CSV...")
     #create a buffer
     buffer=[]
-    categoryLookupList={0:"date",1:"open",2:"high",3:"low",4:"close",5:"adj close",6:"volume"}
+    categoryLookupList=("date","open","high","low","close","adj close","volume")
 
     gap=[[None]]*3
 
@@ -1192,15 +1242,19 @@ def outputRenderedResults(displayList:list[tuple],outputFileName:str)->None:
 
 def main(fileName)->bool|str:
     #our main execution function, it mostly just stages out our steps
+
     #write the header
     easyCLI.fastUIHeader()
-    
+    #write beginning ui
     easyCLI.fastPrint("beginning setup...\n")
-    #startup checks and loading of config files
     easyCLI.fastPrint("loading urls...")
+
+    #this section is just startup checks and loading of config files
+
     #create and start our stopwatch
     timer=easyCLI.Stopwatch()
     timer.start()
+
     rawLinks=loadLinks()
     links:tuple=tuple()
     if((type(rawLinks)==bool)and(rawLinks==False)):
@@ -1213,7 +1267,9 @@ def main(fileName)->bool|str:
         raise Exception("error: url loading failed.")
     
     easyCLI.fastPrint("load successful.\n")
+
     easyCLI.fastPrint("loading commands...")
+
     rawCommands=loadCommands()
     commands:list=list()
     if((type(rawCommands)==bool)and(rawCommands==False)):
@@ -1230,7 +1286,7 @@ def main(fileName)->bool|str:
     validateCommands(commands)
 
     commands=compileCommands(commands)
-
+    #yup, all this just to get set up
     easyCLI.fastPrint("\nsetup complete.")
     easyCLI.fastln(4)
     easyCLI.fastPrint("starting data retrieval process...\n\n")
@@ -1241,21 +1297,29 @@ def main(fileName)->bool|str:
     #use combo function retrieve and parse data sets to save ram freeing more often
     dataSets=retrieveAndParseDataSets(webPages,links[1])
     
-    #type ignore to make is calm down about about this manual free
-    links=None#type: ignore 
+    #clear the no longer needed variables
+    links=(None,)#closest we can get to none for this datatype
+    webPages=None
+
+    #manually collect since the gc doesn't know to run here.
     gc.collect()
+
     #execute our commands on that parsed data
     displayList=processStocks(commands,dataSets)
+
     #save ram, free no longer needed values
     dataSets=None
-    #type ignore to make is calm down about about this manual free
-    commands=None#type: ignore
-    gc.collect()
+    commands=[None,]#closest we can get to none for this datatype
+
     outputRenderedResults(displayList,fileName)
+
     #stop the timer
     timer.stop()
+    #clear this here so we dont waste time doing it after the process is technically done
     displayList=None
+    #grab our final total time taken
     endTime=timer.getUnitDeviatedTimeString()
+    #now free the timer
     timer=None
-    gc.collect()
+
     return endTime
