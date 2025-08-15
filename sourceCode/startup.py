@@ -245,6 +245,7 @@ def licenseScreen()->None:
     " - lxml © 2004 Infrae and lxml Contributors",
     " - libxml2 © 1998-2012 Daniel Veillard and libxml2 Contributors",
     " - libxslt © 2001-2002 Daniel Veillard and libxslt Contributors",
+    " - psutil © 2009 Jay Loden, Dave Daeschler, Giampaolo Rodola, and psutil Contributors",
     " - Playwright © 2025 Microsoft",
     " - Nuitka © Copyright 2025 Kay Hayen and Nuitka Contributors",
     " - Firefox © 1998-2025 Mozilla and Firefox Contributors\n",
