@@ -94,7 +94,7 @@ def typeDelay()->None:
 def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downloadStartTimeout:float)->None:
     
     #avoid bot sniffers
-    antiSnifferRandomDelay(1,2,True)
+    antiSnifferRandomDelay(2,3,True)
 
     easyCLI.fastPrint("configuring webpage for dataset download...")
     
