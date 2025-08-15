@@ -320,6 +320,7 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
                             raise Exception("download error: retry limit exceeded for url: "+str(links[urlIndex]))
                         easyCLI.fastPrint("\ndownload timed out.")
                         easyCLI.fastPrint("retrying...\n")
+                        antiSnifferRandomDelay(1,3,True)
                         easyCLI.fastPrint("starting attempt "+str(tryCount)+"...")
 
 
@@ -1094,8 +1095,8 @@ def executeCommand(stockData:dict,dates:Iterable[date],attributes:list[int],cate
             easyCLI.fastPrint("".join(("\nno data for date: ",str(date.month),"/",str(date.day),"/",str(date.year))))
             easyCLI.fastPrint("skipping...\n")
         
-        elif(type(rawLine)==tuple):
-            line:tuple=rawLine
+        elif(type(rawLine)==list):
+            line:list=rawLine
             #otherwise, loop through all the attributes the command wants
             for attribute in attributes:
                 #and grab their values for the line, then write them to the buffer for this stock
