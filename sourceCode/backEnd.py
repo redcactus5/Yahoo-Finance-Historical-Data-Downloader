@@ -41,7 +41,7 @@ INTMONTHTOSTRINGTUPLE=tuple(STRINGMONTHTOINTDICT.keys())
 URLLISTFILE=os.path.join("config","downloadConfig.json")
 COMMANDFILE=os.path.join("config","commands.json")
 RENDERERDIR="renderer"
-BROWSERPATH=os.path.join(RENDERERDIR,"Firefox","firefox.exe")
+BROWSERPATH=os.path.join(RENDERERDIR,"firefox","firefox.exe")
 MEMORYLIMIT=300#in megabytes
 
 
