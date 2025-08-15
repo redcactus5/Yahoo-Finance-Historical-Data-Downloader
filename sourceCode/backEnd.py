@@ -28,6 +28,7 @@ from typing import Any
 from typing import cast
 from typing import Iterable
 from datetime import timezone
+import psutil
 #i cant believe I have to use this lib
 import gc
 
@@ -408,9 +409,6 @@ def myDateToDate(dateStr:str)->date:
     dateSegments=dateStr.split("/")
     return date(int(dateSegments[2]),int(dateSegments[0]),int(dateSegments[1]))
 
-def dateToFirefoxDate(dateObj:date,conversionTuple:tuple)->str:
-    return "".join(((conversionTuple[dateObj.month-1])," ",str(dateObj.day),", ",str(dateObj.year)))
-
 
 
 def parseDataSet(retrievedData)->tuple[str,dict]:
@@ -521,6 +519,8 @@ def retrieveAndParseDataSets(htmlDataList:list[str],sortAlphabetical:bool)->list
     #cache some variables
     global MEMORYLIMIT
     convertedMemoryLimit=(MEMORYLIMIT*(1024*1024))
+    #grab some library objects so we can do a specific syscall
+
 
     inputListLen=str(len(htmlDataList))
     
@@ -1099,6 +1099,11 @@ def executeCommand(stockData:dict,dates:Iterable[date],attributes:list[int],cate
 
 
 
+def massDateToFirefoxDate(dateObjList:list[date],conversionTuple:tuple)->list[str]:
+    return ["".join(((conversionTuple[dateObj.month-1])," ",str(dateObj.day),", ",str(dateObj.year))) for dateObj in dateObjList]
+
+
+
 def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
     easyCLI.fastPrint("executing commands...")
     global INTMONTHTOSTRINGTUPLE
@@ -1165,8 +1170,7 @@ def processStocks(commands:list[tuple],stocks:list[tuple])->list[tuple]:
                
 
             #convert the dates back to their original format
-            fixedDates=[dateToFirefoxDate(date,localConversionTupleCopy) for date in values[0]]
-            values[0]=fixedDates
+            values[0]=massDateToFirefoxDate(values[0],localConversionTupleCopy)
             
             
             
