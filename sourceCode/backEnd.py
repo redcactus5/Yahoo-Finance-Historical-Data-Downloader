@@ -204,8 +204,7 @@ def waitForTableLoad(page:playwright.sync_api.Page,timeOut:float):
     firstTD = importantTable.locator("td").first
     firstTD.wait_for(state="attached", timeout=timeOut)
     #wait for first entry to stop loading
-    firstTD.locator(".loading").wait_for(state="detached", timeout=timeOut)
-    
+    page.wait_for_selector("td.loading", state="detached", timeout=timeOut)
 
 
 
