@@ -231,7 +231,7 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
         try:
             #launch firefox, so we can client side render scrape. fucking web 2.0. also do it headless so we dont have windows pooping up scaring people
             try:
-                browserDebugMode=True
+                browserDebugMode=False
                 browser = p.firefox.launch(executable_path=BROWSERPATH, headless=(not browserDebugMode))
             except Exception as e:
                 raise browserLaunchFail(e)
