@@ -97,12 +97,13 @@ def configurePageForLoading(page:playwright.sync_api.Page, startDate:date, downl
     antiSnifferRandomDelay(1,2,True)
 
     easyCLI.fastPrint("configuring webpage for dataset download...")
-    easyCLI.fastPrint("1")
+    
     #open the menu we want to use, and wait for it open
-    page.click("button.tertiary-btn.fin-size-small.menuBtn.rounded.yf-26oafv")
+    page.click("button[data-ylk=\"elmt:menu;itc:1;elm:input;sec:qsp-historical;slk:date-select;subsec:calendar\"]")
+
     #these are just to add human like random delay
     antiSnifferRandomDelay(1,1)
-    easyCLI.fastPrint("2")
+ 
 
     #click the box we want
     page.click("input[name='startDate']")
