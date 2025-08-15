@@ -38,6 +38,12 @@ URLLISTFILE=os.path.join("config","downloadConfig.json")
 COMMANDFILE=os.path.join("config","commands.json")
 RENDERERDIR="renderer"
 BROWSERPATH=os.path.join(RENDERERDIR,"Firefox","firefox.exe")
+MEMORYLIMIT=200
+
+
+
+
+
 
 
 def antiSnifferRandomDelay(start,end,message=False)->None:
@@ -354,6 +360,8 @@ def retrieveWebPages(links:list[tuple[str,date]],downloadStartTimeout:float,down
 
 
 
+
+
 def retrieveTableAndName(htmlText:str)->tuple[str,HtmlElement]:
     
     #create a beautiful soup object for this raw page so we can parse it
@@ -382,6 +390,10 @@ def retrieveTableAndName(htmlText:str)->tuple[str,HtmlElement]:
     else:
         easyCLI.waitForFastWriterFinish()
         raise Exception("error: table in page is corrupted.")
+
+
+
+MONTHDICT={"jan":1,"feb":2,"mar":3,"apr":4,"may":5,"jun":6,"jul":7,"aug":8,"sep":9,"oct":10,"nov":11,"dec":12}
 
 
 
@@ -471,7 +483,7 @@ def parseDataSet(retrievedData)->tuple[str,dict]:
     return (str(retrievedData[0]),dataDict)
 
 
-def retrieveAndParseDataSet(rawHTML:str,currentIndex:int,inputListLen:str):
+def retrieveAndParseDataSet(rawHTML:str,currentIndex:int,inputListLen:str,memoryLimit:int):
     easyCLI.fastPrint("".join(("extracting dataset ",str(currentIndex+1)," of ",inputListLen,"...")))
     rawData=retrieveTableAndName(rawHTML)
     easyCLI.fastPrint("done.")
@@ -488,10 +500,13 @@ def retrieveAndParseDataSet(rawHTML:str,currentIndex:int,inputListLen:str):
 def retrieveAndParseDataSets(htmlDataList:list[str],sortAlphabetical:bool)->list[tuple]:
     easyCLI.fastPrint("extracting and parsing datasets...\n")
     #cache some variables
+    global MEMORYLIMIT
+    convertedMemoryLimit=(MEMORYLIMIT*(1024*1024))
+
     inputListLen=str(len(htmlDataList))
     
     #make our output list all fancy like
-    processedData=[retrieveAndParseDataSet(page,pageNumber,inputListLen) for pageNumber, page in enumerate(htmlDataList)]
+    processedData=[retrieveAndParseDataSet(page,pageNumber,inputListLen,convertedMemoryLimit) for pageNumber, page in enumerate(htmlDataList)]
        
 
     if(sortAlphabetical):
