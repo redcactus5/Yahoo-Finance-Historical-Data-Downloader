@@ -522,6 +522,7 @@ def retrieveAndParseDataSets(htmlDataList:list[str],sortAlphabetical:bool)->list
     #grab some library objects so we can do a specific syscall
 
 
+
     inputListLen=str(len(htmlDataList))
     
     #make our output list all fancy like
@@ -1083,7 +1084,7 @@ def executeCommand(stockData:dict,dates:Iterable[date],attributes:list[int],cate
 
         #if it doesn't exist, skip it
         if(rawLine is None):
-            easyCLI.fastPrint("\nno data for date: "+date.strftime("%m/%d/%Y"))
+            easyCLI.fastPrint("".join(("\nno data for date: ",str(date.month),"/",str(date.day),"/",str(date.year))))
             easyCLI.fastPrint("skipping...\n")
         
         elif(type(rawLine)==tuple):
