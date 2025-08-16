@@ -36,7 +36,7 @@ def makeSalt():
     salt="".join(salt)
     return salt.encode()
 
-def makeSillyString():
+def makeValidationData():
     fileNames=os.listdir("LICENSES/")
     print("\n")
     hashes=[""]*(len(fileNames)*3)
@@ -53,7 +53,7 @@ def makeSillyString():
     writeIndex=0
     for file in fileNames:
         hashes[writeIndex]=(base64.b85encode(file.encode()).decode())
-        debug.append(base64.b85encode(file.encode()).decode())
+        
         writeIndex+=1
         with open(os.path.join("LICENSES",file), 'rt') as current:
             #i would like to apologize to my ram
@@ -64,10 +64,10 @@ def makeSillyString():
             hasher.update(digitalSalt)
             digest=base64.b85encode(hasher.hexdigest().encode()).decode()
             hashes[writeIndex]=digest
-            debug.append(digest)
+            
             writeIndex+=1
             hashes[writeIndex]=digitalSalt.decode()
-            debug.append(digitalSalt.decode())
+            
             writeIndex+=1
 
     
@@ -262,7 +262,7 @@ def makeSecurityErrorMessage():
         message3.append("\"")
         if(index<(len(message2)-1)):
             message3.append(", ")
-            if((index>0)and (index%14==0)):
+            if((index>0)and ((index+1)%15==0)):
                 message3.append("\n")
 
         else:
@@ -276,7 +276,7 @@ def makeSecurityErrorMessage():
         message5.append("\"")
         if(index<(len(message2)-1)):
             message5.append(", ")
-            if((index>0)and (index%14==0)):
+            if((index>0)and ((index+1)%15==0)):
                 message5.append("\n")
 
         else:
@@ -291,4 +291,4 @@ def makeSecurityErrorMessage():
 if(MODE):
     makeSecurityErrorMessage()
 else:
-    makeSillyString()
+    makeValidationData()
