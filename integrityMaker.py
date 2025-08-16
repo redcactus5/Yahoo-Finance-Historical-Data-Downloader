@@ -276,7 +276,7 @@ def makeSecurityErrorMessage():
         if(index<(len(message2)-1)):
             message5.append(", ")
             if(index%15==0):
-                message3.append("\n")
+                message5.append("\n")
 
         else:
             message5.append(")")
