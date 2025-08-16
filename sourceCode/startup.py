@@ -433,19 +433,8 @@ def startup()->None:
     
 
     
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    if(integrityCheck()==-1):
-=======
+
     if(checkSuccess==-1):
->>>>>>> Stashed changes
-=======
-    if(checkSuccess==-1):
->>>>>>> Stashed changes
-=======
-    if(checkSuccess==-1):
->>>>>>> Stashed changes
         #something wrong with firefox
         message="critical error: integrity check failed, renderer is corrupted or missing."
         prompt=easyCLI.multilineStringBuilder([
@@ -466,19 +455,8 @@ def startup()->None:
             easyCLI.ln(3)
             
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    elif(integrityCheck()==1):
-=======
+
     elif(checkSuccess==1):
->>>>>>> Stashed changes
-=======
-    elif(checkSuccess==1):
->>>>>>> Stashed changes
-=======
-    elif(checkSuccess==1):
->>>>>>> Stashed changes
         try:
             commandLineInterface()
         except browserLaunchFail as fail:
@@ -491,18 +469,4 @@ def startup()->None:
     
     else:
         badCrash()
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    
-=======
->>>>>>> Stashed changes
 
-    
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-
-
- 
