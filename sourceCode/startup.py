@@ -236,13 +236,7 @@ def integrityCheck()->int:
             return furtherVerifyBrowser()
         else:
             return -1
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
     else:
         return -1
     
@@ -441,7 +435,11 @@ def startup()->None:
     
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     if(integrityCheck()==-1):
+=======
+    if(checkSuccess==-1):
+>>>>>>> Stashed changes
 =======
     if(checkSuccess==-1):
 >>>>>>> Stashed changes
@@ -470,7 +468,11 @@ def startup()->None:
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     elif(integrityCheck()==1):
+=======
+    elif(checkSuccess==1):
+>>>>>>> Stashed changes
 =======
     elif(checkSuccess==1):
 >>>>>>> Stashed changes
@@ -491,11 +493,14 @@ def startup()->None:
         badCrash()
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     
 =======
 >>>>>>> Stashed changes
 
     
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 
