@@ -121,7 +121,9 @@ def verifyNimbleFile(source1,source2,source3,source4,source5)->tuple[tuple,tuple
     return (temp1,temp2,(None,),(None,))
         
         
-            
+
+        
+
             
 
 #license check
@@ -174,6 +176,8 @@ def furtherVerifyBrowser()->int:
 
     integrity4=("wt9Tcf1WMMW=A%4#70Z&YW7wM&$FF)ToB69r5vIG6`6_8DsG)=G6HVVoiwl1znhRH`5l1;Hd>VFc|RgH",
         "1-%0MCa4u3K|>1Kogd<wu>XnbUlx`@|3^<;0+))ZEdBsKe&~oPz}5E7>BFXmEg~D!ns`UYFJ$Ecz9i*TR^IK!1")
+
+
 
 
     if(isinstance(integrity1,tuple) and (len(integrity1)>0) and (len(integrity1)%3==0)):
@@ -230,10 +234,12 @@ def integrityCheck()->int:
         
         if(all((path in folderSet) for path in pathsToCheck)):
             return furtherVerifyBrowser()
-        
         else:
             return -1
+<<<<<<< Updated upstream
         
+=======
+>>>>>>> Stashed changes
     else:
         return -1
     
@@ -424,11 +430,17 @@ def startup()->None:
     print("initializing...")
     #do an integrity check 
     
-    
+    checkSuccess=0
+
+    checkSuccess+=integrityCheck()
     
 
     
+<<<<<<< Updated upstream
     if(integrityCheck()==-1):
+=======
+    if(checkSuccess==-1):
+>>>>>>> Stashed changes
         #something wrong with firefox
         message="critical error: integrity check failed, renderer is corrupted or missing."
         prompt=easyCLI.multilineStringBuilder([
@@ -449,23 +461,29 @@ def startup()->None:
             easyCLI.ln(3)
             
 
+<<<<<<< Updated upstream
     elif(integrityCheck()==1):
+=======
+    elif(checkSuccess==1):
+>>>>>>> Stashed changes
         try:
             commandLineInterface()
         except browserLaunchFail as fail:
-            rootCause=fail.getRootError()
             easyCLI.uiHeader()
             print(fail.message)
             easyCLI.ln()
-            print("root cause: "+str(rootCause))
+            print("root cause: "+str(fail.getRootError()))
             easyCLI.ln(3)
             input("press enter to finish.")
     
     else:
         badCrash()
+<<<<<<< Updated upstream
     
 
     
+=======
+>>>>>>> Stashed changes
 
 
  
