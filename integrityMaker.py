@@ -261,7 +261,7 @@ def makeSecurityErrorMessage():
         message3.append("\"")
         if(index<(len(message2)-1)):
             message3.append(", ")
-            if(index%15==0):
+            if((index>0)and (index%15==0)):
                 message3.append("\n")
 
         else:
@@ -275,7 +275,7 @@ def makeSecurityErrorMessage():
         message5.append("\"")
         if(index<(len(message2)-1)):
             message5.append(", ")
-            if(index%15==0):
+            if((index>0)and (index%15==0)):
                 message5.append("\n")
 
         else:
