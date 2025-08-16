@@ -12,7 +12,7 @@ MODE=1
 
 
 
-def shuffle(inputList:list[str])->tuple[list[str],list[int]]:
+def reversibleShuffle(inputList:list[str])->tuple[list[str],list[int]]:
     #make a copy of our input
     copyList=inputList.copy()
     #create a list of indexes
@@ -78,7 +78,7 @@ def makeSillyString():
     decoders=[]
     nuhashes=[]
     for hash in hashes:
-        shuffled=shuffle(list(hash))
+        shuffled=reversibleShuffle(list(hash))
         decoders.append(shuffled[1])
         nuhashes.append("".join(shuffled[0]))
 
@@ -143,18 +143,18 @@ def makeSillyString():
     mainLicenseHashes=[]
 
     for hash in hashDataUnscrambled:
-        shuffled=shuffle(list(hash))
+        shuffled=reversibleShuffle(list(hash))
         mainLicenseDecoders.append(shuffled[1])
         mainLicenseHashes.append("".join(shuffled[0]))
 
-    scrambledOption=shuffle(list(base85LicenseOptions[0]))
+    scrambledOption=reversibleShuffle(list(base85LicenseOptions[0]))
     scrambled="".join(scrambledOption[0])
     descramble=scrambledOption[1]
 
     print("\n\n main license file and root folder:")
 
 
-    shuffledRoot=shuffle(list(base64.b85encode("LICENSES".encode()).decode()))
+    shuffledRoot=reversibleShuffle(list(base64.b85encode("LICENSES".encode()).decode()))
     print("(\""+"".join(shuffledRoot[0])+"\", ",end="")
     print(str(shuffledRoot[1])+", ",end="")
     print("\""+scrambled+"\", ",end="")
@@ -250,7 +250,7 @@ def makeSecurityErrorMessage():
     
     message2=list(base64.b85encode(errorMessage.encode()).decode())
     
-    shuffled=shuffle(message2)
+    shuffled=reversibleShuffle(message2)
     message2=shuffled[0]
     message4=shuffled[1]
     message4.reverse()
@@ -262,7 +262,7 @@ def makeSecurityErrorMessage():
         message3.append("\"")
         if(index<(len(message2)-1)):
             message3.append(", ")
-            if((index>0)and (index%15==0)):
+            if((index>0)and (index%14==0)):
                 message3.append("\n")
 
         else:
@@ -276,7 +276,7 @@ def makeSecurityErrorMessage():
         message5.append("\"")
         if(index<(len(message2)-1)):
             message5.append(", ")
-            if((index>0)and (index%15==0)):
+            if((index>0)and (index%14==0)):
                 message5.append("\n")
 
         else:
