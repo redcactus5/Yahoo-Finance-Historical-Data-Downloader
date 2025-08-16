@@ -261,9 +261,12 @@ def makeSecurityErrorMessage():
         message3.append("\"")
         if(index<(len(message2)-1)):
             message3.append(", ")
+            if(index%15==0):
+                message3.append("\n")
 
         else:
             message3.append(")")
+  
     
     message5=["("]
     for index, char in enumerate(message4):
@@ -272,9 +275,12 @@ def makeSecurityErrorMessage():
         message5.append("\"")
         if(index<(len(message2)-1)):
             message5.append(", ")
+            if(index%15==0):
+                message3.append("\n")
 
         else:
             message5.append(")")
+        
     print("".join(message3))
     print("\n\n\n")
     print("".join(message5))
