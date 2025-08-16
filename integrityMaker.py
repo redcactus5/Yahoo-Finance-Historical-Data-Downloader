@@ -15,7 +15,7 @@ import os
 
 
 
-#0 is make silly string, 1 is make security message
+#0 is make validation data, 1 is make security message
 MODE=1
 
 
