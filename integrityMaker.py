@@ -237,14 +237,17 @@ def makeFileString():
 
 def makeSecurityErrorMessage():
     import dependencies.easyCLI as easyCLI
-    errorMessage=easyCLI.multilineStringBuilder(("ERROR: integrity check failed, License file(s) not found.",
-                "This program is open source and must be distributed with its licenses.",
-                "Please ensure the LICENSE.txt is present in the program's root folder, and", 
-                "the LICENSES directory is present and contains: \"easyCLI-GPL3-LICENSE.txt\",", 
-                "\"libxml2-MIT-LICENSE.txt\", \"libxslt-MIT-LICENSE.txt\", \"Python-PSFL-2-LICENSE.txt\",", 
-                "\"Mozilla-Public-License-2.0-LICENSE.txt\", \"Playwright-Apache-2.0-LICENSE.txt\",", 
-                "\"Nuitka-Apache-2.0-LICENSE.txt\", \"lxml-BSD-3-Clause-LICENSE.txt\", and ",
-                "\"psutil-BSD-3-Clause-LICENSE.txt."))
+    errorMessage=easyCLI.multilineStringBuilder(
+        ("ERROR: integrity check failed, License file(s) not found.",
+        "This program is open source and must be distributed with its licenses.",
+        "Please ensure the LICENSE.txt is present in the program's root folder, and", 
+        "the LICENSES directory is present and contains: \"easyCLI-GPL3-LICENSE.txt\",", 
+        "\"libxml2-MIT-LICENSE.txt\", \"libxslt-MIT-LICENSE.txt\", \"Python-PSFL-2-LICENSE.txt\",", 
+        "\"Mozilla-Public-License-2.0-LICENSE.txt\", \"Playwright-Apache-2.0-LICENSE.txt\",", 
+        "\"Nuitka-Apache-2.0-LICENSE.txt\", \"lxml-BSD-3-Clause-LICENSE.txt\", and ",
+        "\"psutil-BSD-3-Clause-LICENSE.txt.")
+        )
+    
     message2=list(base64.b85encode(errorMessage.encode()).decode())
     
     shuffled=shuffle(message2)
