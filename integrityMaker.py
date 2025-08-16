@@ -4,6 +4,14 @@ import random
 import string
 import os
 
+
+
+#0 is make silly string, 1 is make security message
+MODE=1
+
+
+
+
 def shuffle(inputList:list[str])->tuple[list[str],list[int]]:
     #make a copy of our input
     copyList=inputList.copy()
@@ -226,8 +234,7 @@ def makeFileString():
         
 
 
-#makeFileString()
-makeSillyString()
+
 def makeSecurityErrorMessage():
     import dependencies.easyCLI as easyCLI
     errorMessage=easyCLI.multilineStringBuilder(("ERROR: integrity check failed, License file(s) not found.",
@@ -267,4 +274,10 @@ def makeSecurityErrorMessage():
     print("".join(message3))
     print("\n\n\n")
     print("".join(message5))
-#makeSecurityErrorMessage()
+
+#makeFileString()
+
+if(MODE):
+    makeSecurityErrorMessage()
+else:
+    makeSillyString()
