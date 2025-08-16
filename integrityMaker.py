@@ -263,7 +263,6 @@ def makeSecurityErrorMessage():
     message2=shuffled[0]
     message4=shuffled[1]
     message4.reverse()
-    message2.reverse()
     message3=["("]
     for index, char in enumerate(message2):
         message3.append("\"")
