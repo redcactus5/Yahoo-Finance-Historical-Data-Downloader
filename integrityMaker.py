@@ -263,6 +263,7 @@ def makeSecurityErrorMessage():
     message2=shuffled[0]
     message4=shuffled[1]
     message4.reverse()
+    
     message3=["("]
     for index, char in enumerate(message2):
         message3.append("\"")
@@ -282,7 +283,7 @@ def makeSecurityErrorMessage():
         message5.append("\"")
         message5.append(str(char))
         message5.append("\"")
-        if(index<(len(message2)-1)):
+        if(index<(len(message4)-1)):
             message5.append(", ")
             if((index>0)and ((index+1)%15==0)):
                 message5.append("\n")
@@ -290,9 +291,11 @@ def makeSecurityErrorMessage():
         else:
             message5.append(")")
         
-    print("".join(message3))
-    print("\n\n\n")
+    
+
     print("".join(message5))
+    print("\n\n\n")
+    print("".join(message3))
 
 #makeFileString()
 
