@@ -200,7 +200,6 @@ class _ClearHandler:
         
         
         try:
-            
             if (self.localOS.name == 'nt'):
                 
                 #ansi compatible check

@@ -125,7 +125,7 @@ def verifyNimbleFile(source1,source2,source3,source4,source5)->tuple[tuple,tuple
             
 
 #license check
-def furtherVerifyBrowser()->int:
+def furtherVerifyBrowser()->bool:
     integrity1=((19, 26, 4, 25, 7, 0, 20, 3, 23, 6, 12, 14, 16, 11, 22, 9, 10, 28, 5, 1, 18, 29, 15, 17, 2, 13, 24, 8, 27, 21),
         (63, 76, 21, 10, 4, 27, 11, 20, 30, 52, 12, 43, 45, 29, 77, 14, 51, 47, 64, 57, 75, 48, 67, 31, 55, 24, 35, 0, 79, 49, 5, 17, 46, 54, 33, 60, 7, 22, 9, 6, 69, 36, 71, 28, 41, 72, 37, 74, 13, 32, 66, 8, 16, 68, 25, 61, 34, 42, 19, 59, 15, 73, 58, 44, 26, 78, 65, 50, 56, 2, 53, 23, 39, 3, 62, 18, 38, 1, 70, 40),
         (49, 37, 5, 39, 58, 41, 79, 4, 65, 51, 19, 82, 30, 50, 75, 16, 54, 21, 78, 57, 64, 67, 10, 12, 33, 34, 40, 35, 83, 20, 13, 43, 46, 74, 22, 38, 31, 36, 48, 42, 52, 45, 44, 25, 76, 3, 62, 29, 56, 1, 73, 11, 8, 69, 70, 84, 7, 60, 63, 15, 2, 59, 6, 72, 81, 9, 68, 66, 47, 26, 61, 24, 23, 32, 28, 71, 53, 17, 85, 18, 55, 0, 27, 14, 77, 80),
@@ -180,7 +180,7 @@ def furtherVerifyBrowser()->int:
         
         validationResult=verifyNimbleFile(integrity1,integrity2,folderAndLicense,integrity3,integrity4)
         if((type(validationResult)==bool)and(validationResult==False)):
-            return -2
+            return False
         elif((isinstance(validationResult,tuple)) and all(isinstance(res,tuple) for res in validationResult)):
             if((len(validationResult[2])==1)and(len(validationResult[3])==1)and(validationResult[2][0] is None)and(validationResult[3][0] is None)):
                 integrity1=validationResult[0]
@@ -189,9 +189,9 @@ def furtherVerifyBrowser()->int:
                 integrity4=validationResult[3]
                 validationResult=None
             else:
-                return -2
+                return False
         else:
-            return -2
+            return False
 
         loops=int(len(integrity1)/3)
         readIndex=0
@@ -210,15 +210,15 @@ def furtherVerifyBrowser()->int:
                     hasher.update(cleanUpString(integrity1[readIndex],integrity2[readIndex]).encode())
                     readIndex-=1
                     if(base64.b85encode(hasher.hexdigest().encode()).decode()!=cleanUpString(integrity1[readIndex],integrity2[readIndex])):
-                        return -2
+                        return False
                     readIndex+=2
                     hasher=None      
             else:
-                return -2
+                return False
 
-        return 1
+        return True
     else:
-        return -2
+        return False
 
 
 def integrityCheck()->int:
@@ -230,10 +230,12 @@ def integrityCheck()->int:
         
         if(all((path in folderSet) for path in pathsToCheck)):
             return furtherVerifyBrowser()
+        
         else:
-            return -1
+            return False
+        
     else:
-        return -1
+        return False
     
 
 
@@ -299,7 +301,7 @@ class YahooFinanceGrabberHeader(easyCLI.UIHeaderClass):
     #simple header class required by easy cli
     def __init__(self):
         super().__init__(None)
-        self.vNumber="v1.4.0"
+        self.vNumber="v1.4.1"
         self.vString="Yahoo Finance Historical Data Downloader "+self.vNumber+" by redcacus5"+"\n\n"
 
     def drawUIHeader(self):
@@ -416,19 +418,18 @@ def badCrash()->None:
     sys.exit()
 
 def startup()->None: 
-    #set the library ui header to the one we just made
-    easyCLI.setUIHeader(YahooFinanceGrabberHeader())
+    
     #devious check to make sure no one is doing an illegal thing and distributing without the open source licenses
     print("initializing...")
     #do an integrity check 
     
-    checkSuccess=0
-
-    checkSuccess+=integrityCheck()
+    
     
 
     
-    if(checkSuccess==-1):
+    if(integrityCheck()==True):
+        #set the library ui header to the one we just made
+        easyCLI.setUIHeader(YahooFinanceGrabberHeader())
         #something wrong with firefox
         message="critical error: integrity check failed, renderer is corrupted or missing."
         prompt=easyCLI.multilineStringBuilder([
@@ -449,19 +450,20 @@ def startup()->None:
             easyCLI.ln(3)
             
 
-    elif(checkSuccess==1):
+    else:
         try:
+            
             commandLineInterface()
         except browserLaunchFail as fail:
+            rootCause=fail.getRootError()
             easyCLI.uiHeader()
             print(fail.message)
             easyCLI.ln()
-            print("root cause: "+str(fail.getRootError()))
+            print("root cause: "+str(rootCause))
             easyCLI.ln(3)
             input("press enter to finish.")
     
-    else:
-        badCrash()
+    
 
 
  
