@@ -1,3 +1,12 @@
+'''
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>. 
+'''
+
+
 import hashlib
 import base64
 import random
@@ -6,13 +15,13 @@ import os
 
 
 
-#0 is make silly string, 1 is make security message
+#0 is make validation data, 1 is make security message
 MODE=1
 
 
 
 
-def shuffle(inputList:list[str])->tuple[list[str],list[int]]:
+def reversibleShuffle(inputList:list[str])->tuple[list[str],list[int]]:
     #make a copy of our input
     copyList=inputList.copy()
     #create a list of indexes
@@ -36,7 +45,7 @@ def makeSalt():
     salt="".join(salt)
     return salt.encode()
 
-def makeSillyString():
+def makeValidationData():
     fileNames=os.listdir("LICENSES/")
     print("\n")
     hashes=[""]*(len(fileNames)*3)
@@ -53,7 +62,7 @@ def makeSillyString():
     writeIndex=0
     for file in fileNames:
         hashes[writeIndex]=(base64.b85encode(file.encode()).decode())
-        debug.append(base64.b85encode(file.encode()).decode())
+        
         writeIndex+=1
         with open(os.path.join("LICENSES",file), 'rt') as current:
             #i would like to apologize to my ram
@@ -64,10 +73,10 @@ def makeSillyString():
             hasher.update(digitalSalt)
             digest=base64.b85encode(hasher.hexdigest().encode()).decode()
             hashes[writeIndex]=digest
-            debug.append(digest)
+            
             writeIndex+=1
             hashes[writeIndex]=digitalSalt.decode()
-            debug.append(digitalSalt.decode())
+            
             writeIndex+=1
 
     
@@ -78,7 +87,7 @@ def makeSillyString():
     decoders=[]
     nuhashes=[]
     for hash in hashes:
-        shuffled=shuffle(list(hash))
+        shuffled=reversibleShuffle(list(hash))
         decoders.append(shuffled[1])
         nuhashes.append("".join(shuffled[0]))
 
@@ -143,18 +152,18 @@ def makeSillyString():
     mainLicenseHashes=[]
 
     for hash in hashDataUnscrambled:
-        shuffled=shuffle(list(hash))
+        shuffled=reversibleShuffle(list(hash))
         mainLicenseDecoders.append(shuffled[1])
         mainLicenseHashes.append("".join(shuffled[0]))
 
-    scrambledOption=shuffle(list(base85LicenseOptions[0]))
+    scrambledOption=reversibleShuffle(list(base85LicenseOptions[0]))
     scrambled="".join(scrambledOption[0])
     descramble=scrambledOption[1]
 
     print("\n\n main license file and root folder:")
 
 
-    shuffledRoot=shuffle(list(base64.b85encode("LICENSES".encode()).decode()))
+    shuffledRoot=reversibleShuffle(list(base64.b85encode("LICENSES".encode()).decode()))
     print("(\""+"".join(shuffledRoot[0])+"\", ",end="")
     print(str(shuffledRoot[1])+", ",end="")
     print("\""+scrambled+"\", ",end="")
@@ -250,10 +259,11 @@ def makeSecurityErrorMessage():
     
     message2=list(base64.b85encode(errorMessage.encode()).decode())
     
-    shuffled=shuffle(message2)
+    shuffled=reversibleShuffle(message2)
     message2=shuffled[0]
     message4=shuffled[1]
     message4.reverse()
+    
     message3=["("]
     for index, char in enumerate(message2):
         message3.append("\"")
@@ -261,7 +271,7 @@ def makeSecurityErrorMessage():
         message3.append("\"")
         if(index<(len(message2)-1)):
             message3.append(", ")
-            if((index>0)and (index%15==0)):
+            if((index>0)and ((index+1)%15==0)):
                 message3.append("\n")
 
         else:
@@ -273,21 +283,23 @@ def makeSecurityErrorMessage():
         message5.append("\"")
         message5.append(str(char))
         message5.append("\"")
-        if(index<(len(message2)-1)):
+        if(index<(len(message4)-1)):
             message5.append(", ")
-            if((index>0)and (index%15==0)):
+            if((index>0)and ((index+1)%15==0)):
                 message5.append("\n")
 
         else:
             message5.append(")")
         
-    print("".join(message3))
-    print("\n\n\n")
+    
+
     print("".join(message5))
+    print("\n\n\n")
+    print("".join(message3))
 
 #makeFileString()
 
 if(MODE):
     makeSecurityErrorMessage()
 else:
-    makeSillyString()
+    makeValidationData()
